@@ -2,29 +2,34 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useLanguage } from '@/src/contexts/LanguageContext';
 import Seo from '@/src/components/Seo';
+import { login } from '@/src/lib/auth';
 import { Eye, EyeOff, Layout } from 'lucide-react';
 import { motion } from 'motion/react';
 
 export default function Login() {
   const { t, language } = useLanguage();
+  const fr = language === 'fr';
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const username = email.split('@')[0];
-    const capitalizedName = username.charAt(0).toUpperCase() + username.slice(1);
-    const mockUser = {
-      email,
-      fullname: capitalizedName,
-      joinDate: new Date().toLocaleDateString(language === 'fr' ? 'fr-FR' : 'en-US', { year: 'numeric', month: 'long' }),
-      phone: '+33 6 12 34 56 78',
-      address: '123 Rue de la Technologie, 75001 Paris, France'
-    };
-    localStorage.setItem('currentUser', JSON.stringify(mockUser));
-    window.dispatchEvent(new Event('storage'));
+    setError('');
+    setLoading(true);
+    const result = await login(email, password);
+    setLoading(false);
+    if (result.error) {
+      setError(
+        result.error === 'NO_USER'
+          ? (fr ? "Aucun compte n'est associé à cet email." : 'No account found for this email.')
+          : (fr ? 'Mot de passe incorrect.' : 'Incorrect password.')
+      );
+      return;
+    }
     navigate('/dashboard');
   };
 
@@ -105,12 +110,19 @@ export default function Login() {
               </div>
             </div>
 
+            {error && (
+              <div className="p-3 rounded-2xl bg-red-50 border border-red-100 text-red-600 text-sm font-medium text-center">
+                {error}
+              </div>
+            )}
+
             <div>
               <button
                 type="submit"
-                className="w-full flex justify-center py-4 px-4 border border-transparent rounded-2xl shadow-lg shadow-blue-500/25 text-sm font-black text-white bg-[#007bff] hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all uppercase tracking-widest"
+                disabled={loading}
+                className="w-full flex justify-center py-4 px-4 border border-transparent rounded-2xl shadow-lg shadow-blue-500/25 text-sm font-black text-white bg-[#007bff] hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all uppercase tracking-widest disabled:opacity-60"
               >
-                {t('auth.login.submit')}
+                {loading ? (fr ? 'Connexion...' : 'Signing in...') : t('auth.login.submit')}
               </button>
             </div>
           </form>

@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { useNavigate, Link } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Seo from '../components/Seo';
+import { updateCurrentUser, logout as authLogout } from '../lib/auth';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useCurrency } from '../contexts/CurrencyContext';
 import {
@@ -89,9 +90,8 @@ export default function Dashboard() {
     e.preventDefault();
     if (!user) return;
     const updatedUser = { ...user, address: shippingAddress, phone: userPhone };
-    localStorage.setItem('currentUser', JSON.stringify(updatedUser));
+    updateCurrentUser({ address: shippingAddress, phone: userPhone });
     setUser(updatedUser);
-    window.dispatchEvent(new Event('storage'));
     setShowAddressSuccess(true);
     setTimeout(() => setShowAddressSuccess(false), 3000);
   };
@@ -101,17 +101,15 @@ export default function Dashboard() {
     e.preventDefault();
     if (!user) return;
     const updatedUser = { ...user, fullname, email };
-    localStorage.setItem('currentUser', JSON.stringify(updatedUser));
+    updateCurrentUser({ fullname, email });
     setUser(updatedUser);
-    window.dispatchEvent(new Event('storage'));
     setShowProfileSuccess(true);
     setTimeout(() => setShowProfileSuccess(false), 3000);
   };
 
   // Handle Logout
   const handleLogout = () => {
-    localStorage.removeItem('currentUser');
-    window.dispatchEvent(new Event('storage'));
+    authLogout();
     navigate('/');
   };
 
