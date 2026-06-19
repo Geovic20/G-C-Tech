@@ -212,9 +212,7 @@ export default function Navbar() {
                 </div>
               )}
             </div>
-            <Link to="/deals" className="hover:text-[#007bff]">{t('nav.deals')}</Link>
-            <Link to="/whats-new" className="hover:text-[#007bff]">{t('nav.whats-new')}</Link>
-            <Link to="/delivery" className="hover:text-[#007bff]">{t('nav.delivery')}</Link>
+            <Link to="/shipping" className="hover:text-[#007bff]">{t('nav.delivery')}</Link>
           </div>
 
           {/* Search Bar - Responsive */}
@@ -376,13 +374,7 @@ export default function Navbar() {
               <div>
                 <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4">Menu</h3>
                 <div className="flex flex-col gap-4">
-                  <Link to="/deals" onClick={() => setIsMobileMenuOpen(false)} className="text-xl font-bold text-gray-900 flex items-center justify-between">
-                    {t('nav.deals')} <ChevronDown className="-rotate-90 text-gray-300" size={20} />
-                  </Link>
-                  <Link to="/whats-new" onClick={() => setIsMobileMenuOpen(false)} className="text-xl font-bold text-gray-900 flex items-center justify-between">
-                    {t('nav.whats-new')} <ChevronDown className="-rotate-90 text-gray-300" size={20} />
-                  </Link>
-                  <Link to="/delivery" onClick={() => setIsMobileMenuOpen(false)} className="text-xl font-bold text-gray-900 flex items-center justify-between">
+                  <Link to="/shipping" onClick={() => setIsMobileMenuOpen(false)} className="text-xl font-bold text-gray-900 flex items-center justify-between">
                     {t('nav.delivery')} <ChevronDown className="-rotate-90 text-gray-300" size={20} />
                   </Link>
                   <Link to={currentUser ? "/dashboard" : "/login"} onClick={() => setIsMobileMenuOpen(false)} className="text-xl font-bold text-gray-900 flex items-center justify-between border-t border-gray-50 pt-3 mt-1">

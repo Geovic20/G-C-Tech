@@ -2,7 +2,6 @@ import React, { useEffect } from 'react';
 import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import Home from './pages/Home';
 import ProductDetail from './pages/ProductDetail';
-import Checkout from './pages/Checkout';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
 import PrivacyPolicy from './pages/PrivacyPolicy';
@@ -21,6 +20,7 @@ import ContactUs from './pages/ContactUs';
 import FAQ from './pages/FAQ';
 import PaymentDetails from './pages/PaymentDetails';
 import Dashboard from './pages/Dashboard';
+import NotFound from './pages/NotFound';
 import Footer from './components/Footer';
 import { LanguageProvider } from './contexts/LanguageContext';
 import { CurrencyProvider } from './contexts/CurrencyContext';
@@ -46,7 +46,6 @@ export default function App() {
               <Routes>
                 <Route path="/" element={<Home />} />
               <Route path="/product/:id" element={<ProductDetail />} />
-              <Route path="/checkout" element={<Checkout />} />
               <Route path="/login" element={<Login />} />
               <Route path="/signup" element={<Signup />} />
               <Route path="/privacy" element={<PrivacyPolicy />} />
@@ -65,8 +64,8 @@ export default function App() {
               <Route path="/faq" element={<FAQ />} />
               <Route path="/payment-details" element={<PaymentDetails />} />
               <Route path="/dashboard" element={<Dashboard />} />
-              {/* Placeholder for other routes shown in nav */}
-              <Route path="*" element={<Home />} />
+              {/* Unknown routes show a proper 404 page */}
+              <Route path="*" element={<NotFound />} />
             </Routes>
           </div>
           <Footer />

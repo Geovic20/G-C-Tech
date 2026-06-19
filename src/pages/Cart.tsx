@@ -5,7 +5,7 @@ import { useLanguage } from '@/src/contexts/LanguageContext';
 import { useCurrency } from '@/src/contexts/CurrencyContext';
 import { useCart } from '@/src/contexts/CartContext';
 import { motion, AnimatePresence } from 'motion/react';
-import { Trash2, Plus, Minus, ShoppingBag, ArrowRight, MapPin, Phone, Calendar, Clock, CreditCard, Wallet, CheckCircle2, ChevronLeft, MessageCircle } from 'lucide-react';
+import { Trash2, Plus, Minus, ShoppingBag, ArrowRight, MapPin, Phone, Calendar, Clock, CheckCircle2, ChevronLeft, MessageCircle } from 'lucide-react';
 import { cn } from '@/src/lib/utils';
 
 const DELIVERY_ZONES = [
@@ -40,7 +40,6 @@ export default function Cart() {
     phone: '',
     date: '',
     timeSlot: '',
-    paymentMethod: 'momo' as 'momo' | 'cash' | 'whatsapp'
   });
 
   const selectedZone = DELIVERY_ZONES.find(z => z.id === deliveryData.zoneId);
@@ -105,23 +104,18 @@ Please let me know how I can settle the payment!`;
   const handleNext = () => {
     if (step < 3) setStep(step + 1);
     else {
-      // Final confirmation logic here
-      console.log('Order Placed:', { items, deliveryData, total });
-      
-      if (deliveryData.paymentMethod === 'whatsapp') {
-        const url = getWhatsappUrl();
-        setWhatsappUrl(url);
-        try {
-          window.open(url, '_blank', 'noopener,noreferrer');
-        } catch (e) {
-          console.error('Popup blocked', e);
-        }
+      // Final step: hand the order off to WhatsApp for payment / confirmation.
+      const url = getWhatsappUrl();
+      setWhatsappUrl(url);
+      try {
+        window.open(url, '_blank', 'noopener,noreferrer');
+      } catch (e) {
+        console.error('Popup blocked', e);
       }
-      
+
       // Empty the cart now that the order has been placed
       clearCart();
-      // Redirect to some success page or show success message
-      setStep(4); // Bonus success step
+      setStep(4); // Success step
     }
   };
 
@@ -145,36 +139,30 @@ Please let me know how I can settle the payment!`;
               <CheckCircle2 className="text-green-500" size={48} />
             </div>
             <h1 className="text-3xl font-black text-gray-900 mb-4">{t('checkout.success')}</h1>
-            {deliveryData.paymentMethod === 'whatsapp' ? (
-              <div className="space-y-6 mb-10">
-                <p className="text-gray-600 leading-relaxed text-sm">
-                  {language === 'fr' 
-                    ? 'Votre commande a été préparée avec succès ! Vous allez être redirigé vers WhatsApp pour finaliser le paiement.'
-                    : 'Your order has been prepared successfully! You are being redirected to WhatsApp to complete your payment.'}
-                </p>
-                
-                {whatsappUrl && (
-                  <div className="bg-green-50 rounded-[24px] p-6 border border-green-100 flex flex-col items-center gap-4 my-6">
-                    <span className="text-xs font-bold text-green-700 uppercase tracking-widest leading-none">
-                      {language === 'fr' ? 'Lancer WhatsApp manuellement' : 'Open WhatsApp manually'}
-                    </span>
-                    <a
-                      href={whatsappUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2 px-6 py-3.5 bg-[#25D366] text-white rounded-xl font-bold hover:bg-green-600 shadow-lg shadow-green-500/10 transition-all text-xs"
-                    >
-                      <MessageCircle size={16} />
-                      {t('delivery.whatsapp.not-opened')}
-                    </a>
-                  </div>
-                )}
-              </div>
-            ) : (
-              <p className="text-gray-500 mb-10 leading-relaxed text-sm">
-                Your order has been placed successfully. We'll contact you at <strong>{deliveryData.phone}</strong> for delivery in <strong>{selectedZone?.name}</strong>.
+            <div className="space-y-6 mb-10">
+              <p className="text-gray-600 leading-relaxed text-sm">
+                {language === 'fr'
+                  ? 'Votre commande a été préparée avec succès ! Vous allez être redirigé vers WhatsApp pour finaliser le paiement.'
+                  : 'Your order has been prepared successfully! You are being redirected to WhatsApp to complete your payment.'}
               </p>
-            )}
+
+              {whatsappUrl && (
+                <div className="bg-green-50 rounded-[24px] p-6 border border-green-100 flex flex-col items-center gap-4 my-6">
+                  <span className="text-xs font-bold text-green-700 uppercase tracking-widest leading-none">
+                    {language === 'fr' ? 'Lancer WhatsApp manuellement' : 'Open WhatsApp manually'}
+                  </span>
+                  <a
+                    href={whatsappUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 px-6 py-3.5 bg-[#25D366] text-white rounded-xl font-bold hover:bg-green-600 shadow-lg shadow-green-500/10 transition-all text-xs"
+                  >
+                    <MessageCircle size={16} />
+                    {t('delivery.whatsapp.not-opened')}
+                  </a>
+                </div>
+              )}
+            </div>
             <Link 
               to="/" 
               className="inline-flex items-center gap-2 px-10 py-5 bg-[#007bff] text-white rounded-full font-black uppercase tracking-widest shadow-lg shadow-blue-500/20 hover:bg-blue-700 transition-all"
@@ -350,55 +338,21 @@ Please let me know how I can settle the payment!`;
                       </div>
                     </div>
 
-                    {/* Payment Method */}
+                    {/* Payment: WhatsApp only */}
                     <div className="md:col-span-2 space-y-4 pt-4">
                       <label className="text-sm font-bold text-gray-500 uppercase tracking-wider">{t('delivery.payment')}</label>
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <button 
-                          onClick={() => setDeliveryData({...deliveryData, paymentMethod: 'momo'})}
-                          className={cn(
-                            "flex items-center gap-4 p-6 rounded-3xl border-2 transition-all text-left",
-                            deliveryData.paymentMethod === 'momo' ? "border-[#007bff] bg-blue-50/50" : "border-gray-100 hover:border-gray-200"
-                          )}
-                        >
-                          <div className={cn("w-12 h-12 rounded-2xl flex items-center justify-center", deliveryData.paymentMethod === 'momo' ? "bg-[#007bff] text-white" : "bg-gray-100 text-gray-400")}>
-                            <CreditCard size={24} />
-                          </div>
-                          <div>
-                            <p className="font-bold text-gray-900 leading-snug">{t('delivery.payment.momo')}</p>
-                            <p className="text-[11px] text-gray-500 mt-0.5">Pay via Mobile Money</p>
-                          </div>
-                        </button>
-                        <button 
-                          onClick={() => setDeliveryData({...deliveryData, paymentMethod: 'cash'})}
-                          className={cn(
-                            "flex items-center gap-4 p-6 rounded-3xl border-2 transition-all text-left",
-                            deliveryData.paymentMethod === 'cash' ? "border-[#007bff] bg-blue-50/50" : "border-gray-100 hover:border-gray-200"
-                          )}
-                        >
-                          <div className={cn("w-12 h-12 rounded-2xl flex items-center justify-center", deliveryData.paymentMethod === 'cash' ? "bg-[#007bff] text-white" : "bg-gray-100 text-gray-400")}>
-                            <Wallet size={24} />
-                          </div>
-                          <div>
-                            <p className="font-bold text-gray-900 leading-snug">{t('delivery.payment.cash')}</p>
-                            <p className="text-[11px] text-gray-500 mt-0.5">Pay when receiving items</p>
-                          </div>
-                        </button>
-                        <button 
-                          onClick={() => setDeliveryData({...deliveryData, paymentMethod: 'whatsapp'})}
-                          className={cn(
-                            "flex items-center gap-4 p-6 rounded-3xl border-2 transition-all text-left",
-                            deliveryData.paymentMethod === 'whatsapp' ? "border-[#25D366] bg-green-50/50 animate-pulse" : "border-gray-100 hover:border-gray-200"
-                          )}
-                        >
-                          <div className={cn("w-12 h-12 rounded-2xl flex items-center justify-center", deliveryData.paymentMethod === 'whatsapp' ? "bg-[#25D366] text-white" : "bg-gray-100 text-gray-400")}>
-                            <MessageCircle size={24} />
-                          </div>
-                          <div>
-                            <p className="font-bold text-gray-950 leading-snug">{t('delivery.payment.whatsapp')}</p>
-                            <p className="text-[11px] text-gray-500 mt-0.5">Agree & pay on WhatsApp</p>
-                          </div>
-                        </button>
+                      <div className="flex items-center gap-4 p-6 rounded-3xl border-2 border-[#25D366] bg-green-50/50">
+                        <div className="w-12 h-12 rounded-2xl flex items-center justify-center bg-[#25D366] text-white flex-shrink-0">
+                          <MessageCircle size={24} />
+                        </div>
+                        <div>
+                          <p className="font-bold text-gray-950 leading-snug">{t('delivery.payment.whatsapp')}</p>
+                          <p className="text-[11px] text-gray-500 mt-0.5">
+                            {language === 'fr'
+                              ? 'Vous serez redirigé vers WhatsApp pour confirmer et régler votre commande.'
+                              : 'You will be redirected to WhatsApp to confirm and settle your order.'}
+                          </p>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -448,20 +402,12 @@ Please let me know how I can settle the payment!`;
                        </div>
 
                        <div className="flex gap-6">
-                         <div className={cn(
-                            "w-16 h-16 rounded-2xl flex items-center justify-center flex-shrink-0 text-white",
-                            deliveryData.paymentMethod === 'whatsapp' ? "bg-[#25D366]" :
-                            deliveryData.paymentMethod === 'momo' ? "bg-[#007bff]" : "bg-purple-600"
-                          )}>
-                           {deliveryData.paymentMethod === 'whatsapp' ? <MessageCircle size={24} /> :
-                             deliveryData.paymentMethod === 'momo' ? <CreditCard size={24} /> : <Wallet size={24} />}
+                         <div className="w-16 h-16 rounded-2xl flex items-center justify-center flex-shrink-0 text-white bg-[#25D366]">
+                           <MessageCircle size={24} />
                          </div>
                          <div>
-                           <h4 className="font-bold text-gray-900">{deliveryData.paymentMethod === 'whatsapp' ? t('delivery.payment.whatsapp') :
-                               deliveryData.paymentMethod === 'momo' ? t('delivery.payment.momo') : t('delivery.payment.cash')}</h4>
-                           <p className="text-gray-500 text-sm">
-                              {deliveryData.paymentMethod === 'whatsapp' ? t('delivery.payment.whatsapp.desc') : 'Payment Method'}
-                            </p>
+                           <h4 className="font-bold text-gray-900">{t('delivery.payment.whatsapp')}</h4>
+                           <p className="text-gray-500 text-sm">{t('delivery.payment.whatsapp.desc')}</p>
                          </div>
                        </div>
                     </div>
