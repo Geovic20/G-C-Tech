@@ -42,7 +42,7 @@ export default function Signup() {
           <div className="w-12 h-12 bg-[#007bff] rounded-2xl flex items-center justify-center shadow-lg shadow-blue-500/20">
             <Layout className="text-white" size={24} />
           </div>
-          <span className="text-3xl font-black text-gray-900 tracking-tight">Shopcart</span>
+          <span className="text-3xl font-black text-gray-900 tracking-tight">G&C Tech</span>
         </Link>
         <h2 className="text-center text-3xl font-extrabold text-gray-900 tracking-tight">
           {t('auth.signup.title')}

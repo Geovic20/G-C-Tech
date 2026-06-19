@@ -15,7 +15,7 @@ export default function Footer() {
               <div className="w-10 h-10 bg-[#007bff] rounded-full flex items-center justify-center">
                 <ShoppingCart className="text-white" size={24} />
               </div>
-              <span className="text-2xl font-bold text-[#007bff]">Shopcart</span>
+              <span className="text-2xl font-bold text-[#007bff]">G&C Tech</span>
             </Link>
             <p className="text-gray-500 text-sm leading-relaxed">
               We offer the best electronics at the most competitive prices. Quality and customer satisfaction guaranteed.
@@ -55,13 +55,13 @@ export default function Footer() {
               <li>123 Electronic Street</li>
               <li>Tech City, TC 12345</li>
               <li>+00 123 456 7890</li>
-              <li>contact@shopcart.com</li>
+              <li>contact@gctech.com</li>
             </ul>
           </div>
         </div>
 
         <div className="pt-8 border-t border-gray-200 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-gray-400">
-          <p>© {new Date().getFullYear()} Shopcart. All rights reserved.</p>
+          <p>© {new Date().getFullYear()} G&C Tech. All rights reserved.</p>
           <div className="flex gap-8">
             <Link to="/privacy" className="hover:text-[#007bff]">{t('footer.privacy')}</Link>
             <Link to="/terms" className="hover:text-[#007bff]">{t('footer.terms')}</Link>

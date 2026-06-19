@@ -99,7 +99,7 @@ export default function Cart() {
     
     const productsText = items.map(p => `• ${p.name} (x${p.quantity}) - ${formatPrice(p.price * p.quantity)}`).join('\n');
     
-    const textFr = `Bonjour Shopcart ! Je souhaite commander et finaliser mon paiement :
+    const textFr = `Bonjour G&C Tech ! Je souhaite commander et finaliser mon paiement :
 
 📝 *RÉCAPITULATIF DE LA COMMANDE*
 ---------------------------------------
@@ -120,7 +120,7 @@ ${productsText}
 
 Merci de m'indiquer la procédure pour le règlement !`;
 
-    const textEn = `Hello Shopcart! I would like to place an order and pay on WhatsApp:
+    const textEn = `Hello G&C Tech! I would like to place an order and pay on WhatsApp:
 
 📝 *ORDER SUMMARY*
 ---------------------------------------

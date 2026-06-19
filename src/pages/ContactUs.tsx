@@ -42,8 +42,8 @@ export default function ContactUs() {
                   </div>
                   <div>
                     <h4 className="font-bold text-gray-900 mb-1">Email us</h4>
-                    <p className="text-gray-500">support@shopcart.com</p>
-                    <p className="text-gray-500">sales@shopcart.com</p>
+                    <p className="text-gray-500">support@gctech.com</p>
+                    <p className="text-gray-500">sales@gctech.com</p>
                   </div>
                 </div>
 

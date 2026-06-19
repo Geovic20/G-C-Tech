@@ -11,7 +11,7 @@ export default function TermsOfService() {
     en: [
       {
         title: "1. Acceptance of Terms",
-        text: "By accessing or using Shopcart, you agree to be bound by these Terms of Service and all applicable laws and regulations."
+        text: "By accessing or using G&C Tech, you agree to be bound by these Terms of Service and all applicable laws and regulations."
       },
       {
         title: "2. Use of the Site",
@@ -23,17 +23,17 @@ export default function TermsOfService() {
       },
       {
         title: "4. Intellectual Property",
-        text: "All content on this site, including text, graphics, logos, and images, is the property of Shopcart and is protected by intellectual property laws."
+        text: "All content on this site, including text, graphics, logos, and images, is the property of G&C Tech and is protected by intellectual property laws."
       },
       {
         title: "5. Limitation of Liability",
-        text: "Shopcart shall not be liable for any direct, indirect, incidental, or consequential damages resulting from the use or inability to use our services."
+        text: "G&C Tech shall not be liable for any direct, indirect, incidental, or consequential damages resulting from the use or inability to use our services."
       }
     ],
     fr: [
       {
         title: "1. Acceptation des conditions",
-        text: "En accédant à Shopcart ou en l'utilisant, vous acceptez d'être lié par ces conditions d'utilisation et par toutes les lois et réglementations applicables."
+        text: "En accédant à G&C Tech ou en l'utilisant, vous acceptez d'être lié par ces conditions d'utilisation et par toutes les lois et réglementations applicables."
       },
       {
         title: "2. Utilisation du site",
@@ -45,11 +45,11 @@ export default function TermsOfService() {
       },
       {
         title: "4. Propriété intellectuelle",
-        text: "Tout le contenu de ce site, y compris les textes, graphiques, logos et images, est la propriété de Shopcart et est protégé par les lois sur la propriété intellectuelle."
+        text: "Tout le contenu de ce site, y compris les textes, graphiques, logos et images, est la propriété de G&C Tech et est protégé par les lois sur la propriété intellectuelle."
       },
       {
         title: "5. Limitation de responsabilité",
-        text: "Shopcart ne sera pas responsable des dommages directs, indirects, accessoires ou consécutifs résultant de l'utilisation ou de l'impossibilité d'utiliser nos services."
+        text: "G&C Tech ne sera pas responsable des dommages directs, indirects, accessoires ou consécutifs résultant de l'utilisation ou de l'impossibilité d'utiliser nos services."
       }
     ]
   };

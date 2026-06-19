@@ -30,7 +30,7 @@ export default function Checkout() {
     const metaEnv = (import.meta as any).env || {};
     const targetPhone = (metaEnv.VITE_WHATSAPP_NUMBER || defaultPhone).replace(/\s+/g, '').replace('+', '');
     
-    const textFr = `Bonjour Shopcart ! Je souhaite acheter cet article :
+    const textFr = `Bonjour G&C Tech ! Je souhaite acheter cet article :
 
 📝 *PRODUIT*
 ---------------------------------------
@@ -45,7 +45,7 @@ export default function Checkout() {
 
 Merci de m'indiquer la procédure pour le règlement !`;
 
-    const textEn = `Hello Shopcart! I would like to purchase this item:
+    const textEn = `Hello G&C Tech! I would like to purchase this item:
 
 📝 *PRODUCT*
 ---------------------------------------
@@ -164,7 +164,7 @@ Please let know how I can settle the payment!`;
                 <div className="space-y-4">
                   {[
                     { id: 'cod', label: 'Cash on Delivery', icon: null },
-                    { id: 'card', label: 'Shopcart Card', icon: null },
+                    { id: 'card', label: 'G&C Tech Card', icon: null },
                     { id: 'paypal', label: 'Paypal', icon: null },
                     { id: 'whatsapp', label: t('delivery.payment.whatsapp') || 'Order via WhatsApp', icon: <div className="p-1 px-3 bg-green-50 text-green-600 rounded-full font-bold text-xs flex items-center gap-1"><MessageCircle size={12} /> WhatsApp</div> },
                     { id: 'credit', label: 'Credit or Debit Card', icon: <div className="flex gap-2"><img src="https://upload.wikimedia.org/wikipedia/commons/5/5e/Visa_Inc._logo.svg" className="h-3" alt="Visa" /><img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg" className="h-5" alt="Mastercard" /></div> }
@@ -266,7 +266,7 @@ Please let know how I can settle the payment!`;
                     <div className="flex items-center gap-2 text-xs font-bold text-blue-700 bg-blue-50 px-4 py-3 rounded-2xl w-full">
                       <CheckCircle2 size={16} />
                       <div>
-                        Earn 5% cash back on Shopcart
+                        Earn 5% cash back on G&C Tech
                         <button type="button" className="underline block mt-1">Learn More</button>
                       </div>
                     </div>

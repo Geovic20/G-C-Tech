@@ -145,7 +145,7 @@ export default function HelpCenter() {
                     <Mail size={20} />
                   </div>
                   <h4 className="text-white font-bold mb-1">Email us</h4>
-                  <p className="text-gray-500 text-sm">support@shopcart.com</p>
+                  <p className="text-gray-500 text-sm">support@gctech.com</p>
                 </div>
               </div>
             </div>

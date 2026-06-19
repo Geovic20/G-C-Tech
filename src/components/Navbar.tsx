@@ -175,7 +175,7 @@ export default function Navbar() {
             <div className="w-8 h-8 md:w-10 md:h-10 bg-[#007bff] rounded-full flex items-center justify-center">
               <ShoppingCart className="text-white w-4 h-4 md:w-5 md:h-5" />
             </div>
-            <span className="text-base md:text-2xl font-bold text-[#007bff] tracking-tight">Shopcart</span>
+            <span className="text-base md:text-2xl font-bold text-[#007bff] tracking-tight">G&C Tech</span>
           </Link>
 
           {/* Navigation Links - Hidden on Mobile */}
@@ -328,7 +328,7 @@ export default function Navbar() {
                 <div className="w-8 h-8 bg-[#007bff] rounded-full flex items-center justify-center">
                   <ShoppingCart className="text-white w-4 h-4" />
                 </div>
-                <span className="text-base font-bold text-[#007bff]">Shopcart</span>
+                <span className="text-base font-bold text-[#007bff]">G&C Tech</span>
               </Link>
               <button 
                 onClick={() => setIsMobileMenuOpen(false)}
