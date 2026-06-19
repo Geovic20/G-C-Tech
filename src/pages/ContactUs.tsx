@@ -5,7 +5,8 @@ import { motion } from 'motion/react';
 import { Mail, Phone, MapPin, MessageSquare, Send, CheckCircle } from 'lucide-react';
 
 export default function ContactUs() {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
+  const fr = language === 'fr';
   const [submitted, setSubmitted] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -16,7 +17,7 @@ export default function ContactUs() {
   return (
     <div className="min-h-screen bg-white">
       <Navbar />
-      
+
       <main className="py-12 md:py-20">
         <div className="px-4 md:px-12 max-w-7xl mx-auto">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 md:gap-20 items-start">
@@ -25,7 +26,7 @@ export default function ContactUs() {
               animate={{ opacity: 1, x: 0 }}
             >
               <span className="px-4 py-2 bg-blue-50 text-[#007bff] text-xs font-bold rounded-full uppercase tracking-widest mb-6 inline-block">
-                Get in touch
+                {fr ? 'Contactez-nous' : 'Get in touch'}
               </span>
               <h1 className="text-3xl md:text-6xl font-black text-gray-900 mb-8 leading-tight">
                 {t('support.contact.title')}
@@ -40,7 +41,7 @@ export default function ContactUs() {
                     <Mail size={24} />
                   </div>
                   <div>
-                    <h4 className="font-bold text-gray-900 mb-1">Email us</h4>
+                    <h4 className="font-bold text-gray-900 mb-1">{fr ? 'Écrivez-nous' : 'Email us'}</h4>
                     <p className="text-gray-500">support@gctech.com</p>
                     <p className="text-gray-500">sales@gctech.com</p>
                   </div>
@@ -51,9 +52,9 @@ export default function ContactUs() {
                     <Phone size={24} />
                   </div>
                   <div>
-                    <h4 className="font-bold text-gray-900 mb-1">Call us</h4>
+                    <h4 className="font-bold text-gray-900 mb-1">{fr ? 'Appelez-nous' : 'Call us'}</h4>
                     <p className="text-gray-500">+221 33 000 00 00</p>
-                    <p className="text-gray-500">Mon-Fri (8am - 8pm)</p>
+                    <p className="text-gray-500">{fr ? 'Lun-Ven (8h - 20h)' : 'Mon-Fri (8am - 8pm)'}</p>
                   </div>
                 </div>
 
@@ -62,9 +63,9 @@ export default function ContactUs() {
                     <MapPin size={24} />
                   </div>
                   <div>
-                    <h4 className="font-bold text-gray-900 mb-1">Visit us</h4>
+                    <h4 className="font-bold text-gray-900 mb-1">{fr ? 'Rendez-nous visite' : 'Visit us'}</h4>
                     <p className="text-gray-500">Electronic Business Center</p>
-                    <p className="text-gray-500">Dakar, Senegal</p>
+                    <p className="text-gray-500">{fr ? 'Dakar, Sénégal' : 'Dakar, Senegal'}</p>
                   </div>
                 </div>
               </div>
@@ -81,34 +82,36 @@ export default function ContactUs() {
                   <div className="w-20 h-20 bg-green-100 text-green-500 rounded-full flex items-center justify-center mx-auto mb-6">
                     <CheckCircle size={40} />
                   </div>
-                  <h2 className="text-2xl font-bold text-gray-900 mb-4">Message Sent!</h2>
+                  <h2 className="text-2xl font-bold text-gray-900 mb-4">{fr ? 'Message envoyé !' : 'Message Sent!'}</h2>
                   <p className="text-gray-500 mb-8">
-                    Thank you for reaching out. We've received your message and will get back to you within 24 hours.
+                    {fr
+                      ? 'Merci de nous avoir contactés. Nous avons bien reçu votre message et reviendrons vers vous sous 24 heures.'
+                      : "Thank you for reaching out. We've received your message and will get back to you within 24 hours."}
                   </p>
-                  <button 
+                  <button
                     onClick={() => setSubmitted(false)}
                     className="text-[#007bff] font-bold underline"
                   >
-                    Send another message
+                    {fr ? 'Envoyer un autre message' : 'Send another message'}
                   </button>
                 </div>
               ) : (
                 <form onSubmit={handleSubmit} className="space-y-6">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-2">
-                      <label className="text-sm font-bold text-gray-900">Your Name</label>
-                      <input 
+                      <label className="text-sm font-bold text-gray-900">{fr ? 'Votre nom' : 'Your Name'}</label>
+                      <input
                         required
-                        type="text" 
+                        type="text"
                         placeholder="John Doe"
                         className="w-full h-14 px-6 bg-white border border-gray-200 rounded-2xl focus:outline-none focus:ring-4 focus:ring-blue-100 font-medium transition-all"
                       />
                     </div>
                     <div className="space-y-2">
-                      <label className="text-sm font-bold text-gray-900">Email Address</label>
-                      <input 
+                      <label className="text-sm font-bold text-gray-900">{fr ? 'Adresse e-mail' : 'Email Address'}</label>
+                      <input
                         required
-                        type="email" 
+                        type="email"
                         placeholder="john@example.com"
                         className="w-full h-14 px-6 bg-white border border-gray-200 rounded-2xl focus:outline-none focus:ring-4 focus:ring-blue-100 font-medium transition-all"
                       />
@@ -116,31 +119,31 @@ export default function ContactUs() {
                   </div>
 
                   <div className="space-y-2">
-                    <label className="text-sm font-bold text-gray-900">Subject</label>
+                    <label className="text-sm font-bold text-gray-900">{fr ? 'Sujet' : 'Subject'}</label>
                     <select className="w-full h-14 px-6 bg-white border border-gray-200 rounded-2xl focus:outline-none focus:ring-4 focus:ring-blue-100 font-medium transition-all appearance-none cursor-pointer">
-                      <option>General Inquiry</option>
-                      <option>Order Support</option>
-                      <option>Technical Issue</option>
-                      <option>Business Partnership</option>
+                      <option>{fr ? 'Demande générale' : 'General Inquiry'}</option>
+                      <option>{fr ? 'Support commande' : 'Order Support'}</option>
+                      <option>{fr ? 'Problème technique' : 'Technical Issue'}</option>
+                      <option>{fr ? 'Partenariat commercial' : 'Business Partnership'}</option>
                     </select>
                   </div>
 
                   <div className="space-y-2">
                     <label className="text-sm font-bold text-gray-900">Message</label>
-                    <textarea 
+                    <textarea
                       required
-                      placeholder="How can we help you?"
+                      placeholder={fr ? 'Comment pouvons-nous vous aider ?' : 'How can we help you?'}
                       rows={5}
                       className="w-full p-6 bg-white border border-gray-200 rounded-3xl focus:outline-none focus:ring-4 focus:ring-blue-100 font-medium transition-all resize-none"
                     ></textarea>
                   </div>
 
-                  <button 
+                  <button
                     type="submit"
                     className="w-full h-16 bg-[#007bff] hover:bg-blue-600 text-white rounded-2xl font-bold transition-all shadow-lg shadow-blue-500/25 active:scale-95 flex items-center justify-center gap-3"
                   >
                     <Send size={20} />
-                    Send Message
+                    {fr ? 'Envoyer le message' : 'Send Message'}
                   </button>
                 </form>
               )}

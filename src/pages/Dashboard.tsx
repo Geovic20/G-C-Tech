@@ -121,10 +121,10 @@ export default function Dashboard() {
           <div className="w-16 h-16 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto mb-4">
             <ShieldCheck size={32} />
           </div>
-          <h2 className="text-2xl font-black text-gray-900 mb-2">Accès restreint</h2>
-          <p className="text-gray-500 mb-6">Veuillez vous connecter pour accéder à votre espace personnel.</p>
+          <h2 className="text-2xl font-black text-gray-900 mb-2">{language === 'fr' ? 'Accès restreint' : 'Restricted access'}</h2>
+          <p className="text-gray-500 mb-6">{language === 'fr' ? 'Veuillez vous connecter pour accéder à votre espace personnel.' : 'Please log in to access your personal area.'}</p>
           <Link to="/login" className="inline-flex items-center justify-center px-6 py-3 bg-[#007bff] text-white rounded-full font-black text-sm uppercase tracking-wide shadow-lg shadow-blue-500/20 hover:bg-blue-700 transition-all">
-            Se connecter <ArrowRight className="ml-2" size={16} />
+            {language === 'fr' ? 'Se connecter' : 'Log in'} <ArrowRight className="ml-2" size={16} />
           </Link>
         </div>
       </div>

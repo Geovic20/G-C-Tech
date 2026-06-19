@@ -12,7 +12,8 @@ import { cn } from '@/src/lib/utils';
 import { Star, ShieldCheck } from 'lucide-react';
 
 export default function Home() {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
+  const fr = language === 'fr';
 
   const TESTIMONIALS = [
     {
@@ -154,9 +155,9 @@ export default function Home() {
           <h2 className="text-2xl font-bold mb-8">{t('services.title')}</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {[
-              { title: 'Frequently Asked Questions', desc: 'Find answers to common questions', bg: '#f7edde', img: 'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=400&h=300&fit=crop', link: '/faq' },
-              { title: 'Online Payment Process', desc: 'Learn about our secure payment methods', bg: '#e0f0ff', img: 'https://images.unsplash.com/photo-1556740758-90de374c12ad?w=400&h=300&fit=crop', link: '/payment-details' },
-              { title: 'Home Delivery Options', desc: 'Shipping rates and delivery times', bg: '#f7edde', img: 'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=400&h=300&fit=crop', link: '/shipping' }
+              { title: fr ? 'Questions fréquentes' : 'Frequently Asked Questions', desc: fr ? 'Trouvez des réponses aux questions courantes' : 'Find answers to common questions', bg: '#f7edde', img: 'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=400&h=300&fit=crop', link: '/faq' },
+              { title: fr ? 'Processus de paiement en ligne' : 'Online Payment Process', desc: fr ? 'Découvrez nos moyens de paiement sécurisés' : 'Learn about our secure payment methods', bg: '#e0f0ff', img: 'https://images.unsplash.com/photo-1556740758-90de374c12ad?w=400&h=300&fit=crop', link: '/payment-details' },
+              { title: fr ? 'Options de livraison à domicile' : 'Home Delivery Options', desc: fr ? 'Tarifs et délais de livraison' : 'Shipping rates and delivery times', bg: '#f7edde', img: 'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=400&h=300&fit=crop', link: '/shipping' }
             ].map((service, i) => (
               <Link key={i} to={service.link} className="rounded-3xl overflow-hidden shadow-sm hover:shadow-md transition-all block group" style={{ backgroundColor: service.bg }}>
                 <div className="p-8">

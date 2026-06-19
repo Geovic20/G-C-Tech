@@ -377,7 +377,7 @@ Please let me know how I can settle the payment!`;
                          </div>
                          <div>
                            <h4 className="font-bold text-gray-900">{selectedZone?.name}</h4>
-                           <p className="text-gray-500 text-sm">{deliveryData.details || 'No extra details'}</p>
+                           <p className="text-gray-500 text-sm">{deliveryData.details || t('cart.no-details')}</p>
                          </div>
                        </div>
                        
@@ -387,7 +387,7 @@ Please let me know how I can settle the payment!`;
                          </div>
                          <div>
                            <h4 className="font-bold text-gray-900">{deliveryData.phone}</h4>
-                           <p className="text-gray-500 text-sm">Contact Number</p>
+                           <p className="text-gray-500 text-sm">{t('cart.contact-number')}</p>
                          </div>
                        </div>
 
@@ -466,7 +466,7 @@ Please let me know how I can settle the payment!`;
                 </div>
 
                 <p className="text-center text-[10px] text-gray-400 mt-6 font-medium uppercase tracking-widest">
-                  Secure transaction protected
+                  {t('cart.secure')}
                 </p>
               </div>
             </div>

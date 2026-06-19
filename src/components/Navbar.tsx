@@ -99,7 +99,7 @@ export default function Navbar() {
           <div className="flex items-center gap-2">
             <Phone size={14} />
             <span className="hidden sm:inline">+001234567890</span>
-            <span className="sm:hidden">Call Us</span>
+            <span className="sm:hidden">{t('nav.call-us')}</span>
           </div>
           
           <div className="hidden xs:flex flex-1 justify-center text-[11px] font-bold uppercase tracking-widest opacity-80">
@@ -163,10 +163,10 @@ export default function Navbar() {
             </div>
             <div className="hidden sm:flex items-center gap-1 cursor-pointer">
               <MapPin size={14} />
-              <span className="hidden xs:inline">Location</span> <ChevronDown size={14} />
+              <span className="hidden xs:inline">{t('nav.location')}</span> <ChevronDown size={14} />
             </div>
             <Link to="/help" className="hidden sm:flex items-center gap-1 hover:text-blue-100 transition-colors">
-              <span className="hidden xs:inline">Help</span>
+              <span className="hidden xs:inline">{t('nav.help')}</span>
             </Link>
           </div>
         </div>
@@ -204,7 +204,7 @@ export default function Navbar() {
                         <span className="text-xl group-hover:scale-110 transition-transform">{cat.icon}</span>
                         <div>
                           <p className="text-sm font-semibold text-gray-900">{cat.name}</p>
-                          <p className="text-xs text-gray-500">Shop now</p>
+                          <p className="text-xs text-gray-500">{t('nav.shop-now')}</p>
                         </div>
                       </Link>
                     ))}
@@ -237,7 +237,7 @@ export default function Navbar() {
               <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-2xl shadow-xl border border-gray-100 z-50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
                 {searchQuery.length === 0 ? (
                   <div className="p-4">
-                    <h3 className="text-sm font-bold text-gray-900 mb-4">Popular Categories</h3>
+                    <h3 className="text-sm font-bold text-gray-900 mb-4">{t('nav.popular')}</h3>
                     <div className="grid grid-cols-2 gap-4">
                     {categories.map((cat) => (
                       <Link
@@ -249,7 +249,7 @@ export default function Navbar() {
                         <span className="text-xl">{cat.icon}</span>
                         <div>
                           <p className="text-sm font-semibold text-gray-900">{cat.name}</p>
-                          <p className="text-xs text-gray-500">240 items available</p>
+                          <p className="text-xs text-gray-500">{t('nav.items-available')}</p>
                         </div>
                       </Link>
                     ))}
@@ -280,7 +280,7 @@ export default function Navbar() {
                         </button>
                       ))
                     ) : (
-                      <div className="p-8 text-center text-gray-500 text-sm">No products found for "{searchQuery}"</div>
+                      <div className="p-8 text-center text-gray-500 text-sm">{t('nav.no-results', { query: searchQuery })}</div>
                     )}
                   </div>
                 )}
@@ -355,7 +355,7 @@ export default function Navbar() {
               </div>
 
               <div>
-                <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4">Categories</h3>
+                <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4">{t('nav.categories')}</h3>
                 <div className="grid grid-cols-1 gap-4">
                   {categories.map((cat) => (
                     <Link
@@ -372,13 +372,13 @@ export default function Navbar() {
               </div>
 
               <div>
-                <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4">Menu</h3>
+                <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4">{t('nav.menu')}</h3>
                 <div className="flex flex-col gap-4">
                   <Link to="/shipping" onClick={() => setIsMobileMenuOpen(false)} className="text-xl font-bold text-gray-900 flex items-center justify-between">
                     {t('nav.delivery')} <ChevronDown className="-rotate-90 text-gray-300" size={20} />
                   </Link>
                   <Link to={currentUser ? "/dashboard" : "/login"} onClick={() => setIsMobileMenuOpen(false)} className="text-xl font-bold text-gray-900 flex items-center justify-between border-t border-gray-50 pt-3 mt-1">
-                    {currentUser ? currentUser.fullname : (language === 'fr' ? 'Se connecter' : 'Log In')} <ChevronDown className="-rotate-90 text-gray-300" size={20} />
+                    {currentUser ? currentUser.fullname : t('nav.login')} <ChevronDown className="-rotate-90 text-gray-300" size={20} />
                   </Link>
                 </div>
               </div>
@@ -387,7 +387,7 @@ export default function Navbar() {
                  <div className="flex items-center gap-4">
                    <Phone size={18} className="text-[#007bff]" />
                    <div>
-                     <p className="text-xs text-gray-500">Contact Support</p>
+                     <p className="text-xs text-gray-500">{t('nav.contact-support')}</p>
                      <p className="font-bold text-gray-900">+001234567890</p>
                    </div>
                  </div>

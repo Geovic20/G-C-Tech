@@ -98,7 +98,7 @@ export default function Smartphones() {
         {/* Empty State / Pagination Simulation */}
         <div className="mt-20 text-center">
           <button className="px-10 py-5 bg-white border border-gray-100 rounded-full font-black text-gray-900 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all uppercase tracking-widest text-sm">
-            Load More Products
+            {t('products.load-more')}
           </button>
         </div>
       </main>

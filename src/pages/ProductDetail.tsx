@@ -10,7 +10,8 @@ import { useCart } from '@/src/contexts/CartContext';
 
 export default function ProductDetail() {
   const { id } = useParams();
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
+  const fr = language === 'fr';
   const { formatPrice } = useCurrency();
   const { addItem } = useCart();
   const navigate = useNavigate();
@@ -173,7 +174,7 @@ export default function ProductDetail() {
           <h2 className="text-2xl font-bold mb-8">{product.name.split(',')[0]} {t('detail.specs')}</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-x-16 gap-y-12">
             <div className="space-y-6">
-              <h3 className="font-bold text-xl pb-4 border-b border-gray-100">General</h3>
+              <h3 className="font-bold text-xl pb-4 border-b border-gray-100">{fr ? 'Général' : 'General'}</h3>
               {Object.entries(product.specs || {}).map(([key, value]) => (
                 <div key={key} className="flex justify-between py-2 border-b border-gray-50 last:border-0">
                   <span className="text-gray-500">{key}</span>
@@ -183,7 +184,7 @@ export default function ProductDetail() {
             </div>
             {product.category === 'Headphones' && (
               <div className="space-y-6">
-                <h3 className="font-bold text-xl pb-4 border-b border-gray-100">Product details</h3>
+                <h3 className="font-bold text-xl pb-4 border-b border-gray-100">{fr ? 'Détails du produit' : 'Product details'}</h3>
                 {[
                   { key: 'Microphone', val: 'Yes' },
                   { key: 'Driver Type', val: 'Dynamic' },
@@ -202,7 +203,7 @@ export default function ProductDetail() {
             )}
             {product.category === 'Phones' && (
               <div className="space-y-6">
-                <h3 className="font-bold text-xl pb-4 border-b border-gray-100">Network & Connectivity</h3>
+                <h3 className="font-bold text-xl pb-4 border-b border-gray-100">{fr ? 'Réseau & Connectivité' : 'Network & Connectivity'}</h3>
                 {[
                   { key: '5G', val: 'Yes' },
                   { key: 'Bluetooth', val: '5.3' },
