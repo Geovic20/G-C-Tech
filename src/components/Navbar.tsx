@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useLanguage } from '@/src/contexts/LanguageContext';
 import { useCurrency, Currency } from '@/src/contexts/CurrencyContext';
+import { useCart } from '@/src/contexts/CartContext';
 import { CreditCard, Globe, Search, ShoppingCart, User, Phone, ChevronDown, MapPin, Menu, X } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { cn } from '@/src/lib/utils';
@@ -19,6 +20,7 @@ export default function Navbar() {
   const navigate = useNavigate();
   const { t, language, setLanguage } = useLanguage();
   const { currency, setCurrency, formatPrice } = useCurrency();
+  const { itemCount } = useCart();
   const [showCurrencyMenu, setShowCurrencyMenu] = useState(false);
   const [currentUser, setCurrentUser] = useState<{ email: string; fullname: string } | null>(null);
 
@@ -305,7 +307,9 @@ export default function Navbar() {
             <Link to="/cart" className="flex items-center gap-2 hover:text-[#007bff] relative">
               <ShoppingCart size={22} />
               <span className="hidden lg:inline text-sm font-medium">{t('nav.cart')}</span>
-              <span className="absolute -top-2 -right-2 bg-red-500 text-white text-[10px] w-4 h-4 rounded-full flex items-center justify-center">2</span>
+              {itemCount > 0 && (
+                <span className="absolute -top-2 -right-2 bg-red-500 text-white text-[10px] min-w-4 h-4 px-1 rounded-full flex items-center justify-center">{itemCount}</span>
+              )}
             </Link>
             
             {/* Mobile Menu Toggle */}

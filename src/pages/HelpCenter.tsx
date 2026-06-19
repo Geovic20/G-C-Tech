@@ -1,6 +1,5 @@
 import React from 'react';
 import Navbar from '@/src/components/Navbar';
-import Footer from '@/src/components/Footer';
 import { useLanguage } from '@/src/contexts/LanguageContext';
 import { motion } from 'motion/react';
 import { Search, ChevronRight, MessageCircle, Phone, Mail, FileText, ShoppingBag, Truck, RotateCcw, ShieldCheck } from 'lucide-react';
@@ -153,7 +152,6 @@ export default function HelpCenter() {
         </div>
       </main>
 
-      <Footer />
     </div>
   );
 }

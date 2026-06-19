@@ -1,43 +1,14 @@
 import React, { useState } from 'react';
 import Navbar from '@/src/components/Navbar';
-import Footer from '@/src/components/Footer';
 import ProductCard from '@/src/components/ProductCard';
 import FilterBar from '@/src/components/FilterBar';
+import { getProductsByGroup } from '@/src/constants';
 import { useLanguage } from '@/src/contexts/LanguageContext';
 import { motion } from 'motion/react';
 import { ChevronRight, LayoutGrid, List } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { cn } from '@/src/lib/utils';
 
-const EARPHONES = [
-  {
-    id: '41',
-    name: 'AirPods Pro (2nd Gen)',
-    price: 249000,
-    rating: 4.9,
-    reviews: 312,
-    image: 'https://images.unsplash.com/photo-1588423770186-80f336a04b71?w=400&h=400&fit=crop',
-    category: 'Earphones'
-  },
-  {
-    id: '42',
-    name: 'Sony WF-1000XM5',
-    price: 299000,
-    rating: 4.8,
-    reviews: 124,
-    image: 'https://images.unsplash.com/photo-1590658268037-6bf12165a8df?w=400&h=400&fit=crop',
-    category: 'Earphones'
-  },
-  {
-    id: '43',
-    name: 'Samsung Galaxy Buds2 Pro',
-    price: 199000,
-    rating: 4.7,
-    reviews: 86,
-    image: 'https://images.unsplash.com/photo-1590658006244-85710daaff1a?w=400&h=400&fit=crop',
-    category: 'Earphones'
-  }
-];
 
 export default function Earphones() {
   const { t } = useLanguage();
@@ -78,14 +49,13 @@ export default function Earphones() {
         </div>
 
         <div className={cn("grid gap-8", viewMode === 'grid' ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3" : "grid-cols-1")}>
-          {EARPHONES.map((product, index) => (
+          {getProductsByGroup('earphones').map((product, index) => (
             <motion.div key={product.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.05 }}>
-              <ProductCard product={{ ...product, description: 'True wireless earbuds with exceptional sound quality and seamless connectivity.' }} />
+              <ProductCard product={product} />
             </motion.div>
           ))}
         </div>
       </main>
-      <Footer />
     </div>
   );
 }

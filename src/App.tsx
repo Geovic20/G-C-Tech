@@ -24,6 +24,7 @@ import Dashboard from './pages/Dashboard';
 import Footer from './components/Footer';
 import { LanguageProvider } from './contexts/LanguageContext';
 import { CurrencyProvider } from './contexts/CurrencyContext';
+import { CartProvider } from './contexts/CartContext';
 
 function ScrollToTop() {
   const { pathname } = useLocation();
@@ -37,6 +38,7 @@ export default function App() {
   return (
     <LanguageProvider>
       <CurrencyProvider>
+        <CartProvider>
         <BrowserRouter>
           <ScrollToTop />
           <div className="flex flex-col min-h-screen">
@@ -70,6 +72,7 @@ export default function App() {
           <Footer />
         </div>
       </BrowserRouter>
+      </CartProvider>
       </CurrencyProvider>
     </LanguageProvider>
   );

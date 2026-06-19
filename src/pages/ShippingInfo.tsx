@@ -1,6 +1,5 @@
 import React from 'react';
 import Navbar from '@/src/components/Navbar';
-import Footer from '@/src/components/Footer';
 import { useLanguage } from '@/src/contexts/LanguageContext';
 import { motion } from 'motion/react';
 import { Truck, Globe, Clock, ShieldCheck, MapPin, Package } from 'lucide-react';
@@ -142,7 +141,6 @@ export default function ShippingInfo() {
         </div>
       </main>
 
-      <Footer />
     </div>
   );
 }

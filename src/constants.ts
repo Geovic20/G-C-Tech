@@ -1,3 +1,11 @@
+export type ProductGroup =
+  | 'smartphones'
+  | 'computers'
+  | 'tablets'
+  | 'headphones'
+  | 'earphones'
+  | 'smartwatches';
+
 export interface Product {
   id: string;
   name: string;
@@ -7,6 +15,8 @@ export interface Product {
   reviews: number;
   image: string;
   category: string;
+  /** High-level group matching a catalog page / route. */
+  group: ProductGroup;
   colors?: string[];
   specs?: Record<string, string>;
 }
@@ -30,6 +40,7 @@ export const CATEGORIES: Category[] = [
 ];
 
 export const PRODUCTS: Product[] = [
+  // ----- Smartphones -----
   {
     id: '1',
     name: 'iPhone 15 Pro',
@@ -39,6 +50,7 @@ export const PRODUCTS: Product[] = [
     reviews: 128,
     image: 'https://images.unsplash.com/photo-1696446701796-da61225697cc?w=500&h=500&fit=crop',
     category: 'Phones',
+    group: 'smartphones',
     colors: ['#2F2F2F', '#E3E2DE', '#BCC1D5', '#3C3A35'],
     specs: {
       Brand: 'Apple',
@@ -57,6 +69,7 @@ export const PRODUCTS: Product[] = [
     reviews: 95,
     image: 'https://images.unsplash.com/photo-1610945265064-0e34e5519bbf?w=500&h=500&fit=crop',
     category: 'Phones',
+    group: 'smartphones',
     colors: ['#2E2E2E', '#EAEAEA', '#F5E6CC', '#D1C4E9'],
     specs: {
       Brand: 'Samsung',
@@ -74,8 +87,44 @@ export const PRODUCTS: Product[] = [
     rating: 4.7,
     reviews: 112,
     image: 'https://images.unsplash.com/photo-1598327105666-5b89351aff97?w=500&h=500&fit=crop',
-    category: 'Phones'
+    category: 'Phones',
+    group: 'smartphones'
   },
+  {
+    id: '4',
+    name: 'OnePlus 12',
+    description: 'Flagship performance with a fluid display and ultra-fast charging.',
+    price: 799000,
+    rating: 4.6,
+    reviews: 84,
+    image: 'https://images.unsplash.com/photo-1678911820864-e2c567c655d7?w=500&h=500&fit=crop',
+    category: 'Phones',
+    group: 'smartphones'
+  },
+  {
+    id: '5',
+    name: 'Xiaomi 14 Ultra',
+    description: 'Pro-grade Leica optics meet powerful performance in a premium build.',
+    price: 1199000,
+    rating: 4.8,
+    reviews: 42,
+    image: 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=500&h=500&fit=crop',
+    category: 'Phones',
+    group: 'smartphones'
+  },
+  {
+    id: '6',
+    name: 'Nothing Phone (2)',
+    description: 'A unique design with the Glyph interface and clean, fast software.',
+    price: 599000,
+    rating: 4.5,
+    reviews: 67,
+    image: 'https://images.unsplash.com/photo-1616348436168-de43ad0db179?w=500&h=500&fit=crop',
+    category: 'Phones',
+    group: 'smartphones'
+  },
+
+  // ----- Computers -----
   {
     id: '11',
     name: 'MacBook Pro M3 Max',
@@ -85,6 +134,7 @@ export const PRODUCTS: Product[] = [
     reviews: 45,
     image: 'https://images.unsplash.com/photo-1517336712468-077648f3efbc?w=500&h=500&fit=crop',
     category: 'Laptops',
+    group: 'computers',
     colors: ['#1C1C1C', '#E3E4E5'],
     specs: {
       Brand: 'Apple',
@@ -94,6 +144,41 @@ export const PRODUCTS: Product[] = [
     }
   },
   {
+    id: '12',
+    name: 'Dell XPS 15',
+    description: 'A premium Windows laptop with a stunning InfinityEdge display.',
+    price: 1899000,
+    rating: 4.8,
+    reviews: 72,
+    image: 'https://images.unsplash.com/photo-1593642632823-8f785ba67e45?w=500&h=500&fit=crop',
+    category: 'Laptops',
+    group: 'computers'
+  },
+  {
+    id: '13',
+    name: 'ASUS ROG Zephyrus G14',
+    description: 'A compact powerhouse built for high-end gaming and creative workloads.',
+    price: 1599000,
+    rating: 4.9,
+    reviews: 88,
+    image: 'https://images.unsplash.com/photo-1588872657578-7efd1f1555ed?w=500&h=500&fit=crop',
+    category: 'Gaming',
+    group: 'computers'
+  },
+  {
+    id: '14',
+    name: 'iMac 24-inch M3',
+    description: 'A strikingly thin all-in-one desktop with a vibrant 4.5K Retina display.',
+    price: 1299000,
+    rating: 4.7,
+    reviews: 31,
+    image: 'https://images.unsplash.com/photo-1527443224154-c4a3942d3acf?w=500&h=500&fit=crop',
+    category: 'Desktops',
+    group: 'computers'
+  },
+
+  // ----- Tablets -----
+  {
     id: '21',
     name: 'iPad Pro 12.9 M2',
     description: 'The ultimate iPad experience. Now with next-generation performance and a brilliant display.',
@@ -101,8 +186,33 @@ export const PRODUCTS: Product[] = [
     rating: 4.9,
     reviews: 156,
     image: 'https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?w=500&h=500&fit=crop',
-    category: 'Tablets'
+    category: 'Tablets',
+    group: 'tablets'
   },
+  {
+    id: '22',
+    name: 'Samsung Galaxy Tab S9 Ultra',
+    description: 'A massive AMOLED display and S Pen support for work and play.',
+    price: 1199000,
+    rating: 4.8,
+    reviews: 42,
+    image: 'https://images.unsplash.com/photo-1561154464-82e9aff32764?w=500&h=500&fit=crop',
+    category: 'Tablets',
+    group: 'tablets'
+  },
+  {
+    id: '23',
+    name: 'Microsoft Surface Pro 9',
+    description: 'The versatile 2-in-1 that is a tablet and a laptop in one device.',
+    price: 999000,
+    rating: 4.6,
+    reviews: 78,
+    image: 'https://images.unsplash.com/photo-1589739900243-4b52cd9b104e?w=500&h=500&fit=crop',
+    category: 'Tablets',
+    group: 'tablets'
+  },
+
+  // ----- Headphones -----
   {
     id: '31',
     name: 'Sony WH-1000XM5',
@@ -112,6 +222,7 @@ export const PRODUCTS: Product[] = [
     reviews: 210,
     image: 'https://images.unsplash.com/photo-1546435770-a3e426ff472b?w=500&h=500&fit=crop',
     category: 'Headphones',
+    group: 'headphones',
     colors: ['#000000', '#F5F5DC'],
     specs: {
       Brand: 'Sony',
@@ -121,6 +232,65 @@ export const PRODUCTS: Product[] = [
     }
   },
   {
+    id: '32',
+    name: 'Bose QuietComfort Ultra',
+    description: 'World-class noise cancellation with immersive spatial audio.',
+    price: 379000,
+    rating: 4.9,
+    reviews: 145,
+    image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500&h=500&fit=crop',
+    category: 'Headphones',
+    group: 'headphones'
+  },
+  {
+    id: '33',
+    name: 'AirPods Max',
+    description: 'High-fidelity audio with Active Noise Cancellation and a premium design.',
+    price: 549000,
+    rating: 4.7,
+    reviews: 89,
+    image: 'https://images.unsplash.com/photo-1613040809024-b4ef7ba99bc3?w=500&h=500&fit=crop',
+    category: 'Headphones',
+    group: 'headphones'
+  },
+
+  // ----- Earphones -----
+  {
+    id: '41',
+    name: 'AirPods Pro (2nd Gen)',
+    description: 'Next-level Active Noise Cancellation and Adaptive Transparency.',
+    price: 249000,
+    rating: 4.9,
+    reviews: 312,
+    image: 'https://images.unsplash.com/photo-1588423770186-80f336a04b71?w=500&h=500&fit=crop',
+    category: 'Earphones',
+    group: 'earphones'
+  },
+  {
+    id: '42',
+    name: 'Sony WF-1000XM5',
+    description: 'The best truly wireless earbuds for noise cancellation and sound quality.',
+    price: 299000,
+    rating: 4.8,
+    reviews: 124,
+    image: 'https://images.unsplash.com/photo-1590658268037-6bf12165a8df?w=500&h=500&fit=crop',
+    category: 'Earphones',
+    group: 'earphones'
+  },
+  {
+    id: '43',
+    name: 'Samsung Galaxy Buds2 Pro',
+    description: 'Compact earbuds with intelligent ANC and 360 Audio.',
+    price: 199000,
+    rating: 4.7,
+    reviews: 86,
+    image: 'https://images.unsplash.com/photo-1590658006244-85710daaff1a?w=500&h=500&fit=crop',
+    category: 'Earphones',
+    group: 'earphones'
+  },
+
+  // ----- Smartwatches -----
+  {
     id: '51',
     name: 'Apple Watch Ultra 2',
     description: 'The most rugged and capable Apple Watch pushes the limits again.',
@@ -128,6 +298,34 @@ export const PRODUCTS: Product[] = [
     rating: 4.9,
     reviews: 64,
     image: 'https://images.unsplash.com/photo-1546868871-7041f2a55e12?w=500&h=500&fit=crop',
-    category: 'Watches'
+    category: 'Watches',
+    group: 'smartwatches'
+  },
+  {
+    id: '52',
+    name: 'Samsung Galaxy Watch6 Classic',
+    description: 'A timeless design with a rotating bezel and advanced health tracking.',
+    price: 399000,
+    rating: 4.7,
+    reviews: 112,
+    image: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=500&h=500&fit=crop',
+    category: 'Watches',
+    group: 'smartwatches'
+  },
+  {
+    id: '53',
+    name: 'Garmin Epix Gen 2',
+    description: 'A premium multisport GPS smartwatch with a brilliant AMOLED display.',
+    price: 899000,
+    rating: 4.8,
+    reviews: 45,
+    image: 'https://images.unsplash.com/photo-1508685096489-7aac29a21244?w=500&h=500&fit=crop',
+    category: 'Watches',
+    group: 'smartwatches'
   }
 ];
+
+/** Returns all products belonging to a given catalog group. */
+export function getProductsByGroup(group: ProductGroup): Product[] {
+  return PRODUCTS.filter((p) => p.group === group);
+}

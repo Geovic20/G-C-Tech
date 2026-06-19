@@ -1,43 +1,14 @@
 import React, { useState } from 'react';
 import Navbar from '@/src/components/Navbar';
-import Footer from '@/src/components/Footer';
 import ProductCard from '@/src/components/ProductCard';
 import FilterBar from '@/src/components/FilterBar';
+import { getProductsByGroup } from '@/src/constants';
 import { useLanguage } from '@/src/contexts/LanguageContext';
 import { motion } from 'motion/react';
 import { ChevronRight, LayoutGrid, List } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { cn } from '@/src/lib/utils';
 
-const SMARTWATCHES = [
-  {
-    id: '51',
-    name: 'Apple Watch Ultra 2',
-    price: 799000,
-    rating: 4.9,
-    reviews: 64,
-    image: 'https://images.unsplash.com/photo-1546868871-7041f2a55e12?w=400&h=400&fit=crop',
-    category: 'Watches'
-  },
-  {
-    id: '52',
-    name: 'Samsung Galaxy Watch6 Classic',
-    price: 399000,
-    rating: 4.7,
-    reviews: 112,
-    image: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400&h=400&fit=crop',
-    category: 'Watches'
-  },
-  {
-    id: '53',
-    name: 'Garmin Epix Gen 2',
-    price: 899000,
-    rating: 4.8,
-    reviews: 45,
-    image: 'https://images.unsplash.com/photo-1508685096489-7aac29a21244?w=400&h=400&fit=crop',
-    category: 'Watches'
-  }
-];
 
 export default function Smartwatches() {
   const { t } = useLanguage();
@@ -78,14 +49,13 @@ export default function Smartwatches() {
         </div>
 
         <div className={cn("grid gap-8", viewMode === 'grid' ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3" : "grid-cols-1")}>
-          {SMARTWATCHES.map((product, index) => (
+          {getProductsByGroup('smartwatches').map((product, index) => (
             <motion.div key={product.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.05 }}>
-              <ProductCard product={{ ...product, description: 'Advanced wearable technology to keep you fit, healthy, and connected.' }} />
+              <ProductCard product={product} />
             </motion.div>
           ))}
         </div>
       </main>
-      <Footer />
     </div>
   );
 }

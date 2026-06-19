@@ -1,20 +1,41 @@
 import React, { useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { ChevronRight, Star, Minus, Plus, Truck, RotateCcw } from 'lucide-react';
 import { PRODUCTS } from '@/src/constants';
 import Navbar from '@/src/components/Navbar';
 import { cn } from '@/src/lib/utils';
 import { useLanguage } from '@/src/contexts/LanguageContext';
 import { useCurrency } from '@/src/contexts/CurrencyContext';
+import { useCart } from '@/src/contexts/CartContext';
 
 export default function ProductDetail() {
   const { id } = useParams();
   const { t } = useLanguage();
   const { formatPrice } = useCurrency();
+  const { addItem } = useCart();
+  const navigate = useNavigate();
   const product = PRODUCTS.find((p) => p.id === id) || PRODUCTS[0];
   const [selectedColor, setSelectedColor] = useState(product.colors?.[0] || '');
   const [quantity, setQuantity] = useState(1);
   const [mainImage, setMainImage] = useState(product.image);
+
+  const handleAddToCart = () => {
+    addItem(
+      {
+        id: product.id,
+        name: product.name,
+        price: product.price,
+        image: product.image,
+        category: product.category,
+      },
+      quantity
+    );
+  };
+
+  const handleBuyNow = () => {
+    handleAddToCart();
+    navigate('/cart');
+  };
 
   const images = [
     product.image,
@@ -115,10 +136,10 @@ export default function ProductDetail() {
             </div>
 
             <div className="flex flex-col sm:flex-row gap-4 mb-12">
-              <Link to="/checkout" className="w-full sm:flex-1 px-8 py-4 bg-[#007bff] text-white rounded-full font-bold text-center hover:bg-blue-700 transition-colors">
+              <button onClick={handleBuyNow} className="w-full sm:flex-1 px-8 py-4 bg-[#007bff] text-white rounded-full font-bold text-center hover:bg-blue-700 transition-colors">
                 {t('detail.buy-now')}
-              </Link>
-              <button className="w-full sm:flex-1 px-8 py-4 border-2 border-[#007bff] text-[#007bff] rounded-full font-bold hover:bg-blue-50 transition-colors">
+              </button>
+              <button onClick={handleAddToCart} className="w-full sm:flex-1 px-8 py-4 border-2 border-[#007bff] text-[#007bff] rounded-full font-bold hover:bg-blue-50 transition-colors">
                 {t('products.add')}
               </button>
             </div>

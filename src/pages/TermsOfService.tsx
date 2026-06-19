@@ -1,6 +1,5 @@
 import React from 'react';
 import Navbar from '@/src/components/Navbar';
-import Footer from '@/src/components/Footer';
 import { useLanguage } from '@/src/contexts/LanguageContext';
 import { motion } from 'motion/react';
 
@@ -80,7 +79,6 @@ export default function TermsOfService() {
           </div>
         </motion.div>
       </main>
-      <Footer />
     </div>
   );
 }

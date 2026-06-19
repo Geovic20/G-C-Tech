@@ -1,40 +1,12 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Navbar from '@/src/components/Navbar';
-import Footer from '@/src/components/Footer';
 import { useLanguage } from '@/src/contexts/LanguageContext';
 import { useCurrency } from '@/src/contexts/CurrencyContext';
+import { useCart } from '@/src/contexts/CartContext';
 import { motion, AnimatePresence } from 'motion/react';
 import { Trash2, Plus, Minus, ShoppingBag, ArrowRight, MapPin, Phone, Calendar, Clock, CreditCard, Wallet, CheckCircle2, ChevronLeft, MessageCircle } from 'lucide-react';
 import { cn } from '@/src/lib/utils';
-
-interface CartItem {
-  id: number;
-  name: string;
-  price: number;
-  quantity: number;
-  image: string;
-  category: string;
-}
-
-const MOCK_CART: CartItem[] = [
-  {
-    id: 1,
-    name: 'MacBook Pro M3 Pro',
-    price: 1999000,
-    quantity: 1,
-    image: 'https://images.unsplash.com/photo-1517336712468-077648f3efbc?w=200&h=200&fit=crop',
-    category: 'Laptops'
-  },
-  {
-    id: 2,
-    name: 'iPhone 15 Pro',
-    price: 999000,
-    quantity: 2,
-    image: 'https://images.unsplash.com/photo-1696446701796-da61225697cc?w=200&h=200&fit=crop',
-    category: 'Phones'
-  }
-];
 
 const DELIVERY_ZONES = [
   { id: 'cotonou', name: 'Cotonou', cost: 1000 },
@@ -56,9 +28,9 @@ const TIME_SLOTS = [
 export default function Cart() {
   const { t, language } = useLanguage();
   const { formatPrice } = useCurrency();
+  const { items, updateQuantity, removeItem, subtotal, clearCart } = useCart();
   const navigate = useNavigate();
   const [step, setStep] = useState(1);
-  const [items, setItems] = useState<CartItem[]>(MOCK_CART);
   const [whatsappUrl, setWhatsappUrl] = useState('');
   
   // Delivery form state
@@ -71,21 +43,6 @@ export default function Cart() {
     paymentMethod: 'momo' as 'momo' | 'cash' | 'whatsapp'
   });
 
-  const updateQuantity = (id: number, delta: number) => {
-    setItems(items.map(item => {
-      if (item.id === id) {
-        const newQty = Math.max(1, item.quantity + delta);
-        return { ...item, quantity: newQty };
-      }
-      return item;
-    }));
-  };
-
-  const removeItem = (id: number) => {
-    setItems(items.filter(item => item.id !== id));
-  };
-
-  const subtotal = items.reduce((acc, item) => acc + item.price * item.quantity, 0);
   const selectedZone = DELIVERY_ZONES.find(z => z.id === deliveryData.zoneId);
   const shipping = selectedZone ? selectedZone.cost : 0;
   const tax = subtotal * 0.1;
@@ -161,6 +118,8 @@ Please let me know how I can settle the payment!`;
         }
       }
       
+      // Empty the cart now that the order has been placed
+      clearCart();
       // Redirect to some success page or show success message
       setStep(4); // Bonus success step
     }
@@ -225,7 +184,6 @@ Please let me know how I can settle the payment!`;
             </Link>
           </motion.div>
         </main>
-        <Footer />
       </div>
     );
   }
@@ -570,7 +528,6 @@ Please let me know how I can settle the payment!`;
         </div>
       </main>
 
-      <Footer />
     </div>
   );
 }

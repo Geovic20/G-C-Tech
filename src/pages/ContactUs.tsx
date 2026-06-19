@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import Navbar from '@/src/components/Navbar';
-import Footer from '@/src/components/Footer';
 import { useLanguage } from '@/src/contexts/LanguageContext';
 import { motion } from 'motion/react';
 import { Mail, Phone, MapPin, MessageSquare, Send, CheckCircle } from 'lucide-react';
@@ -150,7 +149,6 @@ export default function ContactUs() {
         </div>
       </main>
 
-      <Footer />
     </div>
   );
 }

@@ -1,43 +1,14 @@
 import React, { useState } from 'react';
 import Navbar from '@/src/components/Navbar';
-import Footer from '@/src/components/Footer';
 import ProductCard from '@/src/components/ProductCard';
 import FilterBar from '@/src/components/FilterBar';
+import { getProductsByGroup } from '@/src/constants';
 import { useLanguage } from '@/src/contexts/LanguageContext';
 import { motion } from 'motion/react';
 import { ChevronRight, LayoutGrid, List } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { cn } from '@/src/lib/utils';
 
-const HEADPHONES = [
-  {
-    id: '31',
-    name: 'Sony WH-1000XM5',
-    price: 349000,
-    rating: 4.8,
-    reviews: 210,
-    image: 'https://images.unsplash.com/photo-1546435770-a3e426ff472b?w=400&h=400&fit=crop',
-    category: 'Headphones'
-  },
-  {
-    id: '32',
-    name: 'Bose QuietComfort Ultra',
-    price: 379000,
-    rating: 4.9,
-    reviews: 145,
-    image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400&h=400&fit=crop',
-    category: 'Headphones'
-  },
-  {
-    id: '33',
-    name: 'AirPods Max',
-    price: 549000,
-    rating: 4.7,
-    reviews: 89,
-    image: 'https://images.unsplash.com/photo-1613040809024-b4ef7ba99bc3?w=400&h=400&fit=crop',
-    category: 'Headphones'
-  }
-];
 
 export default function Headphones() {
   const { t } = useLanguage();
@@ -78,14 +49,13 @@ export default function Headphones() {
         </div>
 
         <div className={cn("grid gap-8", viewMode === 'grid' ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3" : "grid-cols-1")}>
-          {HEADPHONES.map((product, index) => (
+          {getProductsByGroup('headphones').map((product, index) => (
             <motion.div key={product.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.05 }}>
-              <ProductCard product={{ ...product, description: 'Premium noise-canceling headphones for an unparalleled acoustic experience.' }} />
+              <ProductCard product={product} />
             </motion.div>
           ))}
         </div>
       </main>
-      <Footer />
     </div>
   );
 }

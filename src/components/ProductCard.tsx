@@ -5,6 +5,7 @@ import { Product } from '@/src/constants';
 import { Link } from 'react-router-dom';
 import { useLanguage } from '@/src/contexts/LanguageContext';
 import { useCurrency } from '@/src/contexts/CurrencyContext';
+import { useCart } from '@/src/contexts/CartContext';
 
 interface ProductCardProps {
   product: Product;
@@ -14,6 +15,17 @@ interface ProductCardProps {
 export default function ProductCard({ product }: ProductCardProps) {
   const { t } = useLanguage();
   const { formatPrice } = useCurrency();
+  const { addItem } = useCart();
+
+  const handleAddToCart = () => {
+    addItem({
+      id: product.id,
+      name: product.name,
+      price: product.price,
+      image: product.image,
+      category: product.category,
+    });
+  };
 
   return (
     <motion.div
@@ -48,7 +60,7 @@ export default function ProductCard({ product }: ProductCardProps) {
         <span className="text-gray-400 ml-1">({product.reviews})</span>
       </div>
 
-      <button className="w-full px-4 md:px-6 py-2 border-2 border-gray-900 rounded-full font-bold text-[10px] md:text-sm hover:bg-[#007bff] hover:border-[#007bff] hover:text-white transition-all">
+      <button onClick={handleAddToCart} className="w-full px-4 md:px-6 py-2 border-2 border-gray-900 rounded-full font-bold text-[10px] md:text-sm hover:bg-[#007bff] hover:border-[#007bff] hover:text-white transition-all">
         {t('products.add')}
       </button>
     </motion.div>
