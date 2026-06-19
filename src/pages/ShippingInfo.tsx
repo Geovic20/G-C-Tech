@@ -1,5 +1,6 @@
 import React from 'react';
 import Navbar from '@/src/components/Navbar';
+import Seo from '@/src/components/Seo';
 import { useLanguage } from '@/src/contexts/LanguageContext';
 import { motion } from 'motion/react';
 import { Truck, Globe, Clock, ShieldCheck, MapPin, Package } from 'lucide-react';
@@ -41,6 +42,7 @@ export default function ShippingInfo() {
   return (
     <div className="min-h-screen bg-white">
       <Navbar />
+      <Seo title={t('support.shipping.title')} description={t('support.shipping.subtitle')} />
 
       <main className="py-12 md:py-20">
         <div className="px-4 md:px-12 max-w-7xl mx-auto">

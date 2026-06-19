@@ -1,5 +1,6 @@
 import React from 'react';
 import Navbar from '@/src/components/Navbar';
+import Seo from '@/src/components/Seo';
 import { useLanguage } from '@/src/contexts/LanguageContext';
 import { motion } from 'motion/react';
 import { ChevronDown, ShoppingCart, CreditCard, RotateCcw } from 'lucide-react';
@@ -74,6 +75,7 @@ export default function FAQ() {
   return (
     <div className="min-h-screen bg-white">
       <Navbar />
+      <Seo title={fr ? 'Questions fréquentes' : 'FAQ'} description={fr ? 'Trouvez des réponses aux questions courantes.' : 'Find answers to common questions.'} />
 
       <main className="py-20">
         <div className="px-4 md:px-12 max-w-4xl mx-auto">

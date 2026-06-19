@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import Navbar from '@/src/components/Navbar';
+import Seo from '@/src/components/Seo';
 import { useLanguage } from '@/src/contexts/LanguageContext';
 import { motion } from 'motion/react';
 import { Mail, Phone, MapPin, MessageSquare, Send, CheckCircle } from 'lucide-react';
@@ -17,6 +18,7 @@ export default function ContactUs() {
   return (
     <div className="min-h-screen bg-white">
       <Navbar />
+      <Seo title={t('support.contact.title')} description={t('support.contact.subtitle')} />
 
       <main className="py-12 md:py-20">
         <div className="px-4 md:px-12 max-w-7xl mx-auto">

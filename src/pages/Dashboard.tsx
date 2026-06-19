@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useNavigate, Link } from 'react-router-dom';
 import Navbar from '../components/Navbar';
+import Seo from '../components/Seo';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useCurrency } from '../contexts/CurrencyContext';
 import {
@@ -266,6 +267,7 @@ export default function Dashboard() {
   return (
     <div className="min-h-screen bg-[#f8fafc]">
       <Navbar />
+      <Seo title={language === 'fr' ? 'Mon compte' : 'My Account'} />
 
       <main className="max-w-7xl mx-auto px-4 pt-4 pb-24">
         {/* Profile Card Header */}

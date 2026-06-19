@@ -1,5 +1,6 @@
 import React from 'react';
 import Navbar from '@/src/components/Navbar';
+import Seo from '@/src/components/Seo';
 import { useLanguage } from '@/src/contexts/LanguageContext';
 import { motion } from 'motion/react';
 import { ShieldCheck, CreditCard, Smartphone, Banknote, Lock, CheckCircle } from 'lucide-react';
@@ -52,6 +53,7 @@ export default function PaymentDetails() {
   return (
     <div className="min-h-screen bg-white">
       <Navbar />
+      <Seo title={fr ? 'Paiement en ligne' : 'Online Payment'} description={fr ? 'Nos moyens de paiement sécurisés.' : 'Our secure payment methods.'} />
 
       <main className="py-20">
         <div className="px-4 md:px-12 max-w-7xl mx-auto">

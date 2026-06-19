@@ -3,6 +3,7 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import { ChevronRight, Star, Minus, Plus, Truck, RotateCcw } from 'lucide-react';
 import { PRODUCTS } from '@/src/constants';
 import Navbar from '@/src/components/Navbar';
+import Seo from '@/src/components/Seo';
 import { cn } from '@/src/lib/utils';
 import { useLanguage } from '@/src/contexts/LanguageContext';
 import { useCurrency } from '@/src/contexts/CurrencyContext';
@@ -48,6 +49,7 @@ export default function ProductDetail() {
   return (
     <div className="min-h-screen bg-white">
       <Navbar />
+      <Seo title={product.name} description={product.description} />
 
       <main className="px-4 md:px-12 py-8">
         {/* Breadcrumbs */}

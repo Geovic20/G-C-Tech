@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useLanguage } from '@/src/contexts/LanguageContext';
+import Seo from '@/src/components/Seo';
 import { Eye, EyeOff, Layout } from 'lucide-react';
 import { motion } from 'motion/react';
 
@@ -37,6 +38,7 @@ export default function Signup() {
 
   return (
     <div className="min-h-screen bg-[#f8fafc] flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+      <Seo title={t('auth.signup.title')} />
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
         <Link to="/" className="flex items-center justify-center gap-3 mb-8">
           <div className="w-12 h-12 bg-[#007bff] rounded-2xl flex items-center justify-center shadow-lg shadow-blue-500/20">

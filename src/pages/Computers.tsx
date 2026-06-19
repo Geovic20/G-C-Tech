@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import Navbar from '@/src/components/Navbar';
+import Seo from '@/src/components/Seo';
 import ProductCard from '@/src/components/ProductCard';
 import FilterBar from '@/src/components/FilterBar';
 import { getProductsByGroup } from '@/src/constants';
@@ -17,6 +18,7 @@ export default function Computers() {
   return (
     <div className="min-h-screen bg-[#f8fafc]">
       <Navbar />
+      <Seo title={t('computers.title')} description={t('computers.subtitle')} />
       <main className="max-w-7xl mx-auto px-4 pt-2 pb-12">
         <nav className="flex items-center gap-2 text-sm text-gray-400 mb-8 font-medium">
           <Link to="/" className="hover:text-[#007bff] transition-colors">{t('breadcrumb.home')}</Link>

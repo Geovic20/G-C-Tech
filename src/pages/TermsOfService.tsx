@@ -1,5 +1,6 @@
 import React from 'react';
 import Navbar from '@/src/components/Navbar';
+import Seo from '@/src/components/Seo';
 import { useLanguage } from '@/src/contexts/LanguageContext';
 import { motion } from 'motion/react';
 
@@ -58,6 +59,7 @@ export default function TermsOfService() {
   return (
     <div className="min-h-screen bg-white">
       <Navbar />
+      <Seo title={t('legal.terms.title')} />
       <main className="max-w-4xl mx-auto px-4 py-20">
         <motion.div
           initial={{ opacity: 0, y: 20 }}

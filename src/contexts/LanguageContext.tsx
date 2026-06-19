@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 
 type Language = 'en' | 'fr';
 
@@ -399,6 +399,11 @@ const LanguageContext = createContext<LanguageContextType | undefined>(undefined
 
 export function LanguageProvider({ children }: { children: ReactNode }) {
   const [language, setLanguage] = useState<Language>('en');
+
+  // Keep <html lang> in sync with the active language for accessibility & SEO.
+  useEffect(() => {
+    document.documentElement.lang = language;
+  }, [language]);
 
   const t = (key: string, params?: Record<string, string>) => {
     let translation = translations[language][key as keyof typeof translations['en']] || key;

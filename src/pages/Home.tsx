@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { CATEGORIES, PRODUCTS } from '@/src/constants';
 import Navbar from '@/src/components/Navbar';
+import Seo from '@/src/components/Seo';
 import ProductCard from '@/src/components/ProductCard';
 import FeatureSection from '@/src/components/FeatureSection';
 import { TestimonialStack } from '@/src/components/TestimonialStack';
@@ -66,6 +67,10 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-white">
+      <Seo
+        title={fr ? 'Boutique High-Tech & Électronique' : 'High-Tech & Electronics Store'}
+        description={t('hero.desc')}
+      />
       <Navbar />
 
       <main className="px-4 md:px-12 py-8">

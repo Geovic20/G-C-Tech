@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Compass } from 'lucide-react';
 import Navbar from '@/src/components/Navbar';
+import Seo from '@/src/components/Seo';
 import { useLanguage } from '@/src/contexts/LanguageContext';
 
 export default function NotFound() {
@@ -9,6 +10,7 @@ export default function NotFound() {
 
   return (
     <div className="min-h-screen bg-[#f8fafc]">
+      <Seo title={language === 'fr' ? 'Page introuvable' : 'Page not found'} />
       <Navbar />
       <main className="max-w-xl mx-auto px-4 py-24 text-center">
         <div className="w-24 h-24 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-8 text-[#007bff]">

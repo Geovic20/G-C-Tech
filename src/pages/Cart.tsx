@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Navbar from '@/src/components/Navbar';
+import Seo from '@/src/components/Seo';
 import { useLanguage } from '@/src/contexts/LanguageContext';
 import { useCurrency } from '@/src/contexts/CurrencyContext';
 import { useCart } from '@/src/contexts/CartContext';
@@ -179,6 +180,7 @@ Please let me know how I can settle the payment!`;
   return (
     <div className="min-h-screen bg-[#f8fafc]">
       <Navbar />
+      <Seo title={t('cart.title')} />
       
       <main className="max-w-7xl mx-auto px-4 py-16">
         {/* Steps Progress */}

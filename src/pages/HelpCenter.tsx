@@ -1,5 +1,6 @@
 import React from 'react';
 import Navbar from '@/src/components/Navbar';
+import Seo from '@/src/components/Seo';
 import { useLanguage } from '@/src/contexts/LanguageContext';
 import { motion } from 'motion/react';
 import { Search, ChevronRight, MessageCircle, Phone, Mail, ShoppingBag, Truck, RotateCcw, ShieldCheck } from 'lucide-react';
@@ -28,6 +29,7 @@ export default function HelpCenter() {
   return (
     <div className="min-h-screen bg-white">
       <Navbar />
+      <Seo title={t('support.help.title')} description={t('support.help.subtitle')} />
 
       <main>
         {/* Hero Section */}
