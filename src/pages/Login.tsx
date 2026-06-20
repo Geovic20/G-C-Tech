@@ -2,12 +2,13 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useLanguage } from '@/src/contexts/LanguageContext';
 import Seo from '@/src/components/Seo';
-import { login } from '@/src/lib/auth';
+import { useAuth } from '@/src/contexts/AuthContext';
 import { Eye, EyeOff, Layout } from 'lucide-react';
 import { motion } from 'motion/react';
 
 export default function Login() {
   const { t, language } = useLanguage();
+  const { signIn } = useAuth();
   const fr = language === 'fr';
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
@@ -20,14 +21,12 @@ export default function Login() {
     e.preventDefault();
     setError('');
     setLoading(true);
-    const result = await login(email, password);
+    const result = await signIn(email, password);
     setLoading(false);
     if (result.error) {
-      setError(
-        result.error === 'NO_USER'
-          ? (fr ? "Aucun compte n'est associé à cet email." : 'No account found for this email.')
-          : (fr ? 'Mot de passe incorrect.' : 'Incorrect password.')
-      );
+      // Supabase returns a single "invalid credentials" error for both cases,
+      // which is also the safer message (doesn't reveal whether the email exists).
+      setError(fr ? 'Email ou mot de passe incorrect.' : 'Invalid email or password.');
       return;
     }
     navigate('/dashboard');

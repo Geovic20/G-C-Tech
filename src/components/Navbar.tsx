@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useLanguage } from '@/src/contexts/LanguageContext';
 import { useCurrency, Currency } from '@/src/contexts/CurrencyContext';
 import { useCart } from '@/src/contexts/CartContext';
+import { useAuth } from '@/src/contexts/AuthContext';
 import { CreditCard, Globe, Search, ShoppingCart, User, Phone, ChevronDown, MapPin, Menu, X } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { cn } from '@/src/lib/utils';
@@ -21,28 +22,10 @@ export default function Navbar() {
   const { t, language, setLanguage } = useLanguage();
   const { currency, setCurrency, formatPrice } = useCurrency();
   const { itemCount } = useCart();
+  const { currentUser } = useAuth();
   const [showCurrencyMenu, setShowCurrencyMenu] = useState(false);
-  const [currentUser, setCurrentUser] = useState<{ email: string; fullname: string } | null>(null);
 
-  useEffect(() => {
-    const handleStorageChange = () => {
-      const stored = localStorage.getItem('currentUser');
-      if (stored) {
-        try {
-          setCurrentUser(JSON.parse(stored));
-        } catch (e) {
-          console.error(e);
-        }
-      } else {
-        setCurrentUser(null);
-      }
-    };
-    handleStorageChange();
-    window.addEventListener('storage', handleStorageChange);
-    return () => window.removeEventListener('storage', handleStorageChange);
-  }, []);
-
-  const filteredProducts = PRODUCTS.filter(p => 
+  const filteredProducts = PRODUCTS.filter(p =>
     p.name.toLowerCase().includes(searchQuery.toLowerCase())
   ).slice(0, 5);
 

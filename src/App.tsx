@@ -4,6 +4,7 @@ import Footer from './components/Footer';
 import { LanguageProvider } from './contexts/LanguageContext';
 import { CurrencyProvider } from './contexts/CurrencyContext';
 import { CartProvider } from './contexts/CartContext';
+import { AuthProvider } from './contexts/AuthContext';
 
 // Pages are code-split: each is loaded on demand to keep the initial bundle small.
 const Home = lazy(() => import('./pages/Home'));
@@ -52,6 +53,7 @@ export default function App() {
     <LanguageProvider>
       <CurrencyProvider>
         <CartProvider>
+          <AuthProvider>
           <BrowserRouter>
             <ScrollToTop />
             <div className="flex flex-col min-h-screen">
@@ -86,6 +88,7 @@ export default function App() {
               <Footer />
             </div>
           </BrowserRouter>
+          </AuthProvider>
         </CartProvider>
       </CurrencyProvider>
     </LanguageProvider>

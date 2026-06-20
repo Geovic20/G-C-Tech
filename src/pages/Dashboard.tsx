@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { useNavigate, Link } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Seo from '../components/Seo';
-import { updateCurrentUser, logout as authLogout } from '../lib/auth';
+import { useAuth } from '../contexts/AuthContext';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useCurrency } from '../contexts/CurrencyContext';
 import {
@@ -44,15 +44,10 @@ interface Order {
 export default function Dashboard() {
   const { t, language } = useLanguage();
   const { currency, formatPrice } = useCurrency();
+  const { currentUser, loading, updateProfile, signOut } = useAuth();
+  const user = currentUser;
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<'overview' | 'orders' | 'addresses' | 'settings'>('overview');
-  const [user, setUser] = useState<{
-    fullname: string;
-    email: string;
-    joinDate: string;
-    phone: string;
-    address: string;
-  } | null>(null);
 
   // States for Address Editing
   const [shippingAddress, setShippingAddress] = useState('');
@@ -65,53 +60,46 @@ export default function Dashboard() {
   const [newPassword, setNewPassword] = useState('');
   const [showProfileSuccess, setShowProfileSuccess] = useState(false);
 
-  // Load user data from localStorage
+  // Redirect to login once we know there is no authenticated session.
   useEffect(() => {
-    const storedUser = localStorage.getItem('currentUser');
-    if (storedUser) {
-      try {
-        const parsed = JSON.parse(storedUser);
-        setUser(parsed);
-        setShippingAddress(parsed.address || '');
-        setUserPhone(parsed.phone || '');
-        setFullname(parsed.fullname || '');
-        setEmail(parsed.email || '');
-      } catch (e) {
-        console.error('Error parsing user', e);
-      }
-    } else {
-      // Redirect to login if user is not present
-      navigate('/login');
+    if (!loading && !currentUser) navigate('/login');
+  }, [loading, currentUser, navigate]);
+
+  // Seed the editable fields from the current user.
+  useEffect(() => {
+    if (currentUser) {
+      setShippingAddress(currentUser.address || '');
+      setUserPhone(currentUser.phone || '');
+      setFullname(currentUser.fullname || '');
+      setEmail(currentUser.email || '');
     }
-  }, [navigate]);
+  }, [currentUser]);
 
   // Handle address update
-  const handleAddressUpdate = (e: React.FormEvent) => {
+  const handleAddressUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user) return;
-    const updatedUser = { ...user, address: shippingAddress, phone: userPhone };
-    updateCurrentUser({ address: shippingAddress, phone: userPhone });
-    setUser(updatedUser);
+    await updateProfile({ address: shippingAddress, phone: userPhone });
     setShowAddressSuccess(true);
     setTimeout(() => setShowAddressSuccess(false), 3000);
   };
 
   // Handle profile update
-  const handleProfileUpdate = (e: React.FormEvent) => {
+  const handleProfileUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user) return;
-    const updatedUser = { ...user, fullname, email };
-    updateCurrentUser({ fullname, email });
-    setUser(updatedUser);
+    await updateProfile({ fullname, email });
     setShowProfileSuccess(true);
     setTimeout(() => setShowProfileSuccess(false), 3000);
   };
 
   // Handle Logout
-  const handleLogout = () => {
-    authLogout();
+  const handleLogout = async () => {
+    await signOut();
     navigate('/');
   };
+
+  if (loading) return null;
 
   if (!user) {
     return (

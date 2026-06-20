@@ -2,16 +2,18 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useLanguage } from '@/src/contexts/LanguageContext';
 import Seo from '@/src/components/Seo';
-import { signup } from '@/src/lib/auth';
+import { useAuth } from '@/src/contexts/AuthContext';
 import { Eye, EyeOff, Layout } from 'lucide-react';
 import { motion } from 'motion/react';
 
 export default function Signup() {
   const { t, language } = useLanguage();
+  const { signUp } = useAuth();
   const fr = language === 'fr';
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
+  const [info, setInfo] = useState('');
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     fullname: '',
@@ -22,21 +24,32 @@ export default function Signup() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+    setInfo('');
     if (formData.password.length < 6) {
       setError(fr ? 'Le mot de passe doit contenir au moins 6 caractères.' : 'Password must be at least 6 characters.');
       return;
     }
     setLoading(true);
-    const joinDate = new Date().toLocaleDateString(language === 'fr' ? 'fr-FR' : 'en-US', { year: 'numeric', month: 'long' });
-    const result = await signup({
+    const result = await signUp({
       fullname: formData.fullname,
       email: formData.email,
       password: formData.password,
-      joinDate,
     });
     setLoading(false);
     if (result.error) {
-      setError(fr ? 'Un compte existe déjà avec cet email.' : 'An account already exists with this email.');
+      setError(
+        /already registered|already exists/i.test(result.error)
+          ? (fr ? 'Un compte existe déjà avec cet email.' : 'An account already exists with this email.')
+          : (fr ? 'Une erreur est survenue. Réessayez.' : 'Something went wrong. Please try again.')
+      );
+      return;
+    }
+    if (result.needsConfirmation) {
+      setInfo(
+        fr
+          ? 'Compte créé ! Vérifiez votre boîte mail pour confirmer votre adresse, puis connectez-vous.'
+          : 'Account created! Check your inbox to confirm your email, then sign in.'
+      );
       return;
     }
     navigate('/dashboard');
@@ -136,6 +149,11 @@ export default function Signup() {
               </div>
             </div>
 
+            {info && (
+              <div className="p-3 rounded-2xl bg-green-50 border border-green-100 text-green-700 text-sm font-medium text-center">
+                {info}
+              </div>
+            )}
             {error && (
               <div className="p-3 rounded-2xl bg-red-50 border border-red-100 text-red-600 text-sm font-medium text-center">
                 {error}
