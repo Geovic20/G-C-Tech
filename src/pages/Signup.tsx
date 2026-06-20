@@ -37,6 +37,7 @@ export default function Signup() {
     });
     setLoading(false);
     if (result.error) {
+      console.error('[signup] Supabase error:', result.error);
       setError(
         /already registered|already exists/i.test(result.error)
           ? (fr ? 'Un compte existe déjà avec cet email.' : 'An account already exists with this email.')
