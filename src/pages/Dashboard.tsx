@@ -59,6 +59,7 @@ export default function Dashboard() {
   const [email, setEmail] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [showProfileSuccess, setShowProfileSuccess] = useState(false);
+  const [profileError, setProfileError] = useState('');
 
   // Redirect to login once we know there is no authenticated session.
   useEffect(() => {
@@ -88,7 +89,31 @@ export default function Dashboard() {
   const handleProfileUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user) return;
-    await updateProfile({ fullname, email });
+    setProfileError('');
+
+    if (newPassword && newPassword.length < 6) {
+      setProfileError(
+        language === 'fr'
+          ? 'Le mot de passe doit contenir au moins 6 caractères.'
+          : 'Password must be at least 6 characters.'
+      );
+      return;
+    }
+
+    const result = await updateProfile({
+      fullname,
+      email,
+      ...(newPassword ? { password: newPassword } : {}),
+    });
+
+    if (result.error) {
+      setProfileError(
+        language === 'fr' ? 'La mise à jour a échoué. Réessayez.' : 'Update failed. Please try again.'
+      );
+      return;
+    }
+
+    setNewPassword('');
     setShowProfileSuccess(true);
     setTimeout(() => setShowProfileSuccess(false), 3000);
   };
@@ -625,6 +650,11 @@ export default function Dashboard() {
                     {showProfileSuccess && (
                       <div className="mb-6 p-4 bg-emerald-50 text-emerald-700 rounded-2xl text-sm font-bold flex items-center gap-2">
                         <CheckCircle size={18} /> {texts.settings.success}
+                      </div>
+                    )}
+                    {profileError && (
+                      <div className="mb-6 p-4 bg-red-50 text-red-600 rounded-2xl text-sm font-bold">
+                        {profileError}
                       </div>
                     )}
 

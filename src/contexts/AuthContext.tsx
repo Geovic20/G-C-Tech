@@ -19,7 +19,7 @@ interface AuthContextType {
   signUp: (input: { fullname: string; email: string; password: string }) => Promise<AuthResult & { needsConfirmation?: boolean }>;
   signIn: (email: string, password: string) => Promise<AuthResult>;
   signOut: () => Promise<void>;
-  updateProfile: (patch: Partial<Pick<CurrentUser, 'fullname' | 'phone' | 'address'>> & { email?: string }) => Promise<AuthResult>;
+  updateProfile: (patch: Partial<Pick<CurrentUser, 'fullname' | 'phone' | 'address'>> & { email?: string; password?: string }) => Promise<AuthResult>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -89,8 +89,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const updateProfile: AuthContextType['updateProfile'] = async (patch) => {
-    const updates: { email?: string; data?: Record<string, string> } = {};
+    const updates: { email?: string; password?: string; data?: Record<string, string> } = {};
     if (patch.email) updates.email = patch.email.trim();
+    if (patch.password) updates.password = patch.password;
 
     const data: Record<string, string> = {};
     (['fullname', 'phone', 'address'] as const).forEach((k) => {
