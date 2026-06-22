@@ -17,6 +17,15 @@ export interface SavingsPlan {
   created_at: string;
 }
 
+export interface Contribution {
+  id: string;
+  plan_id: string;
+  amount: number;
+  method: string;
+  reference: string | null;
+  created_at: string;
+}
+
 export interface NewPlanInput {
   productId: string;
   productName: string;
@@ -37,6 +46,38 @@ export async function listPlans(): Promise<SavingsPlan[]> {
   return (data ?? []) as SavingsPlan[];
 }
 
+/** Fetches a single plan owned by the current user (null if not found). */
+export async function getPlan(id: string): Promise<SavingsPlan | null> {
+  const { data, error } = await supabase
+    .from('savings_plans')
+    .select('*')
+    .eq('id', id)
+    .maybeSingle();
+  if (error) throw error;
+  return (data as SavingsPlan) ?? null;
+}
+
+/** Lists the contributions of a plan (most recent first). */
+export async function listContributions(planId: string): Promise<Contribution[]> {
+  const { data, error } = await supabase
+    .from('contributions')
+    .select('*')
+    .eq('plan_id', planId)
+    .order('created_at', { ascending: false });
+  if (error) throw error;
+  return (data ?? []) as Contribution[];
+}
+
+/** True if the user already has an active plan (one active plan at a time). */
+export async function hasActivePlan(): Promise<boolean> {
+  const { count, error } = await supabase
+    .from('savings_plans')
+    .select('id', { count: 'exact', head: true })
+    .eq('status', 'active');
+  if (error) throw error;
+  return (count ?? 0) > 0;
+}
+
 /** Creates a new savings plan for the logged-in user. */
 export async function createPlan(input: NewPlanInput): Promise<{ error?: string }> {
   const { data: auth } = await supabase.auth.getUser();
@@ -53,7 +94,12 @@ export async function createPlan(input: NewPlanInput): Promise<{ error?: string 
     cadence: input.cadence,
     target_date: input.targetDate ?? null,
   });
-  return error ? { error: error.message } : {};
+  if (error) {
+    // Unique-index violation = the user already has an active plan.
+    if (error.code === '23505') return { error: 'ACTIVE_PLAN_EXISTS' };
+    return { error: error.message };
+  }
+  return {};
 }
 
 /**

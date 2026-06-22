@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'motion/react';
 import { PiggyBank, Target, Truck, CheckCircle2, Plus, Wallet } from 'lucide-react';
 import Navbar from '@/src/components/Navbar';
@@ -25,6 +25,7 @@ export default function Tontine() {
   const fr = language === 'fr';
   const { formatPrice } = useCurrency();
   const { currentUser, loading: authLoading } = useAuth();
+  const navigate = useNavigate();
 
   const [plans, setPlans] = useState<SavingsPlan[]>([]);
   const [plansLoading, setPlansLoading] = useState(false);
@@ -37,6 +38,7 @@ export default function Tontine() {
   const [count, setCount] = useState(6);
   const [creating, setCreating] = useState(false);
 
+  const activePlan = plans.find((p) => p.status === 'active');
   const selectedProduct = useMemo(() => PRODUCTS.find((p) => p.id === productId), [productId]);
   const installment = selectedProduct ? Math.ceil(selectedProduct.price / count) : 0;
   const targetDate = computeTargetDate(count, cadence);
@@ -82,7 +84,12 @@ export default function Tontine() {
     });
     setCreating(false);
     if (result.error) {
-      setError(result.error);
+      setError(
+        result.error === 'ACTIVE_PLAN_EXISTS'
+          ? (fr ? 'Vous avez déjà une épargne en cours.' : 'You already have an active savings plan.')
+          : result.error
+      );
+      await loadPlans();
       return;
     }
     await loadPlans();
@@ -178,6 +185,26 @@ export default function Tontine() {
             {/* New plan form */}
             <section className="lg:col-span-2">
               <div className="bg-white rounded-[32px] border border-gray-100 shadow-sm p-6 md:p-8 sticky top-8">
+                {activePlan ? (
+                  <div className="text-center py-4">
+                    <div className="w-12 h-12 bg-blue-50 text-[#007bff] rounded-2xl flex items-center justify-center mx-auto mb-4">
+                      <PiggyBank size={22} />
+                    </div>
+                    <h2 className="text-lg font-bold text-gray-900 mb-2">{fr ? 'Épargne en cours' : 'Active savings plan'}</h2>
+                    <p className="text-sm text-gray-500 mb-6">
+                      {fr
+                        ? 'Vous ne pouvez avoir qu’une seule épargne à la fois. Terminez celle en cours avant d’en ouvrir une nouvelle.'
+                        : 'You can only have one savings plan at a time. Finish the current one before opening a new plan.'}
+                    </p>
+                    <Link
+                      to={`/epargne/${activePlan.id}`}
+                      className="inline-flex items-center gap-2 px-6 py-3 bg-[#007bff] text-white rounded-full font-bold text-sm hover:bg-blue-700 transition-all"
+                    >
+                      {fr ? 'Voir mon épargne' : 'View my savings'}
+                    </Link>
+                  </div>
+                ) : (
+                <>
                 <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
                   <Plus size={20} className="text-[#007bff]" />
                   {fr ? 'Démarrer une épargne' : 'Start a savings plan'}
@@ -247,6 +274,8 @@ export default function Tontine() {
                     {creating ? (fr ? 'Création...' : 'Creating...') : (fr ? 'Ouvrir le plan' : 'Open plan')}
                   </button>
                 </form>
+                </>
+                )}
               </div>
             </section>
 
@@ -277,7 +306,8 @@ export default function Tontine() {
                         key={plan.id}
                         initial={{ opacity: 0, y: 12 }}
                         animate={{ opacity: 1, y: 0 }}
-                        className="bg-white rounded-[28px] border border-gray-100 shadow-sm p-6"
+                        onClick={() => navigate(`/epargne/${plan.id}`)}
+                        className="bg-white rounded-[28px] border border-gray-100 shadow-sm p-6 cursor-pointer hover:border-blue-200 hover:shadow-md transition-all"
                       >
                         <div className="flex gap-4 items-center mb-4">
                           <div className="w-16 h-16 bg-gray-50 rounded-2xl p-2 flex-shrink-0 flex items-center justify-center">
@@ -325,7 +355,7 @@ export default function Tontine() {
                           </div>
                           {!done && (
                             <button
-                              onClick={() => handleContribute(plan)}
+                              onClick={(e) => { e.stopPropagation(); handleContribute(plan); }}
                               disabled={busyId === plan.id}
                               className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#007bff] text-white rounded-full font-bold text-sm hover:bg-blue-700 transition-all disabled:opacity-60"
                             >
