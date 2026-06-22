@@ -106,7 +106,7 @@ export default function Tontine() {
     <div className="min-h-screen bg-[#f8fafc]">
       <Navbar />
       <Seo
-        title="Tontine"
+        title={fr ? 'Épargne' : 'Savings'}
         description={
           fr
             ? 'Épargnez progressivement pour votre produit tech et soyez livré une fois 100% atteint.'
@@ -235,7 +235,7 @@ export default function Tontine() {
                     </div>
                     <div className="flex justify-between">
                       <span className="text-gray-500">{fr ? 'Échéance prévue' : 'Target date'}</span>
-                      <span className="font-bold text-gray-900">{targetDate.toLocaleDateString(locale)}</span>
+                      <span className="font-bold text-gray-900">{targetDate.toLocaleDateString(locale, { day: 'numeric', month: 'long', year: 'numeric' })}</span>
                     </div>
                   </div>
 
@@ -318,7 +318,7 @@ export default function Tontine() {
                               <>
                                 {fr ? 'Reste' : 'Remaining'}: <strong className="text-gray-900">{formatPrice(remaining)}</strong>
                                 {plan.target_date && (
-                                  <> · {fr ? 'Échéance' : 'Due'} {new Date(plan.target_date).toLocaleDateString(locale)}</>
+                                  <> · {fr ? 'Échéance' : 'Due'} {new Date(plan.target_date).toLocaleDateString(locale, { day: 'numeric', month: 'long', year: 'numeric' })}</>
                                 )}
                               </>
                             )}

@@ -196,7 +196,7 @@ export default function Navbar() {
               )}
             </div>
             <Link to="/products" className="hover:text-[#007bff]">{t('nav.shop')}</Link>
-            <Link to="/tontine" className="hover:text-[#007bff]">{t('nav.tontine')}</Link>
+            <Link to="/epargne" className="hover:text-[#007bff]">{t('nav.tontine')}</Link>
           </div>
 
           {/* Search Bar - Responsive */}
@@ -361,7 +361,7 @@ export default function Navbar() {
                   <Link to="/products" onClick={() => setIsMobileMenuOpen(false)} className="text-xl font-bold text-gray-900 flex items-center justify-between">
                     {t('nav.shop')} <ChevronDown className="-rotate-90 text-gray-300" size={20} />
                   </Link>
-                  <Link to="/tontine" onClick={() => setIsMobileMenuOpen(false)} className="text-xl font-bold text-gray-900 flex items-center justify-between">
+                  <Link to="/epargne" onClick={() => setIsMobileMenuOpen(false)} className="text-xl font-bold text-gray-900 flex items-center justify-between">
                     {t('nav.tontine')} <ChevronDown className="-rotate-90 text-gray-300" size={20} />
                   </Link>
                   <Link to={currentUser ? "/dashboard" : "/login"} onClick={() => setIsMobileMenuOpen(false)} className="text-xl font-bold text-gray-900 flex items-center justify-between border-t border-gray-50 pt-3 mt-1">
