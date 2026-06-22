@@ -29,7 +29,7 @@ export default function Login() {
       setError(fr ? 'Email ou mot de passe incorrect.' : 'Invalid email or password.');
       return;
     }
-    navigate('/dashboard');
+    navigate('/products');
   };
 
   return (

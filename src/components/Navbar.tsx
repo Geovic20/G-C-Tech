@@ -195,6 +195,7 @@ export default function Navbar() {
                 </div>
               )}
             </div>
+            <Link to="/products" className="hover:text-[#007bff]">{t('nav.shop')}</Link>
             <Link to="/shipping" className="hover:text-[#007bff]">{t('nav.delivery')}</Link>
           </div>
 
@@ -357,6 +358,9 @@ export default function Navbar() {
               <div>
                 <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4">{t('nav.menu')}</h3>
                 <div className="flex flex-col gap-4">
+                  <Link to="/products" onClick={() => setIsMobileMenuOpen(false)} className="text-xl font-bold text-gray-900 flex items-center justify-between">
+                    {t('nav.shop')} <ChevronDown className="-rotate-90 text-gray-300" size={20} />
+                  </Link>
                   <Link to="/shipping" onClick={() => setIsMobileMenuOpen(false)} className="text-xl font-bold text-gray-900 flex items-center justify-between">
                     {t('nav.delivery')} <ChevronDown className="-rotate-90 text-gray-300" size={20} />
                   </Link>

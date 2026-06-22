@@ -53,7 +53,7 @@ export default function Signup() {
       );
       return;
     }
-    navigate('/dashboard');
+    navigate('/products');
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {

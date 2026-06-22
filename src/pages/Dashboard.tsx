@@ -393,6 +393,28 @@ export default function Dashboard() {
                   exit={{ opacity: 0, y: -15 }}
                   className="space-y-8"
                 >
+                  {/* Browse catalog CTA */}
+                  <div className="relative overflow-hidden rounded-3xl bg-[#007bff] p-6 md:p-8 text-white flex flex-col sm:flex-row items-center justify-between gap-4">
+                    <div className="absolute top-0 right-0 w-40 h-40 bg-white/10 rounded-full blur-3xl -mr-20 -mt-20" />
+                    <div className="relative z-10 text-center sm:text-left">
+                      <h3 className="text-xl md:text-2xl font-black mb-1">
+                        {language === 'fr' ? 'Envie de shopping ?' : 'Ready to shop?'}
+                      </h3>
+                      <p className="text-blue-100 text-sm">
+                        {language === 'fr'
+                          ? 'Découvrez tous nos produits high-tech au meilleur prix.'
+                          : 'Explore our full range of tech at the best prices.'}
+                      </p>
+                    </div>
+                    <Link
+                      to="/products"
+                      className="relative z-10 inline-flex items-center gap-2 px-6 py-3 bg-white text-[#007bff] rounded-full font-black text-sm uppercase tracking-wide hover:bg-blue-50 transition-all flex-shrink-0"
+                    >
+                      <ShoppingBag size={18} />
+                      {language === 'fr' ? 'Parcourir le catalogue' : 'Browse the catalog'}
+                    </Link>
+                  </div>
+
                   {/* Stats Cards */}
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
                     <div className="bg-white rounded-3xl p-6 border border-gray-100 shadow-sm flex items-center gap-5">

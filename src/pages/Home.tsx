@@ -140,7 +140,12 @@ export default function Home() {
 
         {/* Product Listing */}
         <section className="mb-16">
-          <h2 className="text-2xl font-bold mb-8">{t('products.for-you')}</h2>
+          <div className="flex items-center justify-between mb-8">
+            <h2 className="text-2xl font-bold">{t('products.for-you')}</h2>
+            <Link to="/products" className="text-sm font-bold text-[#007bff] hover:text-blue-700 transition-colors">
+              {fr ? 'Voir tout →' : 'View all →'}
+            </Link>
+          </div>
           <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-8">
             {PRODUCTS.map((product) => (
               <ProductCard key={product.id} product={product} />

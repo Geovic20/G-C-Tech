@@ -9,6 +9,7 @@ import { AuthProvider } from './contexts/AuthContext';
 // Pages are code-split: each is loaded on demand to keep the initial bundle small.
 const Home = lazy(() => import('./pages/Home'));
 const ProductDetail = lazy(() => import('./pages/ProductDetail'));
+const Products = lazy(() => import('./pages/Products'));
 const Login = lazy(() => import('./pages/Login'));
 const Signup = lazy(() => import('./pages/Signup'));
 const PrivacyPolicy = lazy(() => import('./pages/PrivacyPolicy'));
@@ -61,6 +62,7 @@ export default function App() {
                 <Suspense fallback={<PageLoader />}>
                   <Routes>
                     <Route path="/" element={<Home />} />
+                    <Route path="/products" element={<Products />} />
                     <Route path="/product/:id" element={<ProductDetail />} />
                     <Route path="/login" element={<Login />} />
                     <Route path="/signup" element={<Signup />} />
