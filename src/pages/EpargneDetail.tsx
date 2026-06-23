@@ -7,7 +7,8 @@ import Seo from '@/src/components/Seo';
 import { useLanguage } from '@/src/contexts/LanguageContext';
 import { useCurrency } from '@/src/contexts/CurrencyContext';
 import { useAuth } from '@/src/contexts/AuthContext';
-import { getPlan, listContributions, contribute, SavingsPlan, Contribution, Cadence } from '@/src/lib/tontine';
+import { getPlan, listContributions, SavingsPlan, Contribution, Cadence } from '@/src/lib/tontine';
+import { startPayment } from '@/src/lib/payment';
 
 export default function EpargneDetail() {
   const { id } = useParams();
@@ -60,15 +61,14 @@ export default function EpargneDetail() {
     if (!plan) return;
     const remaining = plan.target_amount - plan.saved_amount;
     if (remaining <= 0) return;
-    const amount = Math.min(plan.installment ?? remaining, remaining);
     setBusy(true);
-    const result = await contribute(plan.id, amount);
-    setBusy(false);
-    if (result.error) {
-      setError(result.error);
+    const { url, error } = await startPayment(plan.id);
+    if (error || !url) {
+      setBusy(false);
+      setError(error ?? 'Payment could not be started');
       return;
     }
-    await load();
+    window.location.href = url;
   };
 
   const pct = plan ? Math.min(100, Math.round((plan.saved_amount / plan.target_amount) * 100)) : 0;

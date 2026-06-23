@@ -8,7 +8,8 @@ import { useLanguage } from '@/src/contexts/LanguageContext';
 import { useCurrency } from '@/src/contexts/CurrencyContext';
 import { useAuth } from '@/src/contexts/AuthContext';
 import { PRODUCTS } from '@/src/constants';
-import { listPlans, createPlan, contribute, SavingsPlan, Cadence } from '@/src/lib/tontine';
+import { listPlans, createPlan, SavingsPlan, Cadence } from '@/src/lib/tontine';
+import { startPayment } from '@/src/lib/payment';
 
 const INSTALLMENT_COUNTS = [3, 6, 9, 12];
 
@@ -98,15 +99,15 @@ export default function Tontine() {
   const handleContribute = async (plan: SavingsPlan) => {
     const remaining = plan.target_amount - plan.saved_amount;
     if (remaining <= 0) return;
-    const amount = Math.min(plan.installment ?? remaining, remaining);
     setBusyId(plan.id);
-    const result = await contribute(plan.id, amount);
-    setBusyId(null);
-    if (result.error) {
-      setError(result.error);
+    const { url, error } = await startPayment(plan.id);
+    if (error || !url) {
+      setBusyId(null);
+      setError(error ?? 'Payment could not be started');
       return;
     }
-    await loadPlans();
+    // Redirect to FedaPay's secure payment page.
+    window.location.href = url;
   };
 
   return (
@@ -374,8 +375,8 @@ export default function Tontine() {
 
               <p className="mt-6 text-xs text-gray-400">
                 {fr
-                  ? '💡 Les versements sont simulés pour le moment. Le paiement mobile money sera branché prochainement.'
-                  : '💡 Contributions are simulated for now. Mobile money payment will be connected soon.'}
+                  ? '💡 Les versements se font par mobile money ou carte via FedaPay (paiement sécurisé).'
+                  : '💡 Contributions are made via mobile money or card through FedaPay (secure payment).'}
               </p>
             </section>
           </div>
