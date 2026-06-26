@@ -6,7 +6,7 @@ import { useAuth } from '@/src/contexts/AuthContext';
 import { CreditCard, Globe, Search, ShoppingCart, User, Phone, ChevronDown, MapPin, Menu, X } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { cn } from '@/src/lib/utils';
-import { PRODUCTS } from '@/src/constants';
+import { useCatalog } from '@/src/contexts/CatalogContext';
 
 export default function Navbar() {
   const [isSearchFocused, setIsSearchFocused] = useState(false);
@@ -23,9 +23,10 @@ export default function Navbar() {
   const { currency, setCurrency, formatPrice } = useCurrency();
   const { itemCount } = useCart();
   const { currentUser } = useAuth();
+  const { products } = useCatalog();
   const [showCurrencyMenu, setShowCurrencyMenu] = useState(false);
 
-  const filteredProducts = PRODUCTS.filter(p =>
+  const filteredProducts = products.filter(p =>
     p.name.toLowerCase().includes(searchQuery.toLowerCase())
   ).slice(0, 5);
 

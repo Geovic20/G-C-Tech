@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { CATEGORIES, PRODUCTS } from '@/src/constants';
+import { CATEGORIES } from '@/src/constants';
+import { useCatalog } from '@/src/contexts/CatalogContext';
 import Navbar from '@/src/components/Navbar';
 import Seo from '@/src/components/Seo';
 import ProductCard from '@/src/components/ProductCard';
@@ -14,6 +15,7 @@ import { Star, ShieldCheck } from 'lucide-react';
 
 export default function Home() {
   const { t, language } = useLanguage();
+  const { products } = useCatalog();
   const fr = language === 'fr';
 
   const TESTIMONIALS = [
@@ -147,7 +149,7 @@ export default function Home() {
             </Link>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-8">
-            {PRODUCTS.map((product) => (
+            {products.map((product) => (
               <ProductCard key={product.id} product={product} />
             ))}
           </div>

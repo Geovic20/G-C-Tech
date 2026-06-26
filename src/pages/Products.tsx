@@ -7,7 +7,8 @@ import { motion } from 'motion/react';
 import { ChevronRight, LayoutGrid, List } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { cn } from '@/src/lib/utils';
-import { PRODUCTS, ProductGroup } from '@/src/constants';
+import { ProductGroup } from '@/src/constants';
+import { useCatalog } from '@/src/contexts/CatalogContext';
 
 const GROUPS: { key: ProductGroup; labelKey: string }[] = [
   { key: 'smartphones', labelKey: 'cat.smartphones' },
@@ -20,11 +21,11 @@ const GROUPS: { key: ProductGroup; labelKey: string }[] = [
 
 export default function Products() {
   const { t } = useLanguage();
+  const { products: allProducts, byGroup } = useCatalog();
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [activeGroup, setActiveGroup] = useState<ProductGroup | 'all'>('all');
 
-  const products =
-    activeGroup === 'all' ? PRODUCTS : PRODUCTS.filter((p) => p.group === activeGroup);
+  const products = activeGroup === 'all' ? allProducts : byGroup(activeGroup);
 
   return (
     <div className="min-h-screen bg-[#f8fafc]">

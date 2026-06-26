@@ -7,7 +7,7 @@ import Seo from '@/src/components/Seo';
 import { useLanguage } from '@/src/contexts/LanguageContext';
 import { useCurrency } from '@/src/contexts/CurrencyContext';
 import { useAuth } from '@/src/contexts/AuthContext';
-import { PRODUCTS } from '@/src/constants';
+import { useCatalog } from '@/src/contexts/CatalogContext';
 import { listPlans, createPlan, SavingsPlan, Cadence } from '@/src/lib/tontine';
 import { startPayment } from '@/src/lib/payment';
 
@@ -26,6 +26,7 @@ export default function Tontine() {
   const fr = language === 'fr';
   const { formatPrice } = useCurrency();
   const { currentUser, loading: authLoading } = useAuth();
+  const { products } = useCatalog();
   const navigate = useNavigate();
 
   const [plans, setPlans] = useState<SavingsPlan[]>([]);
@@ -34,13 +35,13 @@ export default function Tontine() {
   const [busyId, setBusyId] = useState<string | null>(null);
 
   // New-plan form
-  const [productId, setProductId] = useState(PRODUCTS[0]?.id ?? '');
+  const [productId, setProductId] = useState('');
   const [cadence, setCadence] = useState<Cadence>('monthly');
   const [count, setCount] = useState(6);
   const [creating, setCreating] = useState(false);
 
   const activePlan = plans.find((p) => p.status === 'active');
-  const selectedProduct = useMemo(() => PRODUCTS.find((p) => p.id === productId), [productId]);
+  const selectedProduct = useMemo(() => products.find((p) => p.id === productId), [products, productId]);
   const installment = selectedProduct ? Math.ceil(selectedProduct.price / count) : 0;
   const targetDate = computeTargetDate(count, cadence);
   const locale = fr ? 'fr-FR' : 'en-US';
@@ -68,6 +69,13 @@ export default function Tontine() {
     else setPlans([]);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentUser]);
+
+  // Keep the selected product valid as the catalog loads (fallback → DB).
+  useEffect(() => {
+    if (products.length && !products.some((p) => p.id === productId)) {
+      setProductId(products[0].id);
+    }
+  }, [products, productId]);
 
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -218,7 +226,7 @@ export default function Tontine() {
                       onChange={(e) => setProductId(e.target.value)}
                       className="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium"
                     >
-                      {PRODUCTS.map((p) => (
+                      {products.map((p) => (
                         <option key={p.id} value={p.id}>{p.name} — {formatPrice(p.price)}</option>
                       ))}
                     </select>

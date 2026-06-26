@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { ChevronRight, Star, Minus, Plus, Truck, RotateCcw } from 'lucide-react';
-import { PRODUCTS } from '@/src/constants';
+import { useCatalog } from '@/src/contexts/CatalogContext';
 import Navbar from '@/src/components/Navbar';
 import Seo from '@/src/components/Seo';
 import { cn } from '@/src/lib/utils';
@@ -15,8 +15,9 @@ export default function ProductDetail() {
   const fr = language === 'fr';
   const { formatPrice } = useCurrency();
   const { addItem } = useCart();
+  const { products, byId } = useCatalog();
   const navigate = useNavigate();
-  const product = PRODUCTS.find((p) => p.id === id) || PRODUCTS[0];
+  const product = byId(id ?? '') ?? products[0];
   const [selectedColor, setSelectedColor] = useState(product.colors?.[0] || '');
   const [quantity, setQuantity] = useState(1);
   const [mainImage, setMainImage] = useState(product.image);
