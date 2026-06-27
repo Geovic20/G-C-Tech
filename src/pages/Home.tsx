@@ -77,8 +77,8 @@ export default function Home() {
 
       <main className="px-4 md:px-12 py-8">
         {/* Hero Section */}
-        <div className="relative rounded-[40px] bg-blue-50 overflow-hidden mb-16 flex flex-col md:flex-row items-center justify-between p-12 md:p-20">
-          <div className="max-w-md z-10">
+        <div className="relative rounded-[40px] bg-blue-50 overflow-hidden mb-16 flex flex-col md:flex-row items-center justify-center gap-8 md:gap-14 lg:gap-20 p-10 md:p-16">
+          <div className="max-w-xl z-10">
             <motion.h1 
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
@@ -108,10 +108,10 @@ export default function Home() {
           <div className="relative mt-12 md:mt-0">
              {/* Abstract 3D elements placeholder */}
             <div className="grid grid-cols-2 gap-4">
-              <motion.div initial={{ y: 20 }} animate={{ y: 0 }} transition={{ repeat: Infinity, duration: 4, repeatType: 'reverse' }} className="w-32 h-32 bg-yellow-400 rounded-2xl shadow-xl flex items-center justify-center text-4xl">👜</motion.div>
-              <motion.div initial={{ y: -20 }} animate={{ y: 0 }} transition={{ repeat: Infinity, duration: 3, repeatType: 'reverse' }} className="w-32 h-32 bg-blue-400 rounded-2xl shadow-xl flex items-center justify-center text-4xl">🎮</motion.div>
-              <motion.div initial={{ x: 20 }} animate={{ x: 0 }} transition={{ repeat: Infinity, duration: 5, repeatType: 'reverse' }} className="w-32 h-32 bg-green-400 rounded-2xl shadow-xl flex items-center justify-center text-4xl">💻</motion.div>
-              <motion.div initial={{ x: -20 }} animate={{ x: 0 }} transition={{ repeat: Infinity, duration: 4, repeatType: 'reverse' }} className="w-32 h-32 bg-red-400 rounded-2xl shadow-xl flex items-center justify-center text-4xl">👟</motion.div>
+              <motion.div initial={{ y: 20 }} animate={{ y: 0 }} transition={{ repeat: Infinity, duration: 4, repeatType: 'reverse' }} className="w-32 h-32 bg-yellow-400 rounded-2xl shadow-xl flex items-center justify-center text-4xl">📱</motion.div>
+              <motion.div initial={{ y: -20 }} animate={{ y: 0 }} transition={{ repeat: Infinity, duration: 3, repeatType: 'reverse' }} className="w-32 h-32 bg-blue-400 rounded-2xl shadow-xl flex items-center justify-center text-4xl">💻</motion.div>
+              <motion.div initial={{ x: 20 }} animate={{ x: 0 }} transition={{ repeat: Infinity, duration: 5, repeatType: 'reverse' }} className="w-32 h-32 bg-green-400 rounded-2xl shadow-xl flex items-center justify-center text-4xl">🎧</motion.div>
+              <motion.div initial={{ x: -20 }} animate={{ x: 0 }} transition={{ repeat: Infinity, duration: 4, repeatType: 'reverse' }} className="w-32 h-32 bg-red-400 rounded-2xl shadow-xl flex items-center justify-center text-4xl">⌚</motion.div>
             </div>
             <div className="absolute -bottom-10 left-10 w-64 h-16 bg-blue-400 rounded-full blur-3xl opacity-30"></div>
           </div>

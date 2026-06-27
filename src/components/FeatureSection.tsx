@@ -21,9 +21,9 @@ const iconConfigs: any[] = [
   { Icon: SiLg, color: "#A50034" },
   { Icon: SiAcer, color: "#83B81A" },
   { Icon: SiBose, color: "#010101" },
-  { Icon: null, img: "https://upload.wikimedia.org/wikipedia/commons/7/76/Tecno_Mobile_logo.svg" },
-  { Icon: null, img: "https://upload.wikimedia.org/wikipedia/commons/0/02/Infinix_Logo.svg" },
-  { Icon: null, img: "https://upload.wikimedia.org/wikipedia/commons/e/ea/Redmi_logo.svg" },
+  { Icon: null, img: "/brands/tecno-logo.svg",   name: "Tecno" },
+  { Icon: null, img: "/brands/Infinix-Logo.svg", name: "Infinix" },
+  { Icon: null, img: "/brands/Redmi_logo.svg",   name: "Redmi" },
 ];
 
 export default function FeatureSection() {
@@ -108,9 +108,9 @@ export default function FeatureSection() {
                         ) : (
                           <img
                             src={cfg.img}
-                            alt="brand"
+                            alt={cfg.name}
+                            title={cfg.name}
                             className="w-8 h-8 object-contain"
-                            referrerPolicy="no-referrer"
                           />
                         )}
                       </div>

@@ -376,7 +376,7 @@ export default function Navbar() {
                    <Phone size={18} className="text-[#007bff]" />
                    <div>
                      <p className="text-xs text-gray-500">{t('nav.contact-support')}</p>
-                     <p className="font-bold text-gray-900">+001234567890</p>
+                     <p className="font-bold text-gray-900">+229040543686</p>
                    </div>
                  </div>
               </div>
