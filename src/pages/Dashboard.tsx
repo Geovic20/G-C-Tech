@@ -44,7 +44,7 @@ interface Order {
 export default function Dashboard() {
   const { t, language } = useLanguage();
   const { currency, formatPrice } = useCurrency();
-  const { currentUser, loading, updateProfile, signOut } = useAuth();
+  const { currentUser, isAdmin, loading, updateProfile, signOut } = useAuth();
   const user = currentUser;
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<'overview' | 'orders' | 'addresses' | 'settings'>('overview');
@@ -310,13 +310,24 @@ export default function Dashboard() {
             </div>
           </div>
 
-          <button
-            onClick={handleLogout}
-            className="flex items-center gap-2 px-5 py-3 border border-red-100 bg-red-50/30 text-red-600 hover:bg-red-50 rounded-2xl text-sm font-black transition-all z-10 self-stretch md:self-auto justify-center"
-          >
-            <LogOut size={16} />
-            {texts.settings.logout}
-          </button>
+          <div className="flex items-center gap-3 z-10 self-stretch md:self-auto">
+            {isAdmin && (
+              <Link
+                to="/admin"
+                className="flex items-center gap-2 px-5 py-3 bg-gray-900 text-white hover:bg-black rounded-2xl text-sm font-black transition-all justify-center flex-1 md:flex-none"
+              >
+                <ShieldCheck size={16} />
+                {language === 'fr' ? 'Espace admin' : 'Admin area'}
+              </Link>
+            )}
+            <button
+              onClick={handleLogout}
+              className="flex items-center gap-2 px-5 py-3 border border-red-100 bg-red-50/30 text-red-600 hover:bg-red-50 rounded-2xl text-sm font-black transition-all justify-center flex-1 md:flex-none"
+            >
+              <LogOut size={16} />
+              {texts.settings.logout}
+            </button>
+          </div>
         </div>
 
         {/* Dashboard Grid */}

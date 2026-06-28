@@ -15,6 +15,7 @@ type AuthResult = { error?: string };
 
 interface AuthContextType {
   currentUser: CurrentUser | null;
+  isAdmin: boolean;
   loading: boolean;
   signUp: (input: { fullname: string; email: string; password: string }) => Promise<AuthResult & { needsConfirmation?: boolean }>;
   signIn: (email: string, password: string) => Promise<AuthResult>;
@@ -67,6 +68,28 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const currentUser = useMemo(() => mapUser(user, language), [user, language]);
 
+  // Load the user's role (for admin gating).
+  const [role, setRole] = useState<string | null>(null);
+  useEffect(() => {
+    if (!user) {
+      setRole(null);
+      return;
+    }
+    let active = true;
+    supabase
+      .from('profiles')
+      .select('role')
+      .eq('id', user.id)
+      .maybeSingle()
+      .then(({ data }) => {
+        if (active) setRole((data?.role as string) ?? 'customer');
+      });
+    return () => {
+      active = false;
+    };
+  }, [user]);
+  const isAdmin = role === 'admin';
+
   const signUp: AuthContextType['signUp'] = async ({ fullname, email, password }) => {
     const { data, error } = await supabase.auth.signUp({
       email: email.trim(),
@@ -105,7 +128,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ currentUser, loading, signUp, signIn, signOut, updateProfile }}>
+    <AuthContext.Provider value={{ currentUser, isAdmin, loading, signUp, signIn, signOut, updateProfile }}>
       {children}
     </AuthContext.Provider>
   );
