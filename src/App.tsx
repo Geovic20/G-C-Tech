@@ -16,6 +16,7 @@ const EpargneDetail = lazy(() => import('./pages/EpargneDetail'));
 const PaiementRetour = lazy(() => import('./pages/PaiementRetour'));
 const AdminProducts = lazy(() => import('./pages/admin/AdminProducts'));
 const AdminOrders = lazy(() => import('./pages/admin/AdminOrders'));
+const AdminUsers = lazy(() => import('./pages/admin/AdminUsers'));
 const Login = lazy(() => import('./pages/Login'));
 const Signup = lazy(() => import('./pages/Signup'));
 const PrivacyPolicy = lazy(() => import('./pages/PrivacyPolicy'));
@@ -95,6 +96,7 @@ export default function App() {
                     <Route path="/admin" element={<AdminProducts />} />
                     <Route path="/admin/products" element={<AdminProducts />} />
                     <Route path="/admin/orders" element={<AdminOrders />} />
+                    <Route path="/admin/users" element={<AdminUsers />} />
                     {/* Unknown routes show a proper 404 page */}
                     <Route path="*" element={<NotFound />} />
                   </Routes>

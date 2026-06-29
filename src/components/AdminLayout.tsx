@@ -1,6 +1,6 @@
 import React, { useEffect, ReactNode } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Package, ShoppingBag, ShieldAlert } from 'lucide-react';
+import { Package, ShoppingBag, Users, ShieldAlert } from 'lucide-react';
 import Navbar from '@/src/components/Navbar';
 import Seo from '@/src/components/Seo';
 import { useAuth } from '@/src/contexts/AuthContext';
@@ -22,6 +22,7 @@ export default function AdminLayout({ children, title }: { children: ReactNode; 
   const nav = [
     { to: '/admin/products', label: fr ? 'Produits' : 'Products', icon: Package },
     { to: '/admin/orders', label: fr ? 'Commandes' : 'Orders', icon: ShoppingBag },
+    { to: '/admin/users', label: fr ? 'Utilisateurs' : 'Users', icon: Users },
   ];
 
   if (loading) {

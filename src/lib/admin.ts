@@ -96,6 +96,33 @@ export async function adminUpdateOrderStatus(id: string, status: OrderStatus): P
   return error ? { error: error.message } : {};
 }
 
+// ----------------------- Users -----------------------
+
+export type UserRole = 'customer' | 'admin';
+
+export interface AdminUser {
+  id: string;
+  email: string | null;
+  fullname: string | null;
+  phone: string | null;
+  role: UserRole;
+  created_at: string;
+}
+
+export async function adminListUsers(): Promise<AdminUser[]> {
+  const { data, error } = await supabase
+    .from('profiles')
+    .select('id,email,fullname,phone,role,created_at')
+    .order('created_at', { ascending: false });
+  if (error) throw error;
+  return (data ?? []) as AdminUser[];
+}
+
+export async function adminSetUserRole(id: string, role: UserRole): Promise<{ error?: string }> {
+  const { error } = await supabase.from('profiles').update({ role }).eq('id', id);
+  return error ? { error: error.message } : {};
+}
+
 /** Simple slugifier for product slugs (accents stripped, spaces -> dashes). */
 export function slugify(text: string): string {
   return text
