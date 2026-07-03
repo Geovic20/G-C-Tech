@@ -82,7 +82,7 @@ export default function Navbar() {
         <div className="bg-[#007bff] text-white py-2 px-4 md:px-12 flex justify-between items-center text-sm">
           <div className="flex items-center gap-2">
             <Phone size={14} />
-            <span className="hidden sm:inline">+001234567890</span>
+            <span className="hidden sm:inline">+2290140543686</span>
             <span className="sm:hidden">{t('nav.call-us')}</span>
           </div>
           

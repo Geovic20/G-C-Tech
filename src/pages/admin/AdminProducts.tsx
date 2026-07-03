@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Plus, Pencil, Trash2, X } from 'lucide-react';
+import { Plus, Pencil, Trash2, X, ChevronLeft, Smartphone, Laptop, Tablet, Headphones, Watch, Package } from 'lucide-react';
 import AdminLayout from '@/src/components/AdminLayout';
 import { useLanguage } from '@/src/contexts/LanguageContext';
 import { useCurrency } from '@/src/contexts/CurrencyContext';
@@ -14,6 +14,25 @@ import {
   ProductInput,
 } from '@/src/lib/admin';
 
+// Category-specific technical spec fields (keys are stored as-is in `specs`).
+const SPEC_FIELDS: Record<string, string[]> = {
+  smartphones: ['Chip', 'Display', 'Camera', 'Battery', 'RAM', 'Storage'],
+  computers: ['Chip', 'RAM', 'Storage', 'Display', 'GPU'],
+  tablets: ['Chip', 'Display', 'Storage', 'Battery'],
+  headphones: ['Connectivity', 'Battery Life', 'Noise Canceling', 'Driver Size'],
+  earphones: ['Connectivity', 'Battery Life', 'Noise Canceling'],
+  smartwatches: ['Display', 'Battery', 'Water Resistant', 'GPS', 'Connectivity'],
+};
+
+const CATEGORY_ICONS: Record<string, any> = {
+  smartphones: Smartphone,
+  computers: Laptop,
+  tablets: Tablet,
+  headphones: Headphones,
+  earphones: Headphones,
+  smartwatches: Watch,
+};
+
 const EMPTY: ProductInput = {
   name: '',
   slug: '',
@@ -26,6 +45,8 @@ const EMPTY: ProductInput = {
   category_id: '',
   type: '',
   in_stock: true,
+  colors: [],
+  specs: {},
 };
 
 export default function AdminProducts() {
@@ -40,6 +61,8 @@ export default function AdminProducts() {
   const [error, setError] = useState('');
 
   const [showForm, setShowForm] = useState(false);
+  const [step, setStep] = useState<'category' | 'form'>('category');
+  const [formCategory, setFormCategory] = useState<Category | null>(null);
   const [editing, setEditing] = useState<AdminProduct | null>(null);
   const [form, setForm] = useState<ProductInput>(EMPTY);
   const [saving, setSaving] = useState(false);
@@ -62,14 +85,25 @@ export default function AdminProducts() {
     load();
   }, []);
 
+  // Create: start on the category-picker step.
   const openCreate = () => {
     setEditing(null);
-    setForm({ ...EMPTY, category_id: categories[0]?.id ?? '' });
+    setFormCategory(null);
+    setForm(EMPTY);
+    setStep('category');
     setShowForm(true);
   };
 
+  const pickCategory = (cat: Category) => {
+    setFormCategory(cat);
+    setForm({ ...EMPTY, category_id: cat.id });
+    setStep('form');
+  };
+
+  // Edit: category already known → go straight to the form.
   const openEdit = (p: AdminProduct) => {
     setEditing(p);
+    setFormCategory(categories.find((c) => c.id === p.category_id) ?? null);
     setForm({
       name: p.name,
       slug: p.slug,
@@ -82,12 +116,19 @@ export default function AdminProducts() {
       category_id: p.category_id,
       type: p.type ?? '',
       in_stock: p.in_stock,
+      colors: p.colors ?? [],
+      specs: p.specs ?? {},
     });
+    setStep('form');
     setShowForm(true);
   };
 
   const setName = (name: string) => {
     setForm((f) => ({ ...f, name, slug: editing ? f.slug : slugify(name) }));
+  };
+
+  const setSpec = (key: string, value: string) => {
+    setForm((f) => ({ ...f, specs: { ...f.specs, [key]: value } }));
   };
 
   const handleSave = async (e: React.FormEvent) => {
@@ -98,7 +139,11 @@ export default function AdminProducts() {
       return;
     }
     setSaving(true);
-    const payload: ProductInput = { ...form, slug: form.slug || slugify(form.name) };
+    // Drop empty spec values so we don't store blanks.
+    const cleanSpecs = Object.fromEntries(
+      Object.entries(form.specs).filter(([, v]) => v && String(v).trim() !== '')
+    );
+    const payload: ProductInput = { ...form, slug: form.slug || slugify(form.name), specs: cleanSpecs };
     const result = editing
       ? await adminUpdateProduct(editing.id, payload)
       : await adminCreateProduct(payload);
@@ -120,6 +165,8 @@ export default function AdminProducts() {
     }
     await load();
   };
+
+  const specKeys = formCategory ? SPEC_FIELDS[formCategory.slug] ?? [] : [];
 
   return (
     <AdminLayout title={fr ? 'Produits' : 'Products'}>
@@ -193,86 +240,152 @@ export default function AdminProducts() {
         </div>
       </div>
 
-      {/* Form modal */}
+      {/* Modal */}
       {showForm && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setShowForm(false)} />
           <div className="relative bg-white rounded-[32px] w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl p-6 md:p-8">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-black text-gray-900">
-                {editing ? (fr ? 'Modifier le produit' : 'Edit product') : (fr ? 'Nouveau produit' : 'New product')}
-              </h2>
-              <button onClick={() => setShowForm(false)} className="p-2 text-gray-400 hover:bg-gray-50 rounded-xl">
-                <X size={20} />
-              </button>
-            </div>
+            {/* Step 1: choose category */}
+            {step === 'category' ? (
+              <>
+                <div className="flex items-center justify-between mb-6">
+                  <h2 className="text-xl font-black text-gray-900">{fr ? 'Type de produit' : 'Product type'}</h2>
+                  <button onClick={() => setShowForm(false)} className="p-2 text-gray-400 hover:bg-gray-50 rounded-xl">
+                    <X size={20} />
+                  </button>
+                </div>
+                <p className="text-sm text-gray-500 mb-6">
+                  {fr ? 'Choisissez la catégorie du produit à ajouter :' : 'Choose the category of the product to add:'}
+                </p>
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                  {categories.map((cat) => {
+                    const Icon = CATEGORY_ICONS[cat.slug] ?? Package;
+                    return (
+                      <button
+                        key={cat.id}
+                        onClick={() => pickCategory(cat)}
+                        className="flex flex-col items-center gap-3 p-6 rounded-3xl border-2 border-gray-100 hover:border-[#007bff] hover:bg-blue-50/40 transition-all"
+                      >
+                        <div className="w-12 h-12 bg-blue-50 text-[#007bff] rounded-2xl flex items-center justify-center">
+                          <Icon size={24} />
+                        </div>
+                        <span className="font-bold text-gray-900 text-sm text-center">{cat.name}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </>
+            ) : (
+              /* Step 2: the category-aware form */
+              <>
+                <div className="flex items-center justify-between mb-6">
+                  <div className="flex items-center gap-3">
+                    {!editing && (
+                      <button onClick={() => setStep('category')} className="p-2 text-gray-400 hover:bg-gray-50 rounded-xl" title={fr ? 'Changer de catégorie' : 'Change category'}>
+                        <ChevronLeft size={20} />
+                      </button>
+                    )}
+                    <div>
+                      <h2 className="text-xl font-black text-gray-900">
+                        {editing ? (fr ? 'Modifier le produit' : 'Edit product') : (fr ? 'Nouveau produit' : 'New product')}
+                      </h2>
+                      <p className="text-xs font-bold text-[#007bff] uppercase tracking-wider">{formCategory?.name}</p>
+                    </div>
+                  </div>
+                  <button onClick={() => setShowForm(false)} className="p-2 text-gray-400 hover:bg-gray-50 rounded-xl">
+                    <X size={20} />
+                  </button>
+                </div>
 
-            <form onSubmit={handleSave} className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <Field label={fr ? 'Nom' : 'Name'}>
-                  <input required value={form.name} onChange={(e) => setName(e.target.value)} className={inputCls} />
-                </Field>
-                <Field label="Slug">
-                  <input required value={form.slug} onChange={(e) => setForm({ ...form, slug: e.target.value })} className={inputCls} />
-                </Field>
-              </div>
+                <form onSubmit={handleSave} className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <Field label={fr ? 'Nom' : 'Name'}>
+                      <input required value={form.name} onChange={(e) => setName(e.target.value)} className={inputCls} />
+                    </Field>
+                    <Field label="Slug">
+                      <input required value={form.slug} onChange={(e) => setForm({ ...form, slug: e.target.value })} className={inputCls} />
+                    </Field>
+                  </div>
 
-              <Field label="Description">
-                <textarea rows={2} value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} className={inputCls} />
-              </Field>
+                  <Field label="Description">
+                    <textarea rows={2} value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} className={inputCls} />
+                  </Field>
 
-              <Field label={fr ? "URL de l'image" : 'Image URL'}>
-                <input value={form.image} onChange={(e) => setForm({ ...form, image: e.target.value })} className={inputCls} placeholder="https://..." />
-              </Field>
+                  <Field label={fr ? "URL de l'image" : 'Image URL'}>
+                    <input value={form.image} onChange={(e) => setForm({ ...form, image: e.target.value })} className={inputCls} placeholder="https://..." />
+                  </Field>
 
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <Field label={fr ? 'Prix (F)' : 'Price (F)'}>
-                  <input required type="number" min={0} value={form.price} onChange={(e) => setForm({ ...form, price: Number(e.target.value) })} className={inputCls} />
-                </Field>
-                <Field label={fr ? 'Note' : 'Rating'}>
-                  <input type="number" step="0.1" min={0} max={5} value={form.rating} onChange={(e) => setForm({ ...form, rating: Number(e.target.value) })} className={inputCls} />
-                </Field>
-                <Field label={fr ? 'Avis' : 'Reviews'}>
-                  <input type="number" min={0} value={form.reviews} onChange={(e) => setForm({ ...form, reviews: Number(e.target.value) })} className={inputCls} />
-                </Field>
-                <Field label="Type">
-                  <input value={form.type} onChange={(e) => setForm({ ...form, type: e.target.value })} className={inputCls} placeholder="Phones…" />
-                </Field>
-              </div>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <Field label={fr ? 'Prix (F)' : 'Price (F)'}>
+                      <input required type="number" min={0} value={form.price} onChange={(e) => setForm({ ...form, price: Number(e.target.value) })} className={inputCls} />
+                    </Field>
+                    <Field label={fr ? 'Note' : 'Rating'}>
+                      <input type="number" step="0.1" min={0} max={5} value={form.rating} onChange={(e) => setForm({ ...form, rating: Number(e.target.value) })} className={inputCls} />
+                    </Field>
+                    <Field label={fr ? 'Avis' : 'Reviews'}>
+                      <input type="number" min={0} value={form.reviews} onChange={(e) => setForm({ ...form, reviews: Number(e.target.value) })} className={inputCls} />
+                    </Field>
+                    <Field label={fr ? 'Sous-type' : 'Sub-type'}>
+                      <input value={form.type} onChange={(e) => setForm({ ...form, type: e.target.value })} className={inputCls} placeholder="Phones…" />
+                    </Field>
+                  </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <Field label={fr ? 'Marque' : 'Brand'}>
-                  <select value={form.brand_id ?? ''} onChange={(e) => setForm({ ...form, brand_id: e.target.value || null })} className={inputCls}>
-                    <option value="">{fr ? '— Aucune —' : '— None —'}</option>
-                    {brands.map((b) => (
-                      <option key={b.id} value={b.id}>{b.name}</option>
-                    ))}
-                  </select>
-                </Field>
-                <Field label={fr ? 'Catégorie' : 'Category'}>
-                  <select required value={form.category_id} onChange={(e) => setForm({ ...form, category_id: e.target.value })} className={inputCls}>
-                    <option value="">{fr ? '— Choisir —' : '— Select —'}</option>
-                    {categories.map((c) => (
-                      <option key={c.id} value={c.id}>{c.name}</option>
-                    ))}
-                  </select>
-                </Field>
-              </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <Field label={fr ? 'Marque' : 'Brand'}>
+                      <select value={form.brand_id ?? ''} onChange={(e) => setForm({ ...form, brand_id: e.target.value || null })} className={inputCls}>
+                        <option value="">{fr ? '— Aucune —' : '— None —'}</option>
+                        {brands.map((b) => (
+                          <option key={b.id} value={b.id}>{b.name}</option>
+                        ))}
+                      </select>
+                    </Field>
+                    <Field label={fr ? 'Couleurs (hex, séparées par des virgules)' : 'Colors (hex, comma-separated)'}>
+                      <input
+                        value={form.colors.join(', ')}
+                        onChange={(e) => setForm({ ...form, colors: e.target.value.split(',').map((c) => c.trim()).filter(Boolean) })}
+                        className={inputCls}
+                        placeholder="#000000, #E3E2DE"
+                      />
+                    </Field>
+                  </div>
 
-              <label className="flex items-center gap-3 pt-2">
-                <input type="checkbox" checked={form.in_stock} onChange={(e) => setForm({ ...form, in_stock: e.target.checked })} className="w-4 h-4 accent-[#007bff]" />
-                <span className="text-sm font-bold text-gray-700">{fr ? 'En stock' : 'In stock'}</span>
-              </label>
+                  {/* Category-specific specs */}
+                  {specKeys.length > 0 && (
+                    <div className="pt-2">
+                      <p className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">
+                        {fr ? 'Caractéristiques' : 'Specifications'} — {formCategory?.name}
+                      </p>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {specKeys.map((key) => (
+                          <div key={key} className="space-y-1.5">
+                            <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">{key}</label>
+                            <input
+                              value={form.specs[key] ?? ''}
+                              onChange={(e) => setSpec(key, e.target.value)}
+                              className={inputCls}
+                            />
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
 
-              <div className="flex gap-3 pt-4">
-                <button type="submit" disabled={saving} className="flex-1 py-3.5 bg-[#007bff] text-white rounded-full font-bold hover:bg-blue-700 transition-all disabled:opacity-60">
-                  {saving ? '…' : editing ? (fr ? 'Enregistrer' : 'Save') : (fr ? 'Créer' : 'Create')}
-                </button>
-                <button type="button" onClick={() => setShowForm(false)} className="px-6 py-3.5 border border-gray-200 text-gray-700 rounded-full font-bold hover:bg-gray-50 transition-all">
-                  {fr ? 'Annuler' : 'Cancel'}
-                </button>
-              </div>
-            </form>
+                  <label className="flex items-center gap-3 pt-2">
+                    <input type="checkbox" checked={form.in_stock} onChange={(e) => setForm({ ...form, in_stock: e.target.checked })} className="w-4 h-4 accent-[#007bff]" />
+                    <span className="text-sm font-bold text-gray-700">{fr ? 'En stock' : 'In stock'}</span>
+                  </label>
+
+                  <div className="flex gap-3 pt-4">
+                    <button type="submit" disabled={saving} className="flex-1 py-3.5 bg-[#007bff] text-white rounded-full font-bold hover:bg-blue-700 transition-all disabled:opacity-60">
+                      {saving ? '…' : editing ? (fr ? 'Enregistrer' : 'Save') : (fr ? 'Créer' : 'Create')}
+                    </button>
+                    <button type="button" onClick={() => setShowForm(false)} className="px-6 py-3.5 border border-gray-200 text-gray-700 rounded-full font-bold hover:bg-gray-50 transition-all">
+                      {fr ? 'Annuler' : 'Cancel'}
+                    </button>
+                  </div>
+                </form>
+              </>
+            )}
           </div>
         </div>
       )}
