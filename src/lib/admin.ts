@@ -15,7 +15,6 @@ export interface AdminProduct {
   category_id: string;
   type: string | null;
   in_stock: boolean;
-  colors: string[] | null;
   specs: Record<string, string> | null;
   brands?: { name: string } | null;
   categories?: { slug: string; name: string } | null;
@@ -33,14 +32,13 @@ export interface ProductInput {
   category_id: string;
   type: string;
   in_stock: boolean;
-  colors: string[];
   specs: Record<string, string>;
 }
 
 export async function adminListProducts(): Promise<AdminProduct[]> {
   const { data, error } = await supabase
     .from('products')
-    .select('id,name,slug,description,price,rating,reviews,image,brand_id,category_id,type,in_stock,colors,specs,brands(name),categories(slug,name)')
+    .select('id,name,slug,description,price,rating,reviews,image,brand_id,category_id,type,in_stock,specs,brands(name),categories(slug,name)')
     .order('created_at', { ascending: false });
   if (error) throw error;
   return (data ?? []) as unknown as AdminProduct[];

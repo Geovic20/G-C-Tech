@@ -45,7 +45,6 @@ const EMPTY: ProductInput = {
   category_id: '',
   type: '',
   in_stock: true,
-  colors: [],
   specs: {},
 };
 
@@ -116,7 +115,6 @@ export default function AdminProducts() {
       category_id: p.category_id,
       type: p.type ?? '',
       in_stock: p.in_stock,
-      colors: p.colors ?? [],
       specs: p.specs ?? {},
     });
     setStep('form');
@@ -330,24 +328,14 @@ export default function AdminProducts() {
                     </Field>
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <Field label={fr ? 'Marque' : 'Brand'}>
-                      <select value={form.brand_id ?? ''} onChange={(e) => setForm({ ...form, brand_id: e.target.value || null })} className={inputCls}>
-                        <option value="">{fr ? '— Aucune —' : '— None —'}</option>
-                        {brands.map((b) => (
-                          <option key={b.id} value={b.id}>{b.name}</option>
-                        ))}
-                      </select>
-                    </Field>
-                    <Field label={fr ? 'Couleurs (hex, séparées par des virgules)' : 'Colors (hex, comma-separated)'}>
-                      <input
-                        value={form.colors.join(', ')}
-                        onChange={(e) => setForm({ ...form, colors: e.target.value.split(',').map((c) => c.trim()).filter(Boolean) })}
-                        className={inputCls}
-                        placeholder="#000000, #E3E2DE"
-                      />
-                    </Field>
-                  </div>
+                  <Field label={fr ? 'Marque' : 'Brand'}>
+                    <select value={form.brand_id ?? ''} onChange={(e) => setForm({ ...form, brand_id: e.target.value || null })} className={inputCls}>
+                      <option value="">{fr ? '— Aucune —' : '— None —'}</option>
+                      {brands.map((b) => (
+                        <option key={b.id} value={b.id}>{b.name}</option>
+                      ))}
+                    </select>
+                  </Field>
 
                   {/* Category-specific specs */}
                   {specKeys.length > 0 && (

@@ -18,7 +18,6 @@ export default function ProductDetail() {
   const { products, byId } = useCatalog();
   const navigate = useNavigate();
   const product = byId(id ?? '') ?? products[0];
-  const [selectedColor, setSelectedColor] = useState(product.colors?.[0] || '');
   const [quantity, setQuantity] = useState(1);
   const [mainImage, setMainImage] = useState(product.image);
 
@@ -105,26 +104,6 @@ export default function ProductDetail() {
               </div>
 
             <hr className="border-gray-100 mb-8" />
-
-            {/* Color Selector */}
-            {product.colors && (
-              <div className="mb-8">
-                <h3 className="font-bold text-gray-900 mb-4">{t('detail.choose-color')}</h3>
-                <div className="flex gap-4">
-                  {product.colors.map((color) => (
-                    <button
-                      key={color}
-                      onClick={() => setSelectedColor(color)}
-                      className={cn(
-                        "w-8 h-8 rounded-full border-4 transition-all",
-                        selectedColor === color ? "border-gray-300 ring-2 ring-gray-900" : "border-transparent"
-                      )}
-                      style={{ backgroundColor: color }}
-                    />
-                  ))}
-                </div>
-              </div>
-            )}
 
             {/* Actions */}
             <div className="flex flex-wrap items-center gap-6 mb-8">

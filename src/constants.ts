@@ -17,7 +17,6 @@ export interface Product {
   category: string;
   /** High-level group matching a catalog page / route. */
   group: ProductGroup;
-  colors?: string[];
   specs?: Record<string, string>;
 }
 
@@ -51,7 +50,6 @@ export const PRODUCTS: Product[] = [
     image: 'https://images.unsplash.com/photo-1696446701796-da61225697cc?w=500&h=500&fit=crop',
     category: 'Phones',
     group: 'smartphones',
-    colors: ['#2F2F2F', '#E3E2DE', '#BCC1D5', '#3C3A35'],
     specs: {
       Brand: 'Apple',
       Chip: 'A17 Pro',
@@ -70,7 +68,6 @@ export const PRODUCTS: Product[] = [
     image: 'https://images.unsplash.com/photo-1610945265064-0e34e5519bbf?w=500&h=500&fit=crop',
     category: 'Phones',
     group: 'smartphones',
-    colors: ['#2E2E2E', '#EAEAEA', '#F5E6CC', '#D1C4E9'],
     specs: {
       Brand: 'Samsung',
       Chip: 'Snapdragon 8 Gen 3',
@@ -135,7 +132,6 @@ export const PRODUCTS: Product[] = [
     image: 'https://images.unsplash.com/photo-1517336712468-077648f3efbc?w=500&h=500&fit=crop',
     category: 'Laptops',
     group: 'computers',
-    colors: ['#1C1C1C', '#E3E4E5'],
     specs: {
       Brand: 'Apple',
       Chip: 'M3 Max',
@@ -223,7 +219,6 @@ export const PRODUCTS: Product[] = [
     image: 'https://images.unsplash.com/photo-1546435770-a3e426ff472b?w=500&h=500&fit=crop',
     category: 'Headphones',
     group: 'headphones',
-    colors: ['#000000', '#F5F5DC'],
     specs: {
       Brand: 'Sony',
       Connectivity: 'Bluetooth 5.2',
