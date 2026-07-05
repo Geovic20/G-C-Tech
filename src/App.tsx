@@ -6,11 +6,13 @@ import { CurrencyProvider } from './contexts/CurrencyContext';
 import { CartProvider } from './contexts/CartContext';
 import { AuthProvider } from './contexts/AuthContext';
 import { CatalogProvider } from './contexts/CatalogContext';
+import { WishlistProvider } from './contexts/WishlistContext';
 
 // Pages are code-split: each is loaded on demand to keep the initial bundle small.
 const Home = lazy(() => import('./pages/Home'));
 const ProductDetail = lazy(() => import('./pages/ProductDetail'));
 const Products = lazy(() => import('./pages/Products'));
+const Favorites = lazy(() => import('./pages/Favorites'));
 const Tontine = lazy(() => import('./pages/Tontine'));
 const EpargneDetail = lazy(() => import('./pages/EpargneDetail'));
 const PaiementRetour = lazy(() => import('./pages/PaiementRetour'));
@@ -63,6 +65,7 @@ export default function App() {
         <CartProvider>
           <AuthProvider>
           <CatalogProvider>
+          <WishlistProvider>
           <BrowserRouter>
             <ScrollToTop />
             <div className="flex flex-col min-h-screen">
@@ -71,6 +74,7 @@ export default function App() {
                   <Routes>
                     <Route path="/" element={<Home />} />
                     <Route path="/products" element={<Products />} />
+                    <Route path="/favoris" element={<Favorites />} />
                     <Route path="/epargne" element={<Tontine />} />
                     <Route path="/epargne/:id" element={<EpargneDetail />} />
                     <Route path="/paiement/retour" element={<PaiementRetour />} />
@@ -105,6 +109,7 @@ export default function App() {
               <Footer />
             </div>
           </BrowserRouter>
+          </WishlistProvider>
           </CatalogProvider>
           </AuthProvider>
         </CartProvider>

@@ -2,10 +2,13 @@ import React from 'react';
 import { Heart } from 'lucide-react';
 import { motion } from 'motion/react';
 import { Product } from '@/src/constants';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useLanguage } from '@/src/contexts/LanguageContext';
 import { useCurrency } from '@/src/contexts/CurrencyContext';
 import { useCart } from '@/src/contexts/CartContext';
+import { useAuth } from '@/src/contexts/AuthContext';
+import { useWishlist } from '@/src/contexts/WishlistContext';
+import { cn } from '@/src/lib/utils';
 
 interface ProductCardProps {
   product: Product;
@@ -16,6 +19,11 @@ export default function ProductCard({ product }: ProductCardProps) {
   const { t } = useLanguage();
   const { formatPrice } = useCurrency();
   const { addItem } = useCart();
+  const { currentUser } = useAuth();
+  const { isFavorite, toggle } = useWishlist();
+  const navigate = useNavigate();
+
+  const favorite = isFavorite(product.id);
 
   const handleAddToCart = () => {
     addItem({
@@ -25,6 +33,16 @@ export default function ProductCard({ product }: ProductCardProps) {
       image: product.image,
       category: product.category,
     });
+  };
+
+  const handleFavorite = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!currentUser) {
+      navigate('/login');
+      return;
+    }
+    toggle(product.id);
   };
 
   return (
@@ -43,8 +61,15 @@ export default function ProductCard({ product }: ProductCardProps) {
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
           />
         </Link>
-        <button className="absolute top-4 right-4 w-9 h-9 bg-white rounded-full flex items-center justify-center text-gray-400 hover:text-red-500 transition-colors shadow-sm">
-          <Heart size={20} />
+        <button
+          onClick={handleFavorite}
+          aria-label={favorite ? 'Retirer des favoris' : 'Ajouter aux favoris'}
+          className={cn(
+            'absolute top-4 right-4 w-9 h-9 bg-white rounded-full flex items-center justify-center transition-colors shadow-sm',
+            favorite ? 'text-red-500' : 'text-gray-400 hover:text-red-500'
+          )}
+        >
+          <Heart size={20} fill={favorite ? 'currentColor' : 'none'} />
         </button>
       </div>
 

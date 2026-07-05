@@ -3,7 +3,8 @@ import { useLanguage } from '@/src/contexts/LanguageContext';
 import { useCurrency, Currency } from '@/src/contexts/CurrencyContext';
 import { useCart } from '@/src/contexts/CartContext';
 import { useAuth } from '@/src/contexts/AuthContext';
-import { CreditCard, Globe, Search, ShoppingCart, User, Phone, ChevronDown, MapPin, Menu, X } from 'lucide-react';
+import { useWishlist } from '@/src/contexts/WishlistContext';
+import { CreditCard, Globe, Search, ShoppingCart, User, Phone, ChevronDown, MapPin, Menu, X, Heart } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { cn } from '@/src/lib/utils';
 import { useCatalog } from '@/src/contexts/CatalogContext';
@@ -23,6 +24,7 @@ export default function Navbar() {
   const { currency, setCurrency, formatPrice } = useCurrency();
   const { itemCount } = useCart();
   const { currentUser } = useAuth();
+  const { count: wishlistCount } = useWishlist();
   const { products } = useCatalog();
   const [showCurrencyMenu, setShowCurrencyMenu] = useState(false);
 
@@ -286,6 +288,12 @@ export default function Navbar() {
               <span className="hidden lg:inline text-sm font-medium">
                 {currentUser ? currentUser.fullname : t('nav.account')}
               </span>
+            </Link>
+            <Link to="/favoris" className="flex items-center hover:text-[#007bff] relative" aria-label={t('nav.favorites')}>
+              <Heart size={22} />
+              {wishlistCount > 0 && (
+                <span className="absolute -top-2 -right-2 bg-red-500 text-white text-[10px] min-w-4 h-4 px-1 rounded-full flex items-center justify-center">{wishlistCount}</span>
+              )}
             </Link>
             <Link to="/cart" className="flex items-center gap-2 hover:text-[#007bff] relative">
               <ShoppingCart size={22} />
