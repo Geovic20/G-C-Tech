@@ -24,6 +24,8 @@ const Signup = lazy(() => import('./pages/Signup'));
 const PrivacyPolicy = lazy(() => import('./pages/PrivacyPolicy'));
 const TermsOfService = lazy(() => import('./pages/TermsOfService'));
 const RefundPolicy = lazy(() => import('./pages/RefundPolicy'));
+const LegalNotice = lazy(() => import('./pages/LegalNotice'));
+const CookiesPolicy = lazy(() => import('./pages/CookiesPolicy'));
 const Cart = lazy(() => import('./pages/Cart'));
 const Smartphones = lazy(() => import('./pages/Smartphones'));
 const Computers = lazy(() => import('./pages/Computers'));
@@ -84,6 +86,8 @@ export default function App() {
                     <Route path="/privacy" element={<PrivacyPolicy />} />
                     <Route path="/terms" element={<TermsOfService />} />
                     <Route path="/refund" element={<RefundPolicy />} />
+                    <Route path="/legal-notice" element={<LegalNotice />} />
+                    <Route path="/cookies" element={<CookiesPolicy />} />
                     <Route path="/cart" element={<Cart />} />
                     <Route path="/smartphones" element={<Smartphones />} />
                     <Route path="/computers" element={<Computers />} />

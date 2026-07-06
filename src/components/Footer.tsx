@@ -62,9 +62,11 @@ export default function Footer() {
 
         <div className="pt-8 border-t border-gray-200 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-gray-400">
           <p>© {new Date().getFullYear()} G&C Tech. {t('footer.rights')}</p>
-          <div className="flex gap-8">
+          <div className="flex gap-8 flex-wrap justify-center">
             <Link to="/privacy" className="hover:text-[#007bff]">{t('footer.privacy')}</Link>
             <Link to="/terms" className="hover:text-[#007bff]">{t('footer.terms')}</Link>
+            <Link to="/legal-notice" className="hover:text-[#007bff]">{t('footer.legal-notice')}</Link>
+            <Link to="/cookies" className="hover:text-[#007bff]">{t('footer.cookies')}</Link>
           </div>
         </div>
       </div>
