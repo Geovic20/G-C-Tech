@@ -21,6 +21,8 @@ const AdminOrders = lazy(() => import('./pages/admin/AdminOrders'));
 const AdminUsers = lazy(() => import('./pages/admin/AdminUsers'));
 const Login = lazy(() => import('./pages/Login'));
 const Signup = lazy(() => import('./pages/Signup'));
+const ForgotPassword = lazy(() => import('./pages/ForgotPassword'));
+const ResetPassword = lazy(() => import('./pages/ResetPassword'));
 const PrivacyPolicy = lazy(() => import('./pages/PrivacyPolicy'));
 const TermsOfService = lazy(() => import('./pages/TermsOfService'));
 const RefundPolicy = lazy(() => import('./pages/RefundPolicy'));
@@ -83,6 +85,8 @@ export default function App() {
                     <Route path="/product/:id" element={<ProductDetail />} />
                     <Route path="/login" element={<Login />} />
                     <Route path="/signup" element={<Signup />} />
+                    <Route path="/mot-de-passe-oublie" element={<ForgotPassword />} />
+                    <Route path="/reset-password" element={<ResetPassword />} />
                     <Route path="/privacy" element={<PrivacyPolicy />} />
                     <Route path="/terms" element={<TermsOfService />} />
                     <Route path="/refund" element={<RefundPolicy />} />

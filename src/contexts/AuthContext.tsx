@@ -21,6 +21,8 @@ interface AuthContextType {
   signIn: (email: string, password: string) => Promise<AuthResult>;
   signOut: () => Promise<void>;
   updateProfile: (patch: Partial<Pick<CurrentUser, 'fullname' | 'phone' | 'address'>> & { email?: string; password?: string }) => Promise<AuthResult>;
+  resetPassword: (email: string) => Promise<AuthResult>;
+  updatePassword: (password: string) => Promise<AuthResult>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -111,6 +113,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     await supabase.auth.signOut();
   };
 
+  const resetPassword: AuthContextType['resetPassword'] = async (email) => {
+    const { error } = await supabase.auth.resetPasswordForEmail(email.trim(), {
+      redirectTo: `${window.location.origin}/reset-password`,
+    });
+    return error ? { error: error.message } : {};
+  };
+
+  const updatePassword: AuthContextType['updatePassword'] = async (password) => {
+    const { error } = await supabase.auth.updateUser({ password });
+    return error ? { error: error.message } : {};
+  };
+
   const updateProfile: AuthContextType['updateProfile'] = async (patch) => {
     const updates: { email?: string; password?: string; data?: Record<string, string> } = {};
     if (patch.email) updates.email = patch.email.trim();
@@ -128,7 +142,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ currentUser, isAdmin, loading, signUp, signIn, signOut, updateProfile }}>
+    <AuthContext.Provider value={{ currentUser, isAdmin, loading, signUp, signIn, signOut, updateProfile, resetPassword, updatePassword }}>
       {children}
     </AuthContext.Provider>
   );

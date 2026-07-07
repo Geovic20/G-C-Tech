@@ -102,9 +102,9 @@ export default function Login() {
               </div>
               <div className="flex items-center justify-end mt-2">
                 <div className="text-sm">
-                  <a href="#" className="font-bold text-[#007bff] hover:text-blue-700 transition-colors">
+                  <Link to="/mot-de-passe-oublie" className="font-bold text-[#007bff] hover:text-blue-700 transition-colors">
                     {t('auth.login.forgot')}
-                  </a>
+                  </Link>
                 </div>
               </div>
             </div>
