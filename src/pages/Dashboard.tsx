@@ -4,6 +4,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Seo from '../components/Seo';
 import { useAuth } from '../contexts/AuthContext';
+import { listMyOrders, MyOrder } from '../lib/orders';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useCurrency } from '../contexts/CurrencyContext';
 import {
@@ -25,22 +26,6 @@ import {
   ArrowRight
 } from 'lucide-react';
 
-interface OrderItem {
-  id: string;
-  name: string;
-  image: string;
-  price: number;
-}
-
-interface Order {
-  id: string;
-  date: string;
-  status: 'delivered' | 'pending' | 'shipped';
-  items: OrderItem[];
-  trackingNumber: string;
-  total: number;
-}
-
 export default function Dashboard() {
   const { t, language } = useLanguage();
   const { currency, formatPrice } = useCurrency();
@@ -60,11 +45,28 @@ export default function Dashboard() {
   const [newPassword, setNewPassword] = useState('');
   const [showProfileSuccess, setShowProfileSuccess] = useState(false);
   const [profileError, setProfileError] = useState('');
+  const [orders, setOrders] = useState<MyOrder[]>([]);
 
   // Redirect to login once we know there is no authenticated session.
   useEffect(() => {
     if (!loading && !currentUser) navigate('/login');
   }, [loading, currentUser, navigate]);
+
+  // Load the user's real orders.
+  useEffect(() => {
+    if (!currentUser) return;
+    let active = true;
+    listMyOrders()
+      .then((data) => {
+        if (active) setOrders(data);
+      })
+      .catch(() => {
+        /* ignore */
+      });
+    return () => {
+      active = false;
+    };
+  }, [currentUser]);
 
   // Seed the editable fields from the current user.
   useEffect(() => {
@@ -240,40 +242,8 @@ export default function Dashboard() {
   };
 
   const texts = language === 'fr' ? dbTexts.fr : dbTexts.en;
-
-  // Mock Orders Data
-  const mockOrders: Order[] = [
-    {
-      id: 'SC-9824',
-      date: language === 'fr' ? '12 Mai 2026' : 'May 12, 2026',
-      status: 'delivered',
-      total: 1290,
-      trackingNumber: 'TRK-SHOP4928091',
-      items: [
-        {
-          id: '1',
-          name: language === 'fr' ? 'iPhone 15 Pro Max' : 'iPhone 15 Pro Max',
-          image: 'https://images.unsplash.com/photo-1695048133142-1a20484d2569?q=80&w=300&auto=format&fit=crop',
-          price: 1290
-        }
-      ]
-    },
-    {
-      id: 'SC-8561',
-      date: language === 'fr' ? '28 Avril 2026' : 'April 28, 2026',
-      status: 'shipped',
-      total: 249,
-      trackingNumber: 'TRK-SHOP3810294',
-      items: [
-        {
-          id: '15',
-          name: language === 'fr' ? 'Bose Noise Cancelling 700' : 'Bose Noise Cancelling Headphones 700',
-          image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?q=80&w=300&auto=format&fit=crop',
-          price: 249
-        }
-      ]
-    }
-  ];
+  const locale = language === 'fr' ? 'fr-FR' : 'en-US';
+  const totalSpent = orders.reduce((sum, o) => sum + o.total, 0);
 
   return (
     <div className="min-h-screen bg-[#f8fafc]">
@@ -360,7 +330,7 @@ export default function Dashboard() {
                 <ShoppingBag size={18} /> {texts.tabs.orders}
               </span>
               <span className="bg-blue-500/20 px-2 py-0.5 rounded-full text-xs font-bold text-white min-w-[20px] text-center">
-                {mockOrders.length}
+                {orders.length}
               </span>
             </button>
 
@@ -437,7 +407,7 @@ export default function Dashboard() {
                           {texts.stats.totalSpent}
                         </p>
                         <p className="text-xl font-black text-gray-900 leading-none mt-1">
-                          {formatPrice(1539)}
+                          {formatPrice(totalSpent)}
                         </p>
                       </div>
                     </div>
@@ -451,7 +421,7 @@ export default function Dashboard() {
                           {texts.stats.totalOrders}
                         </p>
                         <p className="text-xl font-black text-gray-900 leading-none mt-1">
-                          {mockOrders.length}
+                          {orders.length}
                         </p>
                       </div>
                     </div>
@@ -532,8 +502,13 @@ export default function Dashboard() {
                     <p className="text-sm text-gray-500 mt-1">{texts.orders.desc}</p>
                   </div>
 
+                  {orders.length === 0 ? (
+                    <div className="bg-white rounded-3xl border border-gray-100 shadow-sm p-12 text-center text-gray-400">
+                      {texts.orders.empty}
+                    </div>
+                  ) : (
                   <div className="space-y-4">
-                    {mockOrders.map((order) => (
+                    {orders.map((order) => (
                       <div key={order.id} className="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden hover:border-blue-100 transition-all">
                         {/* Order Header */}
                         <div className="bg-gray-50/70 px-6 py-4 flex flex-wrap items-center justify-between gap-4 border-b border-gray-100">
@@ -542,12 +517,14 @@ export default function Dashboard() {
                               <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">
                                 {texts.orders.orderNo}
                               </p>
-                              <p className="text-sm font-black text-gray-900">{order.id}</p>
+                              <p className="text-sm font-black text-gray-900">#{order.order_number}</p>
                             </div>
                             <span className="hidden sm:inline text-gray-200">|</span>
                             <div>
                               <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">Date</p>
-                              <p className="text-sm font-bold text-gray-700">{order.date}</p>
+                              <p className="text-sm font-bold text-gray-700">
+                                {new Date(order.created_at).toLocaleDateString(locale, { day: 'numeric', month: 'long', year: 'numeric' })}
+                              </p>
                             </div>
                           </div>
 
@@ -558,8 +535,16 @@ export default function Dashboard() {
                                 <CheckCircle size={12} /> {texts.orders.delivered}
                               </span>
                             ) : order.status === 'shipped' ? (
-                              <span className="inline-flex items-center gap-1 px-3 py-1 bg-blue-50 text-blue-600 rounded-full text-xs font-bold uppercase tracking-wider animate-pulse">
+                              <span className="inline-flex items-center gap-1 px-3 py-1 bg-blue-50 text-blue-600 rounded-full text-xs font-bold uppercase tracking-wider">
                                 <Truck size={12} /> {texts.orders.shipped}
+                              </span>
+                            ) : order.status === 'cancelled' ? (
+                              <span className="inline-flex items-center gap-1 px-3 py-1 bg-red-50 text-red-600 rounded-full text-xs font-bold uppercase tracking-wider">
+                                {language === 'fr' ? 'Annulée' : 'Cancelled'}
+                              </span>
+                            ) : order.status === 'confirmed' ? (
+                              <span className="inline-flex items-center gap-1 px-3 py-1 bg-blue-50 text-blue-600 rounded-full text-xs font-bold uppercase tracking-wider">
+                                <CheckCircle size={12} /> {language === 'fr' ? 'Confirmée' : 'Confirmed'}
                               </span>
                             ) : (
                               <span className="inline-flex items-center gap-1 px-3 py-1 bg-amber-50 text-amber-600 rounded-full text-xs font-bold uppercase tracking-wider">
@@ -572,35 +557,33 @@ export default function Dashboard() {
                         {/* Order Content */}
                         <div className="p-6">
                           <div className="space-y-4">
-                            {order.items.map((item) => (
+                            {order.order_items.map((item) => (
                               <div key={item.id} className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                                 <div className="flex items-center gap-4">
-                                  <img src={item.image} alt={item.name} className="w-16 h-16 object-cover rounded-2xl border border-gray-100" />
+                                  {item.image && <img src={item.image} alt={item.name} className="w-16 h-16 object-cover rounded-2xl border border-gray-100" />}
                                   <div>
-                                    <p className="font-bold text-gray-900 leading-snug">{item.name}</p>
-                                    <p className="text-sm text-gray-500 mt-0.5">{formatPrice(item.price)}</p>
+                                    <p className="font-bold text-gray-900 leading-snug">
+                                      {item.name} <span className="text-gray-400 font-medium">× {item.quantity}</span>
+                                    </p>
+                                    <p className="text-sm text-gray-500 mt-0.5">{formatPrice(item.price * item.quantity)}</p>
                                   </div>
                                 </div>
-                                <Link
-                                  to={`/product/${item.id}`}
-                                  className="text-xs font-bold text-[#007bff] hover:text-blue-700 hover:underline flex items-center gap-1"
-                                >
-                                  {texts.orders.seeProduct} <ChevronRight size={14} />
-                                </Link>
+                                {item.product_id && (
+                                  <Link
+                                    to={`/product/${item.product_id}`}
+                                    className="text-xs font-bold text-[#007bff] hover:text-blue-700 hover:underline flex items-center gap-1"
+                                  >
+                                    {texts.orders.seeProduct} <ChevronRight size={14} />
+                                  </Link>
+                                )}
                               </div>
                             ))}
-                          </div>
-
-                          {/* Tracking Number */}
-                          <div className="mt-6 pt-6 border-t border-gray-100 flex flex-wrap items-center justify-between gap-4 text-xs">
-                            <span className="text-gray-500">
-                              {texts.orders.tracking}: <strong className="text-gray-800 font-bold">{order.trackingNumber}</strong>
-                            </span>
                           </div>
                         </div>
                       </div>
                     ))}
                   </div>
+                  )}
                 </motion.div>
               )}
 

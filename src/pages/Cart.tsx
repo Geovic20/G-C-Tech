@@ -5,6 +5,8 @@ import Seo from '@/src/components/Seo';
 import { useLanguage } from '@/src/contexts/LanguageContext';
 import { useCurrency } from '@/src/contexts/CurrencyContext';
 import { useCart } from '@/src/contexts/CartContext';
+import { useAuth } from '@/src/contexts/AuthContext';
+import { createOrder } from '@/src/lib/orders';
 import { motion, AnimatePresence } from 'motion/react';
 import { Trash2, Plus, Minus, ShoppingBag, ArrowRight, MapPin, Phone, Calendar, Clock, CheckCircle2, ChevronLeft, MessageCircle } from 'lucide-react';
 import { cn } from '@/src/lib/utils';
@@ -30,6 +32,7 @@ export default function Cart() {
   const { t, language } = useLanguage();
   const { formatPrice } = useCurrency();
   const { items, updateQuantity, removeItem, subtotal, clearCart } = useCart();
+  const { currentUser } = useAuth();
   const navigate = useNavigate();
   const [step, setStep] = useState(1);
   const [whatsappUrl, setWhatsappUrl] = useState('');
@@ -102,22 +105,42 @@ Please let me know how I can settle the payment!`;
     return `https://wa.me/${targetPhone}?text=${encodeURIComponent(selectedMessage)}`;
   };
 
-  const handleNext = () => {
-    if (step < 3) setStep(step + 1);
-    else {
-      // Final step: hand the order off to WhatsApp for payment / confirmation.
-      const url = getWhatsappUrl();
-      setWhatsappUrl(url);
-      try {
-        window.open(url, '_blank', 'noopener,noreferrer');
-      } catch (e) {
-        console.error('Popup blocked', e);
-      }
-
-      // Empty the cart now that the order has been placed
-      clearCart();
-      setStep(4); // Success step
+  const handleNext = async () => {
+    if (step < 3) {
+      setStep(step + 1);
+      return;
     }
+    // Final step: hand the order off to WhatsApp for payment / confirmation.
+    const url = getWhatsappUrl();
+    setWhatsappUrl(url);
+    try {
+      window.open(url, '_blank', 'noopener,noreferrer');
+    } catch (e) {
+      console.error('Popup blocked', e);
+    }
+
+    // Persist the order for logged-in users (guests still checkout via WhatsApp).
+    if (currentUser) {
+      const result = await createOrder({
+        items,
+        subtotal,
+        shipping,
+        tax,
+        total,
+        customerName: currentUser.fullname,
+        phone: deliveryData.phone,
+        deliveryZone: selectedZone?.name,
+        deliveryDetails: deliveryData.details,
+        deliveryDate: deliveryData.date,
+        deliveryTime: deliveryData.timeSlot,
+        paymentMethod: 'whatsapp',
+      });
+      if (result.error) console.error('Order not saved:', result.error);
+    }
+
+    // Empty the cart now that the order has been placed
+    clearCart();
+    setStep(4); // Success step
   };
 
   const handlePrev = () => {
