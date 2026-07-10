@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'motion/react';
-import { PiggyBank, Target, Truck, CheckCircle2, Plus, Wallet } from 'lucide-react';
+import { PiggyBank, Target, Truck, CheckCircle2, Plus, Wallet, X } from 'lucide-react';
 import Navbar from '@/src/components/Navbar';
 import Seo from '@/src/components/Seo';
 import { useLanguage } from '@/src/contexts/LanguageContext';
@@ -39,6 +39,8 @@ export default function Tontine() {
   const [cadence, setCadence] = useState<Cadence>('monthly');
   const [count, setCount] = useState(6);
   const [creating, setCreating] = useState(false);
+  const [showRules, setShowRules] = useState(false);
+  const [accepted, setAccepted] = useState(false);
 
   const activePlan = plans.find((p) => p.status === 'active');
   const selectedProduct = useMemo(() => products.find((p) => p.id === productId), [products, productId]);
@@ -77,9 +79,17 @@ export default function Tontine() {
     }
   }, [products, productId]);
 
-  const handleCreate = async (e: React.FormEvent) => {
+  // Submitting the form opens the rules dialog (the plan is only created after acceptance).
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedProduct) return;
+    setError('');
+    setAccepted(false);
+    setShowRules(true);
+  };
+
+  const confirmCreate = async () => {
+    if (!selectedProduct || !accepted) return;
     setCreating(true);
     setError('');
     const result = await createPlan({
@@ -92,6 +102,7 @@ export default function Tontine() {
       targetDate: targetDate.toISOString().slice(0, 10),
     });
     setCreating(false);
+    setShowRules(false);
     if (result.error) {
       setError(
         result.error === 'ACTIVE_PLAN_EXISTS'
@@ -101,6 +112,7 @@ export default function Tontine() {
       await loadPlans();
       return;
     }
+    setAccepted(false);
     await loadPlans();
   };
 
@@ -117,6 +129,24 @@ export default function Tontine() {
     // Redirect to FedaPay's secure payment page.
     window.location.href = url;
   };
+
+  const RULES = fr
+    ? [
+        'Vous épargnez pour un produit précis jusqu’à atteindre 100 % de son prix.',
+        'Le prix du produit est fixé à l’ouverture du plan et ne change plus, quelles que soient les variations futures.',
+        'Les versements se font à votre rythme (mobile money ou carte) via un paiement sécurisé.',
+        'Le produit est commandé et livré une fois les 100 % atteints.',
+        'Vous ne pouvez avoir qu’une seule épargne active à la fois.',
+        'En cas d’annulation, les modalités de remboursement sont soumises à nos conditions.',
+      ]
+    : [
+        'You save toward a specific product until you reach 100% of its price.',
+        'The product price is locked when the plan opens and will not change, whatever future variations occur.',
+        'Contributions are made at your own pace (mobile money or card) via secure payment.',
+        'The product is ordered and delivered once 100% is reached.',
+        'You can only have one active savings plan at a time.',
+        'In case of cancellation, refund terms are subject to our conditions.',
+      ];
 
   return (
     <div className="min-h-screen bg-[#f8fafc]">
@@ -218,7 +248,7 @@ export default function Tontine() {
                   <Plus size={20} className="text-[#007bff]" />
                   {fr ? 'Démarrer une épargne' : 'Start a savings plan'}
                 </h2>
-                <form onSubmit={handleCreate} className="space-y-5">
+                <form onSubmit={handleSubmit} className="space-y-5">
                   <div className="space-y-2">
                     <label className="text-sm font-bold text-gray-500 uppercase tracking-wider">{fr ? 'Produit' : 'Product'}</label>
                     <select
@@ -390,6 +420,66 @@ export default function Tontine() {
           </div>
         )}
       </main>
+
+      {/* Rules acceptance dialog — must accept before a plan is created */}
+      {showRules && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => !creating && setShowRules(false)} />
+          <div className="relative bg-white rounded-[32px] w-full max-w-lg max-h-[90vh] overflow-y-auto shadow-2xl p-6 md:p-8">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xl font-black text-gray-900 flex items-center gap-2">
+                <PiggyBank size={22} className="text-[#007bff]" />
+                {fr ? "Règles de l'épargne" : 'Savings rules'}
+              </h2>
+              <button onClick={() => setShowRules(false)} className="p-2 text-gray-400 hover:bg-gray-50 rounded-xl">
+                <X size={20} />
+              </button>
+            </div>
+            <p className="text-sm text-gray-500 mb-5">
+              {fr
+                ? 'Merci de lire et d’accepter ces règles avant de démarrer votre épargne.'
+                : 'Please read and accept these rules before starting your savings plan.'}
+            </p>
+
+            <ul className="space-y-3 mb-6">
+              {RULES.map((rule, i) => (
+                <li key={i} className="flex gap-3 text-sm text-gray-700 leading-relaxed">
+                  <CheckCircle2 size={18} className="text-[#007bff] flex-shrink-0 mt-0.5" />
+                  <span>{rule}</span>
+                </li>
+              ))}
+            </ul>
+
+            <label className="flex items-start gap-3 mb-6 cursor-pointer select-none">
+              <input
+                type="checkbox"
+                checked={accepted}
+                onChange={(e) => setAccepted(e.target.checked)}
+                className="w-5 h-5 accent-[#007bff] mt-0.5 flex-shrink-0"
+              />
+              <span className="text-sm font-bold text-gray-800">
+                {fr ? "J'ai lu et j'accepte les règles de l'épargne." : 'I have read and accept the savings rules.'}
+              </span>
+            </label>
+
+            <div className="flex gap-3">
+              <button
+                onClick={confirmCreate}
+                disabled={!accepted || creating}
+                className="flex-1 py-3.5 bg-[#007bff] text-white rounded-full font-black uppercase tracking-widest hover:bg-blue-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {creating ? '…' : fr ? 'Confirmer et démarrer' : 'Confirm & start'}
+              </button>
+              <button
+                onClick={() => setShowRules(false)}
+                className="px-6 py-3.5 border border-gray-200 text-gray-700 rounded-full font-bold hover:bg-gray-50 transition-all"
+              >
+                {fr ? 'Annuler' : 'Cancel'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
