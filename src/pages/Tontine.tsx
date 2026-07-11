@@ -10,6 +10,7 @@ import { useAuth } from '@/src/contexts/AuthContext';
 import { useCatalog } from '@/src/contexts/CatalogContext';
 import { listPlans, createPlan, SavingsPlan, Cadence } from '@/src/lib/tontine';
 import { startPayment } from '@/src/lib/payment';
+import { getSavingsTerms, DEFAULT_SAVINGS_TERMS, SavingsTerms } from '@/src/lib/settings';
 
 const INSTALLMENT_COUNTS = [3, 6, 9, 12];
 
@@ -41,6 +42,7 @@ export default function Tontine() {
   const [creating, setCreating] = useState(false);
   const [showRules, setShowRules] = useState(false);
   const [accepted, setAccepted] = useState(false);
+  const [termsData, setTermsData] = useState<SavingsTerms>(DEFAULT_SAVINGS_TERMS);
 
   const activePlan = plans.find((p) => p.status === 'active');
   const selectedProduct = useMemo(() => products.find((p) => p.id === productId), [products, productId]);
@@ -71,6 +73,11 @@ export default function Tontine() {
     else setPlans([]);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentUser]);
+
+  // Load the (admin-editable) savings terms from the database.
+  useEffect(() => {
+    getSavingsTerms().then(setTermsData).catch(() => {});
+  }, []);
 
   // Keep the selected product valid as the catalog loads (fallback → DB).
   useEffect(() => {
@@ -130,23 +137,7 @@ export default function Tontine() {
     window.location.href = url;
   };
 
-  const RULES = fr
-    ? [
-        'Vous épargnez pour un produit précis jusqu’à atteindre 100 % de son prix.',
-        'Le prix du produit est fixé à l’ouverture du plan et ne change plus, quelles que soient les variations futures.',
-        'Les versements se font à votre rythme (mobile money ou carte) via un paiement sécurisé.',
-        'Le produit est commandé et livré une fois les 100 % atteints.',
-        'Vous ne pouvez avoir qu’une seule épargne active à la fois.',
-        'En cas d’annulation, les modalités de remboursement sont soumises à nos conditions.',
-      ]
-    : [
-        'You save toward a specific product until you reach 100% of its price.',
-        'The product price is locked when the plan opens and will not change, whatever future variations occur.',
-        'Contributions are made at your own pace (mobile money or card) via secure payment.',
-        'The product is ordered and delivered once 100% is reached.',
-        'You can only have one active savings plan at a time.',
-        'In case of cancellation, refund terms are subject to our conditions.',
-      ];
+  const terms = fr ? termsData.fr : termsData.en;
 
   return (
     <div className="min-h-screen bg-[#f8fafc]">
@@ -425,30 +416,20 @@ export default function Tontine() {
       {showRules && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => !creating && setShowRules(false)} />
-          <div className="relative bg-white rounded-[32px] w-full max-w-lg max-h-[90vh] overflow-y-auto shadow-2xl p-6 md:p-8">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-black text-gray-900 flex items-center gap-2">
-                <PiggyBank size={22} className="text-[#007bff]" />
-                {fr ? "Règles de l'épargne" : 'Savings rules'}
+          <div className="relative bg-white rounded-[32px] w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl p-6 md:p-8">
+            <div className="flex items-center justify-between mb-4 sticky top-0 bg-white pb-2">
+              <h2 className="text-lg font-black text-gray-900 flex items-center gap-2">
+                <PiggyBank size={20} className="text-[#007bff]" />
+                {fr ? "Conditions de l'épargne" : 'Savings terms'}
               </h2>
               <button onClick={() => setShowRules(false)} className="p-2 text-gray-400 hover:bg-gray-50 rounded-xl">
                 <X size={20} />
               </button>
             </div>
-            <p className="text-sm text-gray-500 mb-5">
-              {fr
-                ? 'Merci de lire et d’accepter ces règles avant de démarrer votre épargne.'
-                : 'Please read and accept these rules before starting your savings plan.'}
-            </p>
 
-            <ul className="space-y-3 mb-6">
-              {RULES.map((rule, i) => (
-                <li key={i} className="flex gap-3 text-sm text-gray-700 leading-relaxed">
-                  <CheckCircle2 size={18} className="text-[#007bff] flex-shrink-0 mt-0.5" />
-                  <span>{rule}</span>
-                </li>
-              ))}
-            </ul>
+            <div className="mb-6 border border-gray-100 rounded-2xl p-4 md:p-5 bg-gray-50/40">
+              <Markdown text={terms} />
+            </div>
 
             <label className="flex items-start gap-3 mb-6 cursor-pointer select-none">
               <input
@@ -458,7 +439,7 @@ export default function Tontine() {
                 className="w-5 h-5 accent-[#007bff] mt-0.5 flex-shrink-0"
               />
               <span className="text-sm font-bold text-gray-800">
-                {fr ? "J'ai lu et j'accepte les règles de l'épargne." : 'I have read and accept the savings rules.'}
+                {fr ? "J'accepte les conditions de l'Épargne Produit." : 'I accept the Product Savings terms.'}
               </span>
             </label>
 
@@ -482,4 +463,68 @@ export default function Tontine() {
       )}
     </div>
   );
+}
+
+/** Inline **bold** parser. */
+function renderInline(text: string, keyPrefix: string) {
+  return text.split(/\*\*(.+?)\*\*/g).map((part, i) =>
+    i % 2 === 1 ? <strong key={keyPrefix + i}>{part}</strong> : <React.Fragment key={keyPrefix + i}>{part}</React.Fragment>
+  );
+}
+
+/** Minimal Markdown renderer: #, ## headings, * bullets, **bold**, paragraphs. */
+function Markdown({ text }: { text: string }) {
+  const lines = text.split('\n');
+  const blocks: React.ReactNode[] = [];
+  let list: string[] = [];
+  let key = 0;
+
+  const flushList = () => {
+    if (list.length) {
+      const items = list;
+      const k = key++;
+      blocks.push(
+        <ul key={`ul-${k}`} className="list-disc pl-5 space-y-1 text-sm text-gray-600 mb-3">
+          {items.map((it, i) => (
+            <li key={i}>{renderInline(it, `li-${k}-${i}-`)}</li>
+          ))}
+        </ul>
+      );
+      list = [];
+    }
+  };
+
+  for (const raw of lines) {
+    const line = raw.trim();
+    if (!line) {
+      flushList();
+      continue;
+    }
+    if (line.startsWith('## ')) {
+      flushList();
+      blocks.push(
+        <h3 key={key++} className="text-sm font-black text-gray-900 mt-4 mb-1 uppercase tracking-wide">
+          {renderInline(line.slice(3), `h3-${key}-`)}
+        </h3>
+      );
+    } else if (line.startsWith('# ')) {
+      flushList();
+      blocks.push(
+        <h2 key={key++} className="text-base font-black text-gray-900 mb-3">
+          {renderInline(line.slice(2), `h2-${key}-`)}
+        </h2>
+      );
+    } else if (line.startsWith('* ') || line.startsWith('- ')) {
+      list.push(line.slice(2));
+    } else {
+      flushList();
+      blocks.push(
+        <p key={key++} className="text-sm text-gray-600 leading-relaxed mb-2">
+          {renderInline(line, `p-${key}-`)}
+        </p>
+      );
+    }
+  }
+  flushList();
+  return <div>{blocks}</div>;
 }

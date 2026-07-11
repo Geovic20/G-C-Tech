@@ -19,6 +19,7 @@ const PaiementRetour = lazy(() => import('./pages/PaiementRetour'));
 const AdminProducts = lazy(() => import('./pages/admin/AdminProducts'));
 const AdminOrders = lazy(() => import('./pages/admin/AdminOrders'));
 const AdminUsers = lazy(() => import('./pages/admin/AdminUsers'));
+const AdminSettings = lazy(() => import('./pages/admin/AdminSettings'));
 const Login = lazy(() => import('./pages/Login'));
 const Signup = lazy(() => import('./pages/Signup'));
 const ForgotPassword = lazy(() => import('./pages/ForgotPassword'));
@@ -109,6 +110,7 @@ export default function App() {
                     <Route path="/admin/products" element={<AdminProducts />} />
                     <Route path="/admin/orders" element={<AdminOrders />} />
                     <Route path="/admin/users" element={<AdminUsers />} />
+                    <Route path="/admin/settings" element={<AdminSettings />} />
                     {/* Unknown routes show a proper 404 page */}
                     <Route path="*" element={<NotFound />} />
                   </Routes>
