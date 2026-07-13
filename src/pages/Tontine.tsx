@@ -103,6 +103,7 @@ export default function Tontine() {
       productId: selectedProduct.id,
       productName: selectedProduct.name,
       productImage: selectedProduct.image,
+      productGroup: selectedProduct.group,
       targetAmount: selectedProduct.price,
       installment,
       cadence,

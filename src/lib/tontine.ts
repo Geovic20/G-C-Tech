@@ -30,6 +30,7 @@ export interface NewPlanInput {
   productId: string;
   productName: string;
   productImage?: string;
+  productGroup?: string;
   targetAmount: number;
   installment: number;
   cadence: Cadence;
@@ -89,6 +90,7 @@ export async function createPlan(input: NewPlanInput): Promise<{ error?: string 
     product_id: input.productId,
     product_name: input.productName,
     product_image: input.productImage ?? null,
+    product_group: input.productGroup ?? null,
     target_amount: input.targetAmount,
     installment: input.installment,
     cadence: input.cadence,

@@ -125,6 +125,74 @@ export async function adminSetUserRole(id: string, role: UserRole): Promise<{ er
   return error ? { error: error.message } : {};
 }
 
+// ----------------------- Savings (admin oversight) -----------------------
+
+export type SavingsStatus = 'active' | 'completed' | 'cancelled' | 'suspended';
+
+export interface AdminSavingsPlan {
+  id: string;
+  user_id: string;
+  product_name: string;
+  product_image: string | null;
+  target_amount: number;
+  saved_amount: number;
+  installment: number | null;
+  cadence: 'daily' | 'weekly' | 'monthly';
+  status: SavingsStatus;
+  target_date: string | null;
+  created_at: string;
+  product_group: string | null;
+  user: { email: string | null; fullname: string | null } | null;
+}
+
+export interface AdminContribution {
+  id: string;
+  amount: number;
+  method: string;
+  reference: string | null;
+  created_at: string;
+}
+
+export async function adminListSavings(): Promise<AdminSavingsPlan[]> {
+  const { data: plans, error } = await supabase
+    .from('savings_plans')
+    .select('id,user_id,product_name,product_image,target_amount,saved_amount,installment,cadence,status,target_date,created_at,product_group')
+    .order('created_at', { ascending: false });
+  if (error) throw error;
+
+  const rows = (plans ?? []) as Omit<AdminSavingsPlan, 'user'>[];
+  const ids = Array.from(new Set(rows.map((p) => p.user_id)));
+
+  const profileMap: Record<string, { email: string | null; fullname: string | null }> = {};
+  if (ids.length) {
+    const { data: profs } = await supabase.from('profiles').select('id,email,fullname').in('id', ids);
+    (profs ?? []).forEach((pr: any) => {
+      profileMap[pr.id] = { email: pr.email, fullname: pr.fullname };
+    });
+  }
+
+  return rows.map((p) => ({ ...p, user: profileMap[p.user_id] ?? null }));
+}
+
+export async function adminListPlanContributions(planId: string): Promise<AdminContribution[]> {
+  const { data, error } = await supabase
+    .from('contributions')
+    .select('id,amount,method,reference,created_at')
+    .eq('plan_id', planId)
+    .order('created_at', { ascending: false });
+  if (error) throw error;
+  return (data ?? []) as AdminContribution[];
+}
+
+export async function adminUpdateSavingsStatus(id: string, status: SavingsStatus): Promise<{ error?: string }> {
+  const { error } = await supabase.from('savings_plans').update({ status }).eq('id', id);
+  if (error) {
+    if ((error as any).code === '23505') return { error: 'ACTIVE_PLAN_EXISTS' };
+    return { error: error.message };
+  }
+  return {};
+}
+
 /** Simple slugifier for product slugs (accents stripped, spaces -> dashes). */
 export function slugify(text: string): string {
   return text
