@@ -14,6 +14,16 @@ import { getSavingsTerms, DEFAULT_SAVINGS_TERMS, SavingsTerms } from '@/src/lib/
 
 const INSTALLMENT_COUNTS = [3, 6, 9, 12];
 
+const GROUP_ORDER = ['smartphones', 'computers', 'tablets', 'headphones', 'earphones', 'smartwatches'];
+const GROUP_LABELS: Record<string, { fr: string; en: string }> = {
+  smartphones: { fr: 'Smartphones', en: 'Smartphones' },
+  computers: { fr: 'Ordinateurs', en: 'Computers' },
+  tablets: { fr: 'Tablettes', en: 'Tablets' },
+  headphones: { fr: 'Casques', en: 'Headphones' },
+  earphones: { fr: 'Écouteurs', en: 'Earphones' },
+  smartwatches: { fr: 'Montres', en: 'Watches' },
+};
+
 function computeTargetDate(count: number, cadence: Cadence): Date {
   const d = new Date();
   if (cadence === 'daily') d.setDate(d.getDate() + count);
@@ -36,6 +46,7 @@ export default function Tontine() {
   const [busyId, setBusyId] = useState<string | null>(null);
 
   // New-plan form
+  const [groupFilter, setGroupFilter] = useState<string>('');
   const [productId, setProductId] = useState('');
   const [cadence, setCadence] = useState<Cadence>('monthly');
   const [count, setCount] = useState(6);
@@ -45,6 +56,9 @@ export default function Tontine() {
   const [termsData, setTermsData] = useState<SavingsTerms>(DEFAULT_SAVINGS_TERMS);
 
   const activePlan = plans.find((p) => p.status === 'active');
+  const groups = GROUP_ORDER.filter((g) => products.some((p) => p.group === g));
+  const formProducts = products.filter((p) => p.group === groupFilter);
+  const groupLabel = (g: string) => (GROUP_LABELS[g] ? (fr ? GROUP_LABELS[g].fr : GROUP_LABELS[g].en) : g);
   const selectedProduct = useMemo(() => products.find((p) => p.id === productId), [products, productId]);
   const installment = selectedProduct ? Math.ceil(selectedProduct.price / count) : 0;
   const targetDate = computeTargetDate(count, cadence);
@@ -79,12 +93,19 @@ export default function Tontine() {
     getSavingsTerms().then(setTermsData).catch(() => {});
   }, []);
 
-  // Keep the selected product valid as the catalog loads (fallback → DB).
+  // Default the category once the catalog has loaded.
   useEffect(() => {
-    if (products.length && !products.some((p) => p.id === productId)) {
-      setProductId(products[0].id);
+    if (groups.length && !groups.includes(groupFilter)) {
+      setGroupFilter(groups[0]);
     }
-  }, [products, productId]);
+  }, [groups, groupFilter]);
+
+  // Keep the selected product valid within the chosen category.
+  useEffect(() => {
+    if (formProducts.length && !formProducts.some((p) => p.id === productId)) {
+      setProductId(formProducts[0].id);
+    }
+  }, [formProducts, productId]);
 
   // Submitting the form opens the rules dialog (the plan is only created after acceptance).
   const handleSubmit = (e: React.FormEvent) => {
@@ -241,6 +262,27 @@ export default function Tontine() {
                   {fr ? 'Démarrer une épargne' : 'Start a savings plan'}
                 </h2>
                 <form onSubmit={handleSubmit} className="space-y-5">
+                  {/* Category first, then the product list is limited to that category */}
+                  <div className="space-y-2">
+                    <label className="text-sm font-bold text-gray-500 uppercase tracking-wider">{fr ? 'Catégorie' : 'Category'}</label>
+                    <div className="flex flex-wrap gap-2">
+                      {groups.map((g) => (
+                        <button
+                          key={g}
+                          type="button"
+                          onClick={() => setGroupFilter(g)}
+                          className={`px-4 py-2 rounded-full text-sm font-bold transition-all ${
+                            groupFilter === g
+                              ? 'bg-[#007bff] text-white shadow-lg shadow-blue-500/20'
+                              : 'bg-gray-50 text-gray-600 border border-gray-100 hover:border-gray-200'
+                          }`}
+                        >
+                          {groupLabel(g)}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
                   <div className="space-y-2">
                     <label className="text-sm font-bold text-gray-500 uppercase tracking-wider">{fr ? 'Produit' : 'Product'}</label>
                     <select
@@ -248,7 +290,7 @@ export default function Tontine() {
                       onChange={(e) => setProductId(e.target.value)}
                       className="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium"
                     >
-                      {products.map((p) => (
+                      {formProducts.map((p) => (
                         <option key={p.id} value={p.id}>{p.name} — {formatPrice(p.price)}</option>
                       ))}
                     </select>
