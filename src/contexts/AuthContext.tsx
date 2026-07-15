@@ -96,7 +96,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const { data, error } = await supabase.auth.signUp({
       email: email.trim(),
       password,
-      options: { data: { fullname: fullname.trim(), phone: '', address: '' } },
+      options: {
+        data: { fullname: fullname.trim(), phone: '', address: '' },
+        // Redirect back to wherever the user signed up (prod or local),
+        // instead of relying on the Supabase Site URL default.
+        emailRedirectTo: window.location.origin,
+      },
     });
     if (error) return { error: error.message };
     // When email confirmation is enabled, no session is returned until confirmed.
