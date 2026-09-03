@@ -37,7 +37,7 @@ export default function Tontine() {
   const fr = language === 'fr';
   const { formatPrice } = useCurrency();
   const { currentUser, loading: authLoading } = useAuth();
-  const { products } = useCatalog();
+  const { products, source: catalogSource } = useCatalog();
   const navigate = useNavigate();
 
   const [plans, setPlans] = useState<SavingsPlan[]>([]);
@@ -107,11 +107,24 @@ export default function Tontine() {
     }
   }, [formProducts, productId]);
 
+  // The plan's target amount is resolved from the catalog row server-side, so a
+  // product that only exists in the static fallback list can't back a plan.
+  // Catch it here rather than letting the insert fail after the terms dialog.
+  const catalogOffline = catalogSource === 'fallback';
+
   // Submitting the form opens the rules dialog (the plan is only created after acceptance).
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedProduct) return;
     setError('');
+    if (catalogOffline) {
+      setError(
+        fr
+          ? "Le catalogue n'est pas joignable pour le moment. Réessayez dans un instant."
+          : 'The catalog is unreachable right now. Please try again in a moment.'
+      );
+      return;
+    }
     setAccepted(false);
     setShowRules(true);
   };
@@ -133,11 +146,15 @@ export default function Tontine() {
     setCreating(false);
     setShowRules(false);
     if (result.error) {
-      setError(
-        result.error === 'ACTIVE_PLAN_EXISTS'
-          ? (fr ? 'Vous avez déjà une épargne en cours.' : 'You already have an active savings plan.')
-          : result.error
-      );
+      const messages: Record<string, string> = {
+        ACTIVE_PLAN_EXISTS: fr
+          ? 'Vous avez déjà une épargne en cours.'
+          : 'You already have an active savings plan.',
+        PRODUCT_UNAVAILABLE: fr
+          ? "Ce produit n'est plus disponible au catalogue. Choisissez-en un autre."
+          : 'This product is no longer in the catalog. Please pick another one.',
+      };
+      setError(messages[result.error] ?? result.error);
       await loadPlans();
       return;
     }
@@ -341,11 +358,19 @@ export default function Tontine() {
 
                   <button
                     type="submit"
-                    disabled={creating || !selectedProduct}
+                    disabled={creating || !selectedProduct || catalogOffline}
                     className="w-full py-4 bg-[#007bff] text-white rounded-full font-black uppercase tracking-widest shadow-lg shadow-blue-500/20 hover:bg-blue-700 transition-all disabled:opacity-60"
                   >
                     {creating ? (fr ? 'Création...' : 'Creating...') : (fr ? 'Ouvrir le plan' : 'Open plan')}
                   </button>
+
+                  {catalogOffline && (
+                    <p className="mt-3 text-xs text-amber-700 bg-amber-50 border border-amber-100 rounded-2xl p-3">
+                      {fr
+                        ? "Catalogue en cours de chargement. L'ouverture d'un plan sera disponible dans un instant."
+                        : 'Catalog still loading. Opening a plan will be available in a moment.'}
+                    </p>
+                  )}
                 </form>
                 </>
                 )}

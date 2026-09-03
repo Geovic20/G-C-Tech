@@ -79,7 +79,14 @@ export async function hasActivePlan(): Promise<boolean> {
   return (count ?? 0) > 0;
 }
 
-/** Creates a new savings plan for the logged-in user. */
+/**
+ * Creates a new savings plan for the logged-in user.
+ *
+ * `targetAmount`, `productName`, `productImage` and `productGroup` are sent for
+ * completeness, but the `trg_validate_plan` trigger (migration 0014) overwrites
+ * them from the catalog row matching `productId` — the DB price is what counts,
+ * never the figure the browser sends.
+ */
 export async function createPlan(input: NewPlanInput): Promise<{ error?: string }> {
   const { data: auth } = await supabase.auth.getUser();
   const user = auth.user;
@@ -99,27 +106,17 @@ export async function createPlan(input: NewPlanInput): Promise<{ error?: string 
   if (error) {
     // Unique-index violation = the user already has an active plan.
     if (error.code === '23505') return { error: 'ACTIVE_PLAN_EXISTS' };
+    // Raised by trg_validate_plan when the product can't be resolved in the
+    // catalog — in practice, the catalog was served from the static fallback.
+    // The trigger uses the default P0001 SQLSTATE (HTTP 400) and tags the
+    // message, so we match on the prefix rather than on a custom code.
+    if (error.message?.includes('PRODUCT_UNAVAILABLE')) return { error: 'PRODUCT_UNAVAILABLE' };
     return { error: error.message };
   }
   return {};
 }
 
-/**
- * Records a contribution toward a plan. For V1 this is "simulated" — in the
- * payment phase, contributions will instead be inserted server-side by the
- * PSP webhook after a real transfer is confirmed.
- */
-export async function contribute(planId: string, amount: number): Promise<{ error?: string }> {
-  const { data: auth } = await supabase.auth.getUser();
-  const user = auth.user;
-  if (!user) return { error: 'NOT_AUTHENTICATED' };
-  if (amount <= 0) return { error: 'INVALID_AMOUNT' };
-
-  const { error } = await supabase.from('contributions').insert({
-    plan_id: planId,
-    user_id: user.id,
-    amount,
-    method: 'simulated',
-  });
-  return error ? { error: error.message } : {};
-}
+// NOTE: there is deliberately no client-side `contribute()` any more.
+// Contributions are inserted only by the `fedapay-webhook` Edge Function, with
+// the service-role key, once FedaPay confirms the transfer. Migration 0014
+// dropped the matching RLS insert policy, so a browser write would be rejected.
