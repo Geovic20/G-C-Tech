@@ -1,4 +1,3 @@
-import React from 'react';
 
 interface SeoProps {
   /** Page-specific title (already localized). Brand suffix is appended automatically. */

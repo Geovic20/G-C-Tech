@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useRef, useEffect, useCallback, CSSProperties } from 'react';
-import { Star, ShieldCheck, Quote } from 'lucide-react';
+import { Quote } from 'lucide-react';
 import { cn } from '@/src/lib/utils';
 
 // --- Component Interfaces ---
@@ -119,7 +119,12 @@ export const TestimonialStack = ({ testimonials, visibleBehind = 2, title, subti
 
           return (
             <div
-              ref={el => cardRefs.current[index] = el}
+              ref={(el) => {
+                // Block body on purpose: React 19 treats a ref callback's
+                // return value as a cleanup function, so this must return
+                // nothing (an assignment expression would return the element).
+                cardRefs.current[index] = el;
+              }}
               key={testimonial.id}
               className={cn(
                 "glass-effect rounded-[40px] p-8 md:p-12 shadow-2xl shadow-blue-900/10 flex flex-col justify-between",

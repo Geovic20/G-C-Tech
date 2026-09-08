@@ -1,4 +1,3 @@
-import React from 'react';
 import Navbar from '@/src/components/Navbar';
 import Seo from '@/src/components/Seo';
 import { useLanguage } from '@/src/contexts/LanguageContext';

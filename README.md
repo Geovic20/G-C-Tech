@@ -62,10 +62,6 @@ Une plateforme d'e-commerce haute gamme et performante pour la vente d'électron
 - **Supabase Functions** - Fonctions serverless
 - **FedaPay** - Intégration de paiement
 
-### API & IA
-
-- **Google Gemini API** - Intégration IA
-
 ### State Management
 
 - **React Context API** - Gestion d'état globale
@@ -81,10 +77,9 @@ Une plateforme d'e-commerce haute gamme et performante pour la vente d'électron
 ### Prérequis
 
 - Node.js 18+
-- npm ou yarn
+- npm
 - Compte Supabase
-- Clé API Google Gemini
-- Compte FedaPay (pour les paiements)
+- Compte FedaPay (pour les paiements de l'épargne)
 
 ### Étapes d'Installation
 
@@ -102,14 +97,17 @@ Une plateforme d'e-commerce haute gamme et performante pour la vente d'électron
    ```
 
 3. **Configurer les variables d'environnement**
-   Créer un fichier `.env` à la racine du projet :
+   Copier `.env.example` en `.env.local` à la racine du projet :
 
    ```env
    VITE_SUPABASE_URL=<votre-url-supabase>
    VITE_SUPABASE_ANON_KEY=<votre-clé-supabase>
-   GEMINI_API_KEY=<votre-clé-gemini>
-   VITE_FEDAPAY_PUBLIC_KEY=<votre-clé-fedapay>
+   VITE_WHATSAPP_NUMBER=<numéro, format international sans +>
    ```
+
+   Seules les variables préfixées `VITE_` sont lues par le front. Les clés
+   FedaPay sont des secrets d'Edge Function et ne figurent jamais ici — voir
+   `supabase/functions/README.md`.
 
 4. **Démarrer le serveur de développement**
    ```bash
@@ -226,7 +224,7 @@ L'application est configurée pour le déploiement sur **Vercel** :
 
 - Configuration présente dans `vercel.json`
 - Deployment automatique depuis le repository
-- Variables d'environnement gérées dans Vercel
+- Variables d'environnement gérées dans Vercel (les trois `VITE_*` ci-dessus)
 
 ## 📝 Licence
 

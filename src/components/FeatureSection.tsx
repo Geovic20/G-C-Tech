@@ -1,4 +1,3 @@
-import React from 'react';
 import { Link } from 'react-router-dom';
 import { 
   SiSamsung, SiApple, SiGoogle, SiHuawei, SiXiaomi, SiHp, SiDell, SiAsus, 

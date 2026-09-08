@@ -19,7 +19,6 @@ import {
   ShieldCheck,
   CreditCard,
   ChevronRight,
-  Package,
   Truck,
   CheckCircle,
   Clock,
@@ -27,8 +26,8 @@ import {
 } from 'lucide-react';
 
 export default function Dashboard() {
-  const { t, language } = useLanguage();
-  const { currency, formatPrice } = useCurrency();
+  const { language } = useLanguage();
+  const { formatPrice } = useCurrency();
   const { currentUser, isAdmin, loading, updateProfile, signOut } = useAuth();
   const user = currentUser;
   const navigate = useNavigate();

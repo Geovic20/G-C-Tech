@@ -3,7 +3,7 @@ import Navbar from '@/src/components/Navbar';
 import Seo from '@/src/components/Seo';
 import { useLanguage } from '@/src/contexts/LanguageContext';
 import { motion } from 'motion/react';
-import { Mail, Phone, MapPin, MessageSquare, Send, CheckCircle } from 'lucide-react';
+import { Mail, Phone, MapPin, Send, CheckCircle } from 'lucide-react';
 
 export default function ContactUs() {
   const { t, language } = useLanguage();

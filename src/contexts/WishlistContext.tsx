@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
+import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { useAuth } from '@/src/contexts/AuthContext';
 import { listWishlist, addWishlist, removeWishlist } from '@/src/lib/wishlist';
 

@@ -1,4 +1,4 @@
-import React, { useEffect, ReactNode } from 'react';
+import { useEffect, ReactNode } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Package, ShoppingBag, Users, Settings, PiggyBank, ShieldAlert } from 'lucide-react';
 import Navbar from '@/src/components/Navbar';

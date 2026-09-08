@@ -1,10 +1,10 @@
-import React, { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useLanguage } from '@/src/contexts/LanguageContext';
 import { useCurrency, Currency } from '@/src/contexts/CurrencyContext';
 import { useCart } from '@/src/contexts/CartContext';
 import { useAuth } from '@/src/contexts/AuthContext';
 import { useWishlist } from '@/src/contexts/WishlistContext';
-import { CreditCard, Globe, Search, ShoppingCart, User, Phone, ChevronDown, MapPin, Menu, X, Heart } from 'lucide-react';
+import { Search, ShoppingCart, User, Phone, ChevronDown, MapPin, Menu, X, Heart } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { cn } from '@/src/lib/utils';
 import { useCatalog } from '@/src/contexts/CatalogContext';

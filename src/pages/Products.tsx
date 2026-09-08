@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import Navbar from '@/src/components/Navbar';
 import Seo from '@/src/components/Seo';
 import ProductCard from '@/src/components/ProductCard';

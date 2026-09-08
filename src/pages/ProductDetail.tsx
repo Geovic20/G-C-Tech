@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { ChevronRight, Star, Minus, Plus, Truck, RotateCcw } from 'lucide-react';
 import { useCatalog } from '@/src/contexts/CatalogContext';

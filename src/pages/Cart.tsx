@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import Navbar from '@/src/components/Navbar';
 import Seo from '@/src/components/Seo';
 import { useLanguage } from '@/src/contexts/LanguageContext';
@@ -33,7 +33,6 @@ export default function Cart() {
   const { formatPrice } = useCurrency();
   const { items, updateQuantity, removeItem, subtotal, clearCart } = useCart();
   const { currentUser } = useAuth();
-  const navigate = useNavigate();
   const [step, setStep] = useState(1);
   const [whatsappUrl, setWhatsappUrl] = useState('');
   

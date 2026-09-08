@@ -1,4 +1,3 @@
-import React from 'react';
 import { ChevronDown, SlidersHorizontal } from 'lucide-react';
 import { useLanguage } from '@/src/contexts/LanguageContext';
 

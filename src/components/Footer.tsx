@@ -1,4 +1,3 @@
-import React from 'react';
 import { Facebook, Twitter, Instagram, Youtube, ShoppingCart } from 'lucide-react';
 import { useLanguage } from '@/src/contexts/LanguageContext';
 import { Link } from 'react-router-dom';

@@ -1,4 +1,3 @@
-import React from 'react';
 import { Link } from 'react-router-dom';
 import { CATEGORIES } from '@/src/constants';
 import { useCatalog } from '@/src/contexts/CatalogContext';
@@ -10,7 +9,6 @@ import { TestimonialStack } from '@/src/components/TestimonialStack';
 import Newsletter from '@/src/components/Newsletter';
 import { motion } from 'motion/react';
 import { useLanguage } from '@/src/contexts/LanguageContext';
-import { cn } from '@/src/lib/utils';
 import { Star, ShieldCheck } from 'lucide-react';
 
 export default function Home() {
