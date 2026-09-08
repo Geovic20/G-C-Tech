@@ -88,10 +88,6 @@ export default function Navbar() {
             <span className="sm:hidden">{t('nav.call-us')}</span>
           </div>
           
-          <div className="hidden xs:flex flex-1 justify-center text-[11px] font-bold uppercase tracking-widest opacity-80">
-            {t('nav.free-delivery', { price: formatPrice(100000) })}
-          </div>
-          
           <div className="flex items-center gap-3 md:gap-6">
             {/* Currency Selector */}
             <div className="relative currency-menu hidden xs:block">

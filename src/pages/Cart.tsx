@@ -8,26 +8,10 @@ import { useCart } from '@/src/contexts/CartContext';
 import { useAuth } from '@/src/contexts/AuthContext';
 import { createOrder } from '@/src/lib/orders';
 import { buildWhatsappUrl } from '@/src/lib/whatsapp';
+import { findZone, searchZones, zoneLabel, TIME_SLOTS } from '@/src/lib/delivery';
 import { motion, AnimatePresence } from 'motion/react';
 import { Trash2, Plus, Minus, ShoppingBag, ArrowRight, MapPin, Phone, Calendar, Clock, CheckCircle2, ChevronLeft, MessageCircle } from 'lucide-react';
 import { cn } from '@/src/lib/utils';
-
-const DELIVERY_ZONES = [
-  { id: 'cotonou', name: 'Cotonou', cost: 1000 },
-  { id: 'porto-novo', name: 'Porto-Novo', cost: 1500 },
-  { id: 'calavi', name: 'Abomey-Calavi', cost: 1200 },
-  { id: 'ouidah', name: 'Ouidah', cost: 2500 },
-  { id: 'parakou', name: 'Parakou', cost: 5000 },
-];
-
-const TIME_SLOTS = [
-  '08:00 - 10:00',
-  '10:00 - 12:00',
-  '12:00 - 14:00',
-  '14:00 - 16:00',
-  '16:00 - 18:00',
-  '18:00 - 20:00',
-];
 
 export default function Cart() {
   const { t, language } = useLanguage();
@@ -50,13 +34,19 @@ export default function Cart() {
     timeSlot: '',
   });
 
-  const selectedZone = DELIVERY_ZONES.find(z => z.id === deliveryData.zoneId);
+  // ~90 neighbourhoods across 14 zones: let the customer type theirs rather
+  // than scroll a very long list.
+  const [zoneQuery, setZoneQuery] = useState('');
+  const visibleZones = searchZones(zoneQuery);
+
+  const selectedZone = findZone(deliveryData.zoneId);
+  const selectedZoneName = selectedZone ? zoneLabel(selectedZone) : '';
   const shipping = selectedZone ? selectedZone.cost : 0;
   const tax = subtotal * 0.1;
   const total = subtotal + shipping + tax;
 
   const getWhatsappUrl = () => {
-    const zoneName = selectedZone ? selectedZone.name : 'Non spécifiée';
+    const zoneName = selectedZoneName || 'Non spécifiée';
     
     const productsText = items.map(p => `• ${p.name} (x${p.quantity}) - ${formatPrice(p.price * p.quantity)}`).join('\n');
     
@@ -133,7 +123,7 @@ Please let me know how I can settle the payment!`;
         total,
         customerName: currentUser.fullname,
         phone: deliveryData.phone,
-        deliveryZone: selectedZone?.name,
+        deliveryZone: selectedZoneName || undefined,
         deliveryDetails: deliveryData.details,
         deliveryDate: deliveryData.date,
         deliveryTime: deliveryData.timeSlot,
@@ -315,16 +305,31 @@ Please let me know how I can settle the payment!`;
                     {/* Zone Select */}
                     <div className="space-y-2">
                       <label className="text-sm font-bold text-gray-500 uppercase tracking-wider">{t('delivery.zone')}</label>
-                      <select 
+                      <input
+                        type="search"
+                        value={zoneQuery}
+                        onChange={(e) => setZoneQuery(e.target.value)}
+                        placeholder={t('delivery.zone.search')}
+                        aria-label={t('delivery.zone.search')}
+                        className="w-full px-6 py-3 bg-white border border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all text-sm"
+                      />
+                      <select
                         value={deliveryData.zoneId}
                         onChange={(e) => setDeliveryData({...deliveryData, zoneId: e.target.value})}
                         className="w-full px-6 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all font-medium"
                       >
                         <option value="">{t('delivery.zone.placeholder')}</option>
-                        {DELIVERY_ZONES.map(zone => (
-                          <option key={zone.id} value={zone.id}>{zone.name} (+{formatPrice(zone.cost)})</option>
+                        {visibleZones.map(zone => (
+                          <option key={zone.id} value={zone.id}>
+                            {formatPrice(zone.cost)} — {zoneLabel(zone)}
+                          </option>
                         ))}
                       </select>
+                      {visibleZones.length === 0 && (
+                        <p className="text-xs text-amber-700 bg-amber-50 border border-amber-100 rounded-xl p-3">
+                          {t('delivery.zone.none')}
+                        </p>
+                      )}
                     </div>
 
                     {/* Phone Number */}
@@ -422,7 +427,7 @@ Please let me know how I can settle the payment!`;
                            <MapPin size={24} />
                          </div>
                          <div>
-                           <h4 className="font-bold text-gray-900">{selectedZone?.name}</h4>
+                           <h4 className="font-bold text-gray-900">{selectedZoneName}</h4>
                            <p className="text-gray-500 text-sm">{deliveryData.details || t('cart.no-details')}</p>
                          </div>
                        </div>

@@ -1,41 +1,52 @@
+import { Link } from 'react-router-dom';
 import Navbar from '@/src/components/Navbar';
 import Seo from '@/src/components/Seo';
 import { useLanguage } from '@/src/contexts/LanguageContext';
+import { useCurrency } from '@/src/contexts/CurrencyContext';
 import { motion } from 'motion/react';
-import { Truck, Globe, Clock, ShieldCheck, MapPin, Package } from 'lucide-react';
+import { Truck, Clock, MessageCircle, MapPin } from 'lucide-react';
+import { DELIVERY_ZONES, TIME_SLOTS, MIN_DELIVERY_COST } from '@/src/lib/delivery';
 
+/**
+ * Everything on this page is derived from `src/lib/delivery.ts`, the same
+ * source the cart charges from. Changing a tariff there updates this page —
+ * the two can no longer drift apart and contradict each other.
+ */
 export default function ShippingInfo() {
   const { t, language } = useLanguage();
   const fr = language === 'fr';
+  const { formatPrice } = useCurrency();
 
-  const methods = [
+  // Zones grouped by tariff, cheapest first.
+  const tiers = Array.from(new Set(DELIVERY_ZONES.map((z) => z.cost)))
+    .sort((a, b) => a - b)
+    .map((cost) => ({ cost, zones: DELIVERY_ZONES.filter((z) => z.cost === cost) }));
+
+  const facts = [
     {
-      title: fr ? 'Livraison standard' : 'Standard Delivery',
-      time: fr ? '3-5 jours ouvrés' : '3-5 Business Days',
-      price: fr ? 'Gratuit' : 'Free',
-      description: fr
-        ? 'Une livraison fiable et abordable pour les commandes non urgentes.'
-        : 'Reliable and affordable shipping for non-urgent orders.',
-      icon: Truck
+      icon: Truck,
+      title: fr ? 'Un tarif par quartier' : 'One tariff per neighbourhood',
+      value: `${fr ? 'À partir de' : 'From'} ${formatPrice(MIN_DELIVERY_COST)}`,
+      desc: fr
+        ? 'Les frais dépendent uniquement de votre zone, jamais du montant de la commande. Le tarif exact s’affiche dès que vous choisissez votre quartier dans le panier.'
+        : 'The fee depends only on your zone, never on the order amount. The exact tariff appears as soon as you pick your neighbourhood in the cart.',
     },
     {
-      title: fr ? 'Livraison express' : 'Express Delivery',
-      time: fr ? '1-2 jours ouvrés' : '1-2 Business Days',
-      price: '5,000 F',
-      description: fr
-        ? 'Recevez votre matériel plus vite grâce à notre service prioritaire.'
-        : 'Get your tech faster with our priority shipping service.',
-      icon: Clock
+      icon: Clock,
+      title: fr ? 'Vous choisissez le créneau' : 'You pick the time slot',
+      value: `${TIME_SLOTS.length} ${fr ? 'créneaux' : 'slots'} · 08h–20h`,
+      desc: fr
+        ? 'Au moment de la commande, vous indiquez la date qui vous arrange et l’un des créneaux de deux heures. Nous nous y tenons.'
+        : 'When ordering, you choose the date that suits you and one of the two-hour slots. We stick to it.',
     },
     {
-      title: fr ? 'Livraison le jour même' : 'Same Day Delivery',
-      time: fr ? 'Sous 24 heures' : 'Within 24 Hours',
-      price: '10,000 F',
-      description: fr
-        ? 'Disponible dans les grandes villes pour les commandes passées avant midi.'
-        : 'Available in major cities for orders placed before 12 PM.',
-      icon: Package
-    }
+      icon: MessageCircle,
+      title: fr ? 'Le suivi se fait sur WhatsApp' : 'Follow-up happens on WhatsApp',
+      value: fr ? 'Contact direct' : 'Direct contact',
+      desc: fr
+        ? 'Votre commande est finalisée par WhatsApp : c’est là que nous confirmons le paiement, la disponibilité et l’heure de passage du livreur.'
+        : 'Your order is completed on WhatsApp: that is where we confirm payment, availability and the courier’s time.',
+    },
   ];
 
   return (
@@ -45,7 +56,8 @@ export default function ShippingInfo() {
 
       <main className="py-12 md:py-20">
         <div className="px-4 md:px-12 max-w-7xl mx-auto">
-          <div className="max-w-3xl mb-12 md:mb-20 text-center mx-auto">
+          {/* Hero */}
+          <div className="max-w-3xl mb-12 md:mb-16 text-center mx-auto">
             <motion.span
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
@@ -70,87 +82,92 @@ export default function ShippingInfo() {
             </motion.p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-20">
-            {methods.map((method, idx) => (
+          {/* Three facts */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16 md:mb-20">
+            {facts.map((f, idx) => (
               <motion.div
-                key={method.title}
+                key={f.title}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2 + idx * 0.1 }}
-                className="bg-gray-50 p-10 rounded-[40px] border border-gray-100 hover:border-blue-200 hover:shadow-xl transition-all group"
+                transition={{ delay: 0.15 + idx * 0.08 }}
+                className="bg-gray-50 p-8 rounded-[32px] border border-gray-100"
               >
-                <div className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center text-[#007bff] mb-8 shadow-sm group-hover:scale-110 transition-transform">
-                  <method.icon size={28} />
+                <div className="w-14 h-14 bg-white rounded-2xl flex items-center justify-center text-[#007bff] mb-6 shadow-sm">
+                  <f.icon size={26} />
                 </div>
-                <h3 className="text-2xl font-bold text-gray-900 mb-2">{method.title}</h3>
-                <p className="text-[#007bff] font-bold mb-6">{method.time} • {method.price}</p>
-                <p className="text-gray-500 leading-relaxed text-sm">
-                  {method.description}
-                </p>
+                <h2 className="text-xl font-bold text-gray-900 mb-1">{f.title}</h2>
+                <p className="text-[#007bff] font-bold mb-4">{f.value}</p>
+                <p className="text-gray-500 leading-relaxed text-sm">{f.desc}</p>
               </motion.div>
             ))}
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            <motion.div
-               initial={{ opacity: 0, x: -20 }}
-               animate={{ opacity: 1, x: 0 }}
-               className="bg-[#007bff] rounded-[32px] md:rounded-[40px] p-8 md:p-12 text-white relative overflow-hidden"
-            >
-              <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -mr-32 -mt-32 blur-3xl"></div>
-              <h2 className="text-3xl font-black mb-8 relative z-10">{fr ? 'Livraison internationale' : 'International Shipping'}</h2>
-              <div className="space-y-6 relative z-10">
-                <div className="flex gap-4">
-                  <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center flex-shrink-0">
-                    <Globe size={20} />
-                  </div>
-                  <div>
-                    <h4 className="font-bold mb-1">{fr ? 'Portée mondiale' : 'Global Reach'}</h4>
-                    <p className="text-blue-100 text-sm">{fr ? 'Nous livrons dans plus de 100 pays grâce à nos partenaires logistiques mondiaux.' : 'We ship to over 100 countries worldwide with our global logistics partners.'}</p>
-                  </div>
-                </div>
-                <div className="flex gap-4">
-                  <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center flex-shrink-0">
-                    <ShieldCheck size={20} />
-                  </div>
-                  <div>
-                    <h4 className="font-bold mb-1">{fr ? 'Douanes & taxes' : 'Customs & Duties'}</h4>
-                    <p className="text-blue-100 text-sm">{fr ? 'Nous gérons toute la documentation douanière pour une livraison sans souci.' : 'We handle all customs documentation to ensure a smooth delivery process.'}</p>
-                  </div>
-                </div>
-              </div>
-            </motion.div>
+          {/* Tariffs — the real reason people open this page */}
+          <section>
+            <div className="flex items-baseline gap-3 flex-wrap mb-2">
+              <h2 className="text-2xl md:text-3xl font-black text-gray-900">
+                {fr ? 'Zones et tarifs' : 'Zones and tariffs'}
+              </h2>
+              <span className="text-sm text-gray-400 font-medium">
+                {DELIVERY_ZONES.length} {fr ? 'zones' : 'zones'}
+              </span>
+            </div>
+            <p className="text-gray-500 text-sm mb-8 max-w-2xl leading-relaxed">
+              {fr
+                ? 'Trouvez votre quartier ci-dessous : le montant indiqué est celui qui sera ajouté à votre commande. Aucun autre frais ne s’applique.'
+                : 'Find your neighbourhood below: the amount shown is what gets added to your order. No other fee applies.'}
+            </p>
 
-            <motion.div
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              className="space-y-8"
-            >
-              <h2 className="text-2xl md:text-3xl font-black text-gray-900">{fr ? 'Suivez votre colis' : 'Track your package'}</h2>
-              <p className="text-gray-500 text-sm md:text-base leading-relaxed">
-                {fr
-                  ? "Une fois votre commande expédiée, vous recevrez un numéro de suivi par e-mail. Vous pourrez l'utiliser pour suivre votre colis en temps réel."
-                  : "Once your order has been dispatched, you'll receive a tracking number via email. You can use this to monitor your shipment in real-time."}
-              </p>
-              <div className="flex flex-col sm:flex-row gap-4">
-                <input
-                  type="text"
-                  placeholder={fr ? 'Entrez votre numéro de suivi' : 'Enter your tracking number'}
-                  className="flex-1 h-14 px-6 bg-gray-50 border border-gray-100 rounded-2xl focus:outline-none focus:ring-4 focus:ring-blue-100 font-medium"
-                />
-                <button className="h-14 px-8 bg-gray-900 text-white rounded-2xl font-bold hover:bg-black transition-colors whitespace-nowrap">
-                  {fr ? 'Suivre la commande' : 'Track Order'}
-                </button>
+            <div className="space-y-4">
+              {tiers.map((tier) => (
+                <div
+                  key={tier.cost}
+                  className="border border-gray-100 rounded-[28px] overflow-hidden bg-white"
+                >
+                  <div className="flex items-baseline gap-3 px-6 py-4 bg-gray-50 border-b border-gray-100">
+                    <span className="text-xl font-black text-[#007bff] tabular-nums">
+                      {formatPrice(tier.cost)}
+                    </span>
+                    <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">
+                      {tier.zones.length} {fr ? (tier.zones.length > 1 ? 'zones' : 'zone') : (tier.zones.length > 1 ? 'zones' : 'zone')}
+                    </span>
+                  </div>
+                  <ul className="divide-y divide-gray-50">
+                    {tier.zones.map((zone) => (
+                      <li key={zone.id} className="px-6 py-4 flex gap-3">
+                        <MapPin size={16} className="text-gray-300 flex-shrink-0 mt-1" />
+                        <p className="text-sm text-gray-700 leading-relaxed">
+                          {zone.areas.join(' · ')}
+                        </p>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+            </div>
+
+            <div className="mt-8 p-6 md:p-8 bg-blue-50/60 border border-blue-100 rounded-[28px] flex flex-col sm:flex-row sm:items-center gap-5">
+              <div className="flex-1">
+                <h3 className="font-bold text-gray-900 mb-1">
+                  {fr ? 'Votre quartier n’est pas dans la liste ?' : 'Your neighbourhood is not listed?'}
+                </h3>
+                <p className="text-sm text-gray-600 leading-relaxed">
+                  {fr
+                    ? 'Écrivez-nous : nous livrons au-delà de ces zones au cas par cas, et nous vous donnons le tarif avant que vous ne commandiez.'
+                    : 'Get in touch: we deliver beyond these zones case by case, and we quote the fee before you order.'}
+                </p>
               </div>
-              <div className="flex items-center gap-2 text-sm text-gray-400">
-                <MapPin size={16} className="text-[#007bff]" />
-                {fr ? 'Le délai de livraison estimé varie selon la localisation.' : 'Estimated delivery time varies by location.'}
-              </div>
-            </motion.div>
-          </div>
+              <Link
+                to="/contact"
+                className="inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-[#007bff] text-white rounded-full font-bold hover:bg-blue-700 transition-all whitespace-nowrap flex-shrink-0"
+              >
+                <MessageCircle size={18} />
+                {fr ? 'Nous contacter' : 'Contact us'}
+              </Link>
+            </div>
+          </section>
         </div>
       </main>
-
     </div>
   );
 }

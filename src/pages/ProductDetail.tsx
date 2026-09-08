@@ -9,6 +9,7 @@ import { cn } from '@/src/lib/utils';
 import { useLanguage } from '@/src/contexts/LanguageContext';
 import { useCurrency } from '@/src/contexts/CurrencyContext';
 import { useCart } from '@/src/contexts/CartContext';
+import { MIN_DELIVERY_COST } from '@/src/lib/delivery';
 
 export default function ProductDetail() {
   const { id } = useParams();
@@ -156,8 +157,10 @@ export default function ProductDetail() {
                   <Truck size={20} />
                 </div>
                 <div>
-                  <p className="font-bold text-sm">{t('detail.free-delivery')}</p>
-                  <button className="text-xs underline text-gray-500">{t('detail.free-delivery-desc')}</button>
+                  <p className="font-bold text-sm">{t('detail.delivery')}</p>
+                  <p className="text-xs text-gray-500">
+                    {t('detail.delivery-desc', { price: formatPrice(MIN_DELIVERY_COST) })}
+                  </p>
                 </div>
               </div>
               <div className="p-4 border border-gray-100 rounded-2xl flex items-start gap-4">
@@ -166,7 +169,9 @@ export default function ProductDetail() {
                 </div>
                 <div>
                   <p className="font-bold text-sm">{t('detail.return')}</p>
-                  <p className="text-xs text-gray-500">{t('detail.return-desc')}</p>
+                  <Link to="/refund" className="text-xs text-gray-500 underline hover:text-[#007bff]">
+                    {t('detail.return-desc')}
+                  </Link>
                 </div>
               </div>
             </div>
