@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { Plus, Pencil, Trash2, X, ChevronLeft, Smartphone, Laptop, Tablet, Headphones, Watch, Package } from 'lucide-react';
+import React, { useEffect, useMemo, useState } from 'react';
+import { Plus, Pencil, Trash2, X, ChevronLeft, ChevronDown, Smartphone, Laptop, Tablet, Headphones, Watch, Package } from 'lucide-react';
 import AdminLayout from '@/src/components/AdminLayout';
 import { useLanguage } from '@/src/contexts/LanguageContext';
 import { useCurrency } from '@/src/contexts/CurrencyContext';
@@ -22,6 +22,15 @@ const SPEC_FIELDS: Record<string, string[]> = {
   headphones: ['Connectivity', 'Battery Life', 'Noise Canceling', 'Driver Size'],
   earphones: ['Connectivity', 'Battery Life', 'Noise Canceling'],
   smartwatches: ['Display', 'Battery', 'Water Resistant', 'GPS', 'Connectivity'],
+};
+
+const CATEGORY_LABELS: Record<string, { fr: string; en: string }> = {
+  smartphones:  { fr: 'Smartphones', en: 'Smartphones' },
+  computers:    { fr: 'Ordinateurs', en: 'Computers' },
+  tablets:      { fr: 'Tablettes',   en: 'Tablets' },
+  headphones:   { fr: 'Casques',     en: 'Headphones' },
+  earphones:    { fr: 'Écouteurs',   en: 'Earphones' },
+  smartwatches: { fr: 'Montres',     en: 'Watches' },
 };
 
 const CATEGORY_ICONS: Record<string, any> = {
@@ -164,13 +173,146 @@ export default function AdminProducts() {
     await load();
   };
 
+  const [collapsed, setCollapsed] = useState<Record<string, boolean>>({});
+  const toggleGroup = (slug: string) =>
+    setCollapsed((c) => ({ ...c, [slug]: !c[slug] }));
+
+  const categoryLabel = (c: Category) =>
+    CATEGORY_LABELS[c.slug] ? (fr ? CATEGORY_LABELS[c.slug].fr : CATEGORY_LABELS[c.slug].en) : c.name;
+
+  // Products bucketed per category, in the catalog's own `position` order.
+  // Empty categories are kept: seeing "0 produit" is how an admin notices a
+  // section nobody has filled yet. `orphans` should stay empty (category_id is
+  // NOT NULL with a foreign key) but a stray row must not silently vanish.
+  const { buckets, orphans } = useMemo(() => {
+    const list = categories.map((cat) => ({ cat, items: [] as AdminProduct[] }));
+    const index = new Map(list.map((b) => [b.cat.id, b]));
+    const rest: AdminProduct[] = [];
+    products.forEach((p) => {
+      const bucket = index.get(p.category_id);
+      if (bucket) bucket.items.push(p);
+      else rest.push(p);
+    });
+    return { buckets: list, orphans: rest };
+  }, [products, categories]);
+
   const specKeys = formCategory ? SPEC_FIELDS[formCategory.slug] ?? [] : [];
+
+  // One table, reused by every category card.
+  const productRows = (items: AdminProduct[]) => (
+    <div className="overflow-x-auto">
+      <table className="w-full text-sm">
+        <thead className="bg-gray-50 text-gray-400 text-xs uppercase tracking-wider">
+          <tr>
+            <th className="text-left font-bold px-5 py-3">{fr ? 'Produit' : 'Product'}</th>
+            <th className="text-left font-bold px-5 py-3 hidden md:table-cell">{fr ? 'Marque' : 'Brand'}</th>
+            <th className="text-left font-bold px-5 py-3 hidden lg:table-cell">{fr ? 'Type' : 'Type'}</th>
+            <th className="text-right font-bold px-5 py-3">{fr ? 'Prix' : 'Price'}</th>
+            <th className="text-center font-bold px-5 py-3 hidden sm:table-cell">{fr ? 'Stock' : 'Stock'}</th>
+            <th className="px-5 py-3"></th>
+          </tr>
+        </thead>
+        <tbody className="divide-y divide-gray-50">
+          {items.map((p) => (
+            <tr key={p.id} className="hover:bg-gray-50/50">
+              <td className="px-5 py-3">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-gray-50 rounded-xl flex items-center justify-center flex-shrink-0 overflow-hidden">
+                    {p.image && <img src={p.image} alt="" loading="lazy" className="w-full h-full object-contain" />}
+                  </div>
+                  <span className="font-bold text-gray-900">{p.name}</span>
+                </div>
+              </td>
+              <td className="px-5 py-3 text-gray-500 hidden md:table-cell">{p.brands?.name ?? '—'}</td>
+              <td className="px-5 py-3 text-gray-500 hidden lg:table-cell">{p.type || '—'}</td>
+              <td className="px-5 py-3 text-right font-bold text-gray-900 whitespace-nowrap">{formatPrice(p.price)}</td>
+              <td className="px-5 py-3 text-center hidden sm:table-cell">
+                <span
+                  title={p.in_stock ? (fr ? 'En stock' : 'In stock') : (fr ? 'Rupture' : 'Out of stock')}
+                  className={`inline-block w-2.5 h-2.5 rounded-full ${p.in_stock ? 'bg-emerald-500' : 'bg-gray-300'}`}
+                />
+              </td>
+              <td className="px-5 py-3">
+                <div className="flex items-center justify-end gap-2">
+                  <button
+                    onClick={() => openEdit(p)}
+                    aria-label={(fr ? 'Modifier ' : 'Edit ') + p.name}
+                    className="p-2 text-gray-400 hover:text-[#007bff] hover:bg-blue-50 rounded-xl transition-all"
+                  >
+                    <Pencil size={16} />
+                  </button>
+                  <button
+                    onClick={() => handleDelete(p)}
+                    aria-label={(fr ? 'Supprimer ' : 'Delete ') + p.name}
+                    className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all"
+                  >
+                    <Trash2 size={16} />
+                  </button>
+                </div>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+
+  // A category card: icon, label, counts, collapse toggle, then its table.
+  const groupCard = (key: string, label: string, Icon: any, items: AdminProduct[]) => {
+    const isOpen = !collapsed[key];
+    const outOfStock = items.filter((p) => !p.in_stock).length;
+    return (
+      <section key={key} className="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden">
+        <button
+          onClick={() => toggleGroup(key)}
+          aria-expanded={isOpen}
+          className="w-full flex items-center gap-3 px-5 py-4 text-left hover:bg-gray-50/60 transition-colors"
+        >
+          <span className="w-9 h-9 bg-blue-50 text-[#007bff] rounded-xl flex items-center justify-center flex-shrink-0">
+            <Icon size={18} />
+          </span>
+          <span className="font-black text-gray-900">{label}</span>
+
+          <span className="px-2.5 py-0.5 bg-gray-100 text-gray-600 rounded-full text-xs font-bold tabular-nums">
+            {items.length}{' '}
+            {fr
+              ? items.length > 1 ? 'produits' : 'produit'
+              : items.length > 1 ? 'products' : 'product'}
+          </span>
+
+          {outOfStock > 0 && (
+            <span className="px-2.5 py-0.5 bg-amber-50 text-amber-700 rounded-full text-xs font-bold tabular-nums">
+              {outOfStock} {fr ? 'en rupture' : 'out of stock'}
+            </span>
+          )}
+
+          <ChevronDown
+            size={18}
+            className={`ml-auto text-gray-400 flex-shrink-0 transition-transform ${isOpen ? '' : '-rotate-90'}`}
+          />
+        </button>
+
+        {isOpen &&
+          (items.length === 0 ? (
+            <p className="px-5 pb-5 text-sm text-gray-400">
+              {fr ? 'Aucun produit dans cette catégorie.' : 'No product in this category.'}
+            </p>
+          ) : (
+            productRows(items)
+          ))}
+      </section>
+    );
+  };
 
   return (
     <AdminLayout title={fr ? 'Produits' : 'Products'}>
       <div className="flex items-center justify-between mb-6">
         <p className="text-gray-500 text-sm">
-          {loading ? '…' : `${products.length} ${fr ? 'produits' : 'products'}`}
+          {loading
+            ? '…'
+            : `${products.length} ${fr ? 'produits' : 'products'} · ${categories.length} ${
+                fr ? 'catégories' : 'categories'
+              }`}
         </p>
         <button
           onClick={openCreate}
@@ -184,59 +326,24 @@ export default function AdminProducts() {
         <div className="mb-4 p-3 rounded-2xl bg-red-50 border border-red-100 text-red-600 text-sm font-medium">{error}</div>
       )}
 
-      <div className="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead className="bg-gray-50 text-gray-400 text-xs uppercase tracking-wider">
-              <tr>
-                <th className="text-left font-bold px-5 py-3">{fr ? 'Produit' : 'Product'}</th>
-                <th className="text-left font-bold px-5 py-3 hidden md:table-cell">{fr ? 'Marque' : 'Brand'}</th>
-                <th className="text-left font-bold px-5 py-3 hidden md:table-cell">{fr ? 'Catégorie' : 'Category'}</th>
-                <th className="text-right font-bold px-5 py-3">{fr ? 'Prix' : 'Price'}</th>
-                <th className="text-center font-bold px-5 py-3 hidden sm:table-cell">{fr ? 'Stock' : 'Stock'}</th>
-                <th className="px-5 py-3"></th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-50">
-              {products.map((p) => (
-                <tr key={p.id} className="hover:bg-gray-50/50">
-                  <td className="px-5 py-3">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 bg-gray-50 rounded-xl flex items-center justify-center flex-shrink-0 overflow-hidden">
-                        {p.image && <img src={p.image} alt="" className="w-full h-full object-contain" />}
-                      </div>
-                      <span className="font-bold text-gray-900">{p.name}</span>
-                    </div>
-                  </td>
-                  <td className="px-5 py-3 text-gray-500 hidden md:table-cell">{p.brands?.name ?? '—'}</td>
-                  <td className="px-5 py-3 text-gray-500 hidden md:table-cell capitalize">{p.categories?.slug ?? '—'}</td>
-                  <td className="px-5 py-3 text-right font-bold text-gray-900 whitespace-nowrap">{formatPrice(p.price)}</td>
-                  <td className="px-5 py-3 text-center hidden sm:table-cell">
-                    <span className={`inline-block w-2.5 h-2.5 rounded-full ${p.in_stock ? 'bg-emerald-500' : 'bg-gray-300'}`} />
-                  </td>
-                  <td className="px-5 py-3">
-                    <div className="flex items-center justify-end gap-2">
-                      <button onClick={() => openEdit(p)} className="p-2 text-gray-400 hover:text-[#007bff] hover:bg-blue-50 rounded-xl transition-all">
-                        <Pencil size={16} />
-                      </button>
-                      <button onClick={() => handleDelete(p)} className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all">
-                        <Trash2 size={16} />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-              {!loading && products.length === 0 && (
-                <tr>
-                  <td colSpan={6} className="px-5 py-12 text-center text-gray-400">
-                    {fr ? 'Aucun produit.' : 'No products.'}
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
+      {loading ? (
+        <p className="text-gray-400 text-sm">{fr ? 'Chargement…' : 'Loading…'}</p>
+      ) : (
+        <div className="space-y-4">
+          {buckets.map((b) =>
+            groupCard(b.cat.slug, categoryLabel(b.cat), CATEGORY_ICONS[b.cat.slug] ?? Package, b.items)
+          )}
+
+          {orphans.length > 0 &&
+            groupCard('__orphans', fr ? 'Sans catégorie' : 'Uncategorised', Package, orphans)}
+
+          {products.length === 0 && (
+            <div className="bg-white rounded-3xl border border-gray-100 shadow-sm px-5 py-12 text-center text-gray-400">
+              {fr ? 'Aucun produit.' : 'No products.'}
+            </div>
+          )}
         </div>
-      </div>
+      )}
 
       {/* Modal */}
       {showForm && (
