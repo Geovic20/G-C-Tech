@@ -6,7 +6,6 @@ import Seo from '@/src/components/Seo';
 import ProductCard from '@/src/components/ProductCard';
 import FeatureSection from '@/src/components/FeatureSection';
 import { TestimonialStack } from '@/src/components/TestimonialStack';
-import Newsletter from '@/src/components/Newsletter';
 import { motion } from 'motion/react';
 import { useLanguage } from '@/src/contexts/LanguageContext';
 import { Star, ShieldCheck } from 'lucide-react';
@@ -180,8 +179,6 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Newsletter Section */}
-        <Newsletter />
       </main>
     </div>
   );

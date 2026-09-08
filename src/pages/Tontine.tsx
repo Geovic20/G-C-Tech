@@ -10,6 +10,7 @@ import { useAuth } from '@/src/contexts/AuthContext';
 import { useCatalog } from '@/src/contexts/CatalogContext';
 import { listPlans, createPlan, SavingsPlan, Cadence } from '@/src/lib/tontine';
 import { startPayment } from '@/src/lib/payment';
+import { rememberPendingPayment } from '@/src/lib/paymentReturn';
 import { getSavingsTerms, DEFAULT_SAVINGS_TERMS, SavingsTerms } from '@/src/lib/settings';
 
 const INSTALLMENT_COUNTS = [3, 6, 9, 12];
@@ -166,6 +167,7 @@ export default function Tontine() {
     const remaining = plan.target_amount - plan.saved_amount;
     if (remaining <= 0) return;
     setBusyId(plan.id);
+    rememberPendingPayment(plan.id, plan.saved_amount);
     const { url, error } = await startPayment(plan.id);
     if (error || !url) {
       setBusyId(null);

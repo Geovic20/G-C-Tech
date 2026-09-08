@@ -9,6 +9,7 @@ import { useCurrency } from '@/src/contexts/CurrencyContext';
 import { useAuth } from '@/src/contexts/AuthContext';
 import { getPlan, listContributions, SavingsPlan, Contribution, Cadence } from '@/src/lib/tontine';
 import { startPayment } from '@/src/lib/payment';
+import { rememberPendingPayment } from '@/src/lib/paymentReturn';
 
 export default function EpargneDetail() {
   const { id } = useParams();
@@ -62,6 +63,7 @@ export default function EpargneDetail() {
     const remaining = plan.target_amount - plan.saved_amount;
     if (remaining <= 0) return;
     setBusy(true);
+    rememberPendingPayment(plan.id, plan.saved_amount);
     const { url, error } = await startPayment(plan.id);
     if (error || !url) {
       setBusy(false);

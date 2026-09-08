@@ -7,6 +7,7 @@ import { useCurrency } from '@/src/contexts/CurrencyContext';
 import { useCart } from '@/src/contexts/CartContext';
 import { useAuth } from '@/src/contexts/AuthContext';
 import { createOrder } from '@/src/lib/orders';
+import { buildWhatsappUrl } from '@/src/lib/whatsapp';
 import { motion, AnimatePresence } from 'motion/react';
 import { Trash2, Plus, Minus, ShoppingBag, ArrowRight, MapPin, Phone, Calendar, Clock, CheckCircle2, ChevronLeft, MessageCircle } from 'lucide-react';
 import { cn } from '@/src/lib/utils';
@@ -35,6 +36,10 @@ export default function Cart() {
   const { currentUser } = useAuth();
   const [step, setStep] = useState(1);
   const [whatsappUrl, setWhatsappUrl] = useState('');
+  // WhatsApp is the channel of record for an order; the `orders` row is the
+  // customer's history copy. If only the copy fails we must still not pretend
+  // everything went through — hence a warning rather than a silent console.error.
+  const [historyWarning, setHistoryWarning] = useState(false);
   
   // Delivery form state
   const [deliveryData, setDeliveryData] = useState({
@@ -51,9 +56,6 @@ export default function Cart() {
   const total = subtotal + shipping + tax;
 
   const getWhatsappUrl = () => {
-    const defaultPhone = '+22960000000';
-    const metaEnv = (import.meta as any).env || {};
-    const targetPhone = (metaEnv.VITE_WHATSAPP_NUMBER || defaultPhone).replace(/\s+/g, '').replace('+', '');
     const zoneName = selectedZone ? selectedZone.name : 'Non spécifiée';
     
     const productsText = items.map(p => `• ${p.name} (x${p.quantity}) - ${formatPrice(p.price * p.quantity)}`).join('\n');
@@ -100,8 +102,7 @@ ${productsText}
 
 Please let me know how I can settle the payment!`;
 
-    const selectedMessage = language === 'fr' ? textFr : textEn;
-    return `https://wa.me/${targetPhone}?text=${encodeURIComponent(selectedMessage)}`;
+    return buildWhatsappUrl(language === 'fr' ? textFr : textEn);
   };
 
   const handleNext = async () => {
@@ -109,7 +110,12 @@ Please let me know how I can settle the payment!`;
       setStep(step + 1);
       return;
     }
-    // Final step: hand the order off to WhatsApp for payment / confirmation.
+
+    setHistoryWarning(false);
+
+    // Open WhatsApp synchronously, still inside the click's call stack: after an
+    // `await` the browser no longer treats it as user-initiated and pop-up
+    // blockers reject it. The success screen offers a manual link as a fallback.
     const url = getWhatsappUrl();
     setWhatsappUrl(url);
     try {
@@ -118,7 +124,6 @@ Please let me know how I can settle the payment!`;
       console.error('Popup blocked', e);
     }
 
-    // Persist the order for logged-in users (guests still checkout via WhatsApp).
     if (currentUser) {
       const result = await createOrder({
         items,
@@ -134,10 +139,12 @@ Please let me know how I can settle the payment!`;
         deliveryTime: deliveryData.timeSlot,
         paymentMethod: 'whatsapp',
       });
-      if (result.error) console.error('Order not saved:', result.error);
+      if (result.error) {
+        console.error('Order not saved:', result.error);
+        setHistoryWarning(true);
+      }
     }
 
-    // Empty the cart now that the order has been placed
     clearCart();
     setStep(4); // Success step
   };
@@ -168,6 +175,21 @@ Please let me know how I can settle the payment!`;
                   ? 'Votre commande a été préparée avec succès ! Vous allez être redirigé vers WhatsApp pour finaliser le paiement.'
                   : 'Your order has been prepared successfully! You are being redirected to WhatsApp to complete your payment.'}
               </p>
+
+              {historyWarning && (
+                <div className="bg-amber-50 rounded-[24px] p-5 border border-amber-100 text-left">
+                  <p className="text-sm font-bold text-amber-800 mb-1">
+                    {language === 'fr'
+                      ? "Commande transmise, mais absente de votre historique"
+                      : 'Order sent, but missing from your history'}
+                  </p>
+                  <p className="text-xs text-amber-700 leading-relaxed">
+                    {language === 'fr'
+                      ? "Votre message WhatsApp est bien parti et votre commande sera traitée. Nous n'avons simplement pas pu l'enregistrer dans votre espace client — mentionnez-le au support si vous souhaitez la retrouver dans « Mes commandes »."
+                      : 'Your WhatsApp message went through and your order will be processed. We just could not record it in your account — mention it to support if you want it to appear under "My orders".'}
+                  </p>
+                </div>
+              )}
 
               {whatsappUrl && (
                 <div className="bg-green-50 rounded-[24px] p-6 border border-green-100 flex flex-col items-center gap-4 my-6">

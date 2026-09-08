@@ -26,6 +26,7 @@ interface ProductRow {
   image: string | null;
   type: string | null;
   specs: Record<string, string> | null;
+  in_stock: boolean;
   brands: { name: string } | null;
   categories: { slug: string } | null;
 }
@@ -43,6 +44,7 @@ function mapProduct(row: ProductRow): Product {
     category: row.type ?? row.categories?.slug ?? '',
     group: (row.categories?.slug ?? 'smartphones') as ProductGroup,
     specs: row.specs && Object.keys(row.specs).length ? row.specs : undefined,
+    inStock: row.in_stock,
   };
 }
 
@@ -50,7 +52,7 @@ export async function fetchProducts(): Promise<Product[]> {
   const { data, error } = await supabase
     .from('products')
     .select(
-      'id,name,slug,description,price,rating,reviews,image,type,specs,brands(name),categories(slug)'
+      'id,name,slug,description,price,rating,reviews,image,type,specs,in_stock,brands(name),categories(slug)'
     )
     .order('created_at', { ascending: true });
   if (error) throw error;

@@ -2,7 +2,7 @@ import { useState } from 'react';
 import Navbar from '@/src/components/Navbar';
 import Seo from '@/src/components/Seo';
 import ProductCard from '@/src/components/ProductCard';
-import { useLanguage } from '@/src/contexts/LanguageContext';
+import { useLanguage, TranslationKey } from '@/src/contexts/LanguageContext';
 import { motion } from 'motion/react';
 import { ChevronRight, LayoutGrid, List } from 'lucide-react';
 import { Link } from 'react-router-dom';
@@ -10,7 +10,7 @@ import { cn } from '@/src/lib/utils';
 import { ProductGroup } from '@/src/constants';
 import { useCatalog } from '@/src/contexts/CatalogContext';
 
-const GROUPS: { key: ProductGroup; labelKey: string }[] = [
+const GROUPS: { key: ProductGroup; labelKey: TranslationKey }[] = [
   { key: 'smartphones', labelKey: 'cat.smartphones' },
   { key: 'computers', labelKey: 'cat.computers' },
   { key: 'tablets', labelKey: 'cat.tablets' },

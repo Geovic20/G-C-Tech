@@ -1,12 +1,13 @@
 import { useEffect, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { motion } from 'motion/react';
-import { CheckCircle2, XCircle, Loader2, ArrowRight, ShoppingBag } from 'lucide-react';
+import { CheckCircle2, XCircle, Loader2, Clock, ArrowRight, ShoppingBag } from 'lucide-react';
 import Navbar from '@/src/components/Navbar';
 import Seo from '@/src/components/Seo';
 import { useLanguage } from '@/src/contexts/LanguageContext';
 import { useCurrency } from '@/src/contexts/CurrencyContext';
 import { getPlan, SavingsPlan } from '@/src/lib/tontine';
+import { readPendingPayment, clearPendingPayment } from '@/src/lib/paymentReturn';
 
 export default function PaiementRetour() {
   const { language } = useLanguage();
@@ -16,36 +17,55 @@ export default function PaiementRetour() {
 
   const planId = params.get('plan');
   const status = (params.get('status') || '').toLowerCase();
-  const failed = status === 'declined' || status === 'canceled' || status === 'cancelled';
+  // FedaPay's callback carries no status today, so this only fires if it ever
+  // starts sending one. Absence of a status is NOT evidence of success.
+  const declined = status === 'declined' || status === 'canceled' || status === 'cancelled';
 
   const [plan, setPlan] = useState<SavingsPlan | null>(null);
-  const [polling, setPolling] = useState(!failed && !!planId);
+  const [confirmed, setConfirmed] = useState(false);
+  const [polling, setPolling] = useState(!declined && !!planId);
 
-  // The webhook credits the contribution asynchronously, so poll the plan a few
-  // times to reflect the new balance once FedaPay confirms.
+  // The only trustworthy signal is the balance itself going up, which happens
+  // when the webhook credits the contribution. We compare against the amount
+  // recorded just before the customer left for FedaPay.
   useEffect(() => {
-    if (!planId || failed) return;
+    if (!planId || declined) return;
+    const pending = readPendingPayment(planId);
     let active = true;
     let tries = 0;
+    let timer: ReturnType<typeof setTimeout> | undefined;
+
     const poll = async () => {
       try {
         const p = await getPlan(planId);
-        if (active && p) setPlan(p);
+        if (active && p) {
+          setPlan(p);
+          if (pending && p.saved_amount > pending.savedBefore) {
+            setConfirmed(true);
+            setPolling(false);
+            clearPendingPayment();
+            return; // credited: stop polling
+          }
+        }
       } catch {
         /* ignore transient errors */
       }
       tries += 1;
-      if (active && tries < 5) {
-        setTimeout(poll, 2500);
-      } else if (active) {
+      if (!active) return;
+      if (tries < 5) {
+        timer = setTimeout(poll, 2500);
+      } else {
         setPolling(false);
       }
     };
     poll();
+
     return () => {
       active = false;
+      // `active` stops the state updates; this stops the timer itself.
+      if (timer) clearTimeout(timer);
     };
-  }, [planId, failed]);
+  }, [planId, declined]);
 
   const pct = plan ? Math.min(100, Math.round((plan.saved_amount / plan.target_amount) * 100)) : null;
 
@@ -60,7 +80,7 @@ export default function PaiementRetour() {
           animate={{ opacity: 1, scale: 1 }}
           className="bg-white rounded-[40px] p-10 md:p-12 shadow-xl shadow-blue-500/5 border border-blue-50 text-center"
         >
-          {failed ? (
+          {declined ? (
             <>
               <div className="w-20 h-20 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-6 text-red-500">
                 <XCircle size={40} />
@@ -90,17 +110,35 @@ export default function PaiementRetour() {
             </>
           ) : (
             <>
-              <div className="w-20 h-20 bg-green-50 rounded-full flex items-center justify-center mx-auto mb-6 text-green-500">
-                <CheckCircle2 size={40} />
-              </div>
-              <h1 className="text-2xl font-black text-gray-900 mb-3">
-                {fr ? 'Paiement confirmé !' : 'Payment confirmed!'}
-              </h1>
-              <p className="text-gray-500 mb-8 leading-relaxed text-sm">
-                {fr
-                  ? 'Merci ! Votre versement est en cours d’enregistrement sur votre épargne.'
-                  : 'Thank you! Your contribution is being recorded on your savings plan.'}
-              </p>
+              {confirmed ? (
+                <>
+                  <div className="w-20 h-20 bg-green-50 rounded-full flex items-center justify-center mx-auto mb-6 text-green-500">
+                    <CheckCircle2 size={40} />
+                  </div>
+                  <h1 className="text-2xl font-black text-gray-900 mb-3">
+                    {fr ? 'Versement confirmé !' : 'Payment confirmed!'}
+                  </h1>
+                  <p className="text-gray-500 mb-8 leading-relaxed text-sm">
+                    {fr
+                      ? 'Merci ! Votre versement a bien été crédité sur votre épargne.'
+                      : 'Thank you! Your contribution has been credited to your savings plan.'}
+                  </p>
+                </>
+              ) : (
+                <>
+                  <div className="w-20 h-20 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-6 text-[#007bff]">
+                    <Clock size={40} />
+                  </div>
+                  <h1 className="text-2xl font-black text-gray-900 mb-3">
+                    {fr ? 'Versement en cours de vérification' : 'Verifying your payment'}
+                  </h1>
+                  <p className="text-gray-500 mb-8 leading-relaxed text-sm">
+                    {fr
+                      ? "Nous attendons la confirmation de FedaPay. Si votre paiement a abouti, votre solde se mettra à jour d'ici quelques instants — sinon, aucun montant n'a été débité et vous pouvez réessayer."
+                      : "We're waiting for FedaPay to confirm. If your payment went through, your balance will update shortly — otherwise nothing was charged and you can try again."}
+                  </p>
+                </>
+              )}
 
               {/* Live plan progress (updates as the webhook credits the payment) */}
               {plan && (
@@ -124,7 +162,7 @@ export default function PaiementRetour() {
               {polling && (
                 <div className="flex items-center justify-center gap-2 text-sm text-gray-400 mb-8">
                   <Loader2 size={16} className="animate-spin" />
-                  {fr ? 'Mise à jour de votre solde…' : 'Updating your balance…'}
+                  {fr ? 'Vérification auprès de FedaPay…' : 'Checking with FedaPay…'}
                 </div>
               )}
 
@@ -133,7 +171,10 @@ export default function PaiementRetour() {
                   to={planId ? `/epargne/${planId}` : '/epargne'}
                   className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-[#007bff] text-white rounded-full font-bold hover:bg-blue-700 transition-all"
                 >
-                  {fr ? 'Voir mon épargne' : 'View my savings'} <ArrowRight size={18} />
+                  {confirmed
+                    ? (fr ? 'Voir mon épargne' : 'View my savings')
+                    : (fr ? 'Suivre mon épargne' : 'Track my savings')}
+                  <ArrowRight size={18} />
                 </Link>
                 <Link
                   to="/products"

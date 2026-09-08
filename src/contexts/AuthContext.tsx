@@ -47,7 +47,7 @@ function mapUser(user: User | null, language: string): CurrentUser | null {
 export function AuthProvider({ children }: { children: ReactNode }) {
   const { language } = useLanguage();
   const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [sessionLoading, setSessionLoading] = useState(true);
 
   useEffect(() => {
     let active = true;
@@ -55,7 +55,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     supabase.auth.getSession().then(({ data }) => {
       if (!active) return;
       setUser(data.session?.user ?? null);
-      setLoading(false);
+      setSessionLoading(false);
     });
 
     const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
@@ -70,27 +70,39 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const currentUser = useMemo(() => mapUser(user, language), [user, language]);
 
-  // Load the user's role (for admin gating).
+  // Load the user's role (for admin gating). This is a second round-trip after
+  // the session resolves, so it has its own loading flag: without it, `isAdmin`
+  // reads false while the profile is in flight and an admin briefly gets the
+  // "restricted area" screen.
   const [role, setRole] = useState<string | null>(null);
+  const [roleLoading, setRoleLoading] = useState(true);
   useEffect(() => {
     if (!user) {
       setRole(null);
+      setRoleLoading(false);
       return;
     }
     let active = true;
+    setRoleLoading(true);
     supabase
       .from('profiles')
       .select('role')
       .eq('id', user.id)
       .maybeSingle()
       .then(({ data }) => {
-        if (active) setRole((data?.role as string) ?? 'customer');
+        if (!active) return;
+        setRole((data?.role as string) ?? 'customer');
+        setRoleLoading(false);
       });
     return () => {
       active = false;
     };
   }, [user]);
   const isAdmin = role === 'admin';
+
+  // Consumers must not act on `currentUser` or `isAdmin` until both round-trips
+  // are done — gating on a half-loaded auth state is what caused the flash.
+  const loading = sessionLoading || roleLoading;
 
   const signUp: AuthContextType['signUp'] = async ({ fullname, email, password }) => {
     const { data, error } = await supabase.auth.signUp({

@@ -17,6 +17,8 @@ export interface Product {
   category: string;
   /** High-level group matching a catalog page / route. */
   group: ProductGroup;
+  /** False when the product is out of stock. Absent in the static fallback list. */
+  inStock?: boolean;
   specs?: Record<string, string>;
 }
 

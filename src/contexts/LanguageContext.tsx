@@ -2,10 +2,13 @@ import { createContext, useContext, useEffect, useState, ReactNode } from 'react
 
 type Language = 'en' | 'fr';
 
+/** Every key of the English dictionary — the reference set. */
+export type TranslationKey = keyof typeof translations.en;
+
 interface LanguageContextType {
   language: Language;
   setLanguage: (lang: Language) => void;
-  t: (key: string, params?: Record<string, string>) => string;
+  t: (key: TranslationKey, params?: Record<string, string>) => string;
 }
 
 const translations = {
@@ -26,6 +29,7 @@ const translations = {
     'banner.buy': 'Buy Now',
     'products.for-you': 'Latest News',
     'products.add': 'Add to Cart',
+    'product.out-of-stock': 'Out of stock',
     'products.sort': 'Sort by',
     'services.title': 'Services To Help You Shop',
     'detail.back-electronics': 'Electronics',
@@ -86,12 +90,6 @@ const translations = {
     'testimonials.stat.delivery': 'Fast Delivery',
     'testimonials.tag.featured': 'Featured',
     'testimonials.tag.tech': 'Tech',
-    'newsletter.title': 'Join our newsletter',
-    'newsletter.subtitle': 'Get 20% off your first order plus early access to new drops and secret sales.',
-    'newsletter.placeholder': 'Enter your email',
-    'newsletter.button': 'Subscribe',
-    'newsletter.success': 'Thanks for subscribing!',
-    'newsletter.privacy': 'By subscribing, you agree to our Privacy Policy and Terms of Service.',
     'auth.login.title': 'Welcome back',
     'auth.login.subtitle': 'Enter your details to access your account',
     'auth.login.email': 'Email address',
@@ -103,6 +101,7 @@ const translations = {
     'auth.signup.title': 'Create account',
     'auth.signup.subtitle': 'Join G&C Tech today and start shopping',
     'auth.signup.fullname': 'Full Name',
+    'auth.signup.email': 'Email',
     'auth.signup.submit': 'Create Account',
     'auth.signup.have-account': 'Already have an account?',
     'auth.signup.login': 'Sign In',
@@ -228,6 +227,7 @@ const translations = {
     'banner.buy': 'Acheter maintenant',
     'products.for-you': 'Dernières nouveautés',
     'products.add': 'Ajouter au panier',
+    'product.out-of-stock': 'Rupture de stock',
     'products.sort': 'Trier par',
     'services.title': 'Des services pour vous aider',
     'detail.back-electronics': 'Électronique',
@@ -288,12 +288,6 @@ const translations = {
     'testimonials.stat.delivery': 'Livraison Rapide',
     'testimonials.tag.featured': 'En vedette',
     'testimonials.tag.tech': 'Tech',
-    'newsletter.title': 'Rejoignez notre newsletter',
-    'newsletter.subtitle': 'Bénéficiez de 20% de réduction sur votre première commande et d\'un accès anticipé aux nouveautés.',
-    'newsletter.placeholder': 'Entrez votre email',
-    'newsletter.button': 'S\'abonner',
-    'newsletter.success': 'Merci pour votre abonnement !',
-    'newsletter.privacy': 'En vous abonnant, vous acceptez notre politique de confidentialité et nos conditions d\'utilisation.',
     'auth.login.title': 'Bon retour',
     'auth.login.subtitle': 'Entrez vos informations pour accéder à votre compte',
     'auth.login.email': 'Adresse e-mail',
@@ -305,6 +299,7 @@ const translations = {
     'auth.signup.title': 'Créer un compte',
     'auth.signup.subtitle': 'Rejoignez G&C Tech dès aujourd\'hui',
     'auth.signup.fullname': 'Nom complet',
+    'auth.signup.email': 'Adresse e-mail',
     'auth.signup.submit': 'Créer le compte',
     'auth.signup.have-account': 'Vous avez déjà un compte ?',
     'auth.signup.login': 'Se connecter',
@@ -425,8 +420,8 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     document.documentElement.lang = language;
   }, [language]);
 
-  const t = (key: string, params?: Record<string, string>) => {
-    let translation = translations[language][key as keyof typeof translations['en']] || key;
+  const t = (key: TranslationKey, params?: Record<string, string>) => {
+    let translation: string = translations[language][key] ?? key;
     
     if (params) {
       Object.entries(params).forEach(([k, v]) => {

@@ -24,8 +24,12 @@ export default function ProductCard({ product }: ProductCardProps) {
   const navigate = useNavigate();
 
   const favorite = isFavorite(product.id);
+  // Absent from the static fallback catalog, where stock isn't known: only an
+  // explicit `false` means out of stock, so the fallback stays purchasable.
+  const outOfStock = product.inStock === false;
 
   const handleAddToCart = () => {
+    if (outOfStock) return;
     addItem({
       id: product.id,
       name: product.name,
@@ -61,6 +65,11 @@ export default function ProductCard({ product }: ProductCardProps) {
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
           />
         </Link>
+        {outOfStock && (
+          <span className="absolute top-4 left-4 px-3 py-1 bg-gray-900/85 text-white rounded-full text-[10px] font-bold uppercase tracking-widest">
+            {t('product.out-of-stock')}
+          </span>
+        )}
         <button
           onClick={handleFavorite}
           aria-label={favorite ? 'Retirer des favoris' : 'Ajouter aux favoris'}
@@ -85,8 +94,17 @@ export default function ProductCard({ product }: ProductCardProps) {
         <span className="text-gray-400 ml-1">({product.reviews})</span>
       </div>
 
-      <button onClick={handleAddToCart} className="w-full px-4 md:px-6 py-2 border-2 border-gray-900 rounded-full font-bold text-[10px] md:text-sm hover:bg-[#007bff] hover:border-[#007bff] hover:text-white transition-all">
-        {t('products.add')}
+      <button
+        onClick={handleAddToCart}
+        disabled={outOfStock}
+        className={cn(
+          'w-full px-4 md:px-6 py-2 border-2 rounded-full font-bold text-[10px] md:text-sm transition-all',
+          outOfStock
+            ? 'border-gray-200 text-gray-400 cursor-not-allowed'
+            : 'border-gray-900 hover:bg-[#007bff] hover:border-[#007bff] hover:text-white'
+        )}
+      >
+        {outOfStock ? t('product.out-of-stock') : t('products.add')}
       </button>
     </motion.div>
   );

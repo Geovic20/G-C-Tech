@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
+import NotFound from '@/src/pages/NotFound';
 import { ChevronRight, Star, Minus, Plus, Truck, RotateCcw } from 'lucide-react';
 import { useCatalog } from '@/src/contexts/CatalogContext';
 import Navbar from '@/src/components/Navbar';
@@ -15,11 +16,33 @@ export default function ProductDetail() {
   const fr = language === 'fr';
   const { formatPrice } = useCurrency();
   const { addItem } = useCart();
-  const { products, byId } = useCatalog();
+  const { byId, loading: catalogLoading } = useCatalog();
   const navigate = useNavigate();
-  const product = byId(id ?? '') ?? products[0];
+  const product = byId(id ?? '');
   const [quantity, setQuantity] = useState(1);
-  const [mainImage, setMainImage] = useState(product.image);
+  const [mainImage, setMainImage] = useState<string>('');
+
+  // The catalog starts on the static fallback and swaps to the DB rows once
+  // they load, so `product` can change identity after the first render. A state
+  // initializer only runs once, hence the sync.
+  useEffect(() => {
+    if (product) setMainImage(product.image);
+  }, [product?.id, product?.image]);
+
+  if (!product) {
+    // Still resolving: don't flash a 404 at someone following a valid link.
+    if (catalogLoading) {
+      return (
+        <div className="min-h-screen bg-white">
+          <Navbar />
+          <p className="max-w-7xl mx-auto px-4 py-20 text-gray-400">
+            {fr ? 'Chargement du produit…' : 'Loading product…'}
+          </p>
+        </div>
+      );
+    }
+    return <NotFound />;
+  }
 
   const handleAddToCart = () => {
     addItem(
@@ -39,12 +62,10 @@ export default function ProductDetail() {
     navigate('/cart');
   };
 
-  const images = [
-    product.image,
-    'https://images.unsplash.com/photo-1546435770-a3e426bf472b?w=500&h=500&fit=crop',
-    'https://images.unsplash.com/photo-1590658268037-6bf12165a8df?w=500&h=500&fit=crop',
-    'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500&h=500&fit=crop'
-  ];
+  // Only the product's own image. The three Unsplash stock photos that used to
+  // pad this gallery showed the same unrelated headphones/laptop on every
+  // product page. A real gallery needs an `images text[]` column on `products`.
+  const images = [product.image];
 
   return (
     <div className="min-h-screen bg-white">
@@ -67,7 +88,8 @@ export default function ProductDetail() {
             <div className="aspect-square bg-[#f5f6f6] rounded-[32px] md:rounded-[40px] overflow-hidden flex items-center justify-center p-6 md:p-12">
               <img src={mainImage} alt={product.name} className="max-w-full max-h-full object-contain" />
             </div>
-            <div className="grid grid-cols-4 gap-4">
+            {/* Thumbnail strip only earns its place with more than one image. */}
+            <div className={cn('grid grid-cols-4 gap-4', images.length < 2 && 'hidden')}>
               {images.map((img, i) => (
                 <button
                   key={i}

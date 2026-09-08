@@ -4,14 +4,51 @@ import Seo from '@/src/components/Seo';
 import { useLanguage } from '@/src/contexts/LanguageContext';
 import { motion } from 'motion/react';
 import { Mail, Phone, MapPin, Send, CheckCircle } from 'lucide-react';
+import { buildWhatsappUrl } from '@/src/lib/whatsapp';
 
 export default function ContactUs() {
   const { t, language } = useLanguage();
   const fr = language === 'fr';
   const [submitted, setSubmitted] = useState(false);
+  const [sentUrl, setSentUrl] = useState('');
+  const [form, setForm] = useState({ name: '', email: '', subject: '', message: '' });
 
+  const set = (k: keyof typeof form) => (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+  ) => setForm((f) => ({ ...f, [k]: e.target.value }));
+
+  const subjects = fr
+    ? ['Demande générale', 'Support commande', 'Problème technique', 'Partenariat commercial']
+    : ['General Inquiry', 'Order Support', 'Technical Issue', 'Business Partnership'];
+
+  // The message is handed to WhatsApp, the shop's support channel — the same
+  // route the cart uses. Nothing is stored: there is no inbox behind this form.
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    const subject = form.subject || subjects[0];
+    const body = fr
+      ? `Bonjour G&C Tech,
+
+*${subject}*
+
+${form.message}
+
+—
+${form.name}
+${form.email}`
+      : `Hello G&C Tech,
+
+*${subject}*
+
+${form.message}
+
+—
+${form.name}
+${form.email}`;
+    const url = buildWhatsappUrl(body);
+    setSentUrl(url);
+    // Synchronous: still inside the submit gesture, so pop-up blockers allow it.
+    window.open(url, '_blank', 'noopener,noreferrer');
     setSubmitted(true);
   };
 
@@ -84,12 +121,27 @@ export default function ContactUs() {
                   <div className="w-20 h-20 bg-green-100 text-green-500 rounded-full flex items-center justify-center mx-auto mb-6">
                     <CheckCircle size={40} />
                   </div>
-                  <h2 className="text-2xl font-bold text-gray-900 mb-4">{fr ? 'Message envoyé !' : 'Message Sent!'}</h2>
-                  <p className="text-gray-500 mb-8">
+                  <h2 className="text-2xl font-bold text-gray-900 mb-4">
+                    {fr ? 'WhatsApp est ouvert' : 'WhatsApp is open'}
+                  </h2>
+                  <p className="text-gray-500 mb-6">
                     {fr
-                      ? 'Merci de nous avoir contactés. Nous avons bien reçu votre message et reviendrons vers vous sous 24 heures.'
-                      : "Thank you for reaching out. We've received your message and will get back to you within 24 hours."}
+                      ? "Votre message vous attend dans WhatsApp, prêt à partir : il ne nous parviendra qu'une fois que vous l'aurez envoyé depuis la conversation."
+                      : "Your message is waiting in WhatsApp, ready to go: it only reaches us once you send it from the conversation."}
                   </p>
+
+                  {sentUrl && (
+                    <a
+                      href={sentUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 px-6 py-3.5 mb-8 bg-[#25D366] text-white rounded-xl font-bold hover:bg-green-600 transition-all text-sm"
+                    >
+                      {fr ? "WhatsApp ne s'est pas ouvert ?" : "WhatsApp didn't open?"}
+                    </a>
+                  )}
+
+                  <div />
                   <button
                     onClick={() => setSubmitted(false)}
                     className="text-[#007bff] font-bold underline"
@@ -106,6 +158,8 @@ export default function ContactUs() {
                         required
                         type="text"
                         placeholder="John Doe"
+                        value={form.name}
+                        onChange={set('name')}
                         className="w-full h-14 px-6 bg-white border border-gray-200 rounded-2xl focus:outline-none focus:ring-4 focus:ring-blue-100 font-medium transition-all"
                       />
                     </div>
@@ -115,6 +169,8 @@ export default function ContactUs() {
                         required
                         type="email"
                         placeholder="john@example.com"
+                        value={form.email}
+                        onChange={set('email')}
                         className="w-full h-14 px-6 bg-white border border-gray-200 rounded-2xl focus:outline-none focus:ring-4 focus:ring-blue-100 font-medium transition-all"
                       />
                     </div>
@@ -122,11 +178,14 @@ export default function ContactUs() {
 
                   <div className="space-y-2">
                     <label className="text-sm font-bold text-gray-900">{fr ? 'Sujet' : 'Subject'}</label>
-                    <select className="w-full h-14 px-6 bg-white border border-gray-200 rounded-2xl focus:outline-none focus:ring-4 focus:ring-blue-100 font-medium transition-all appearance-none cursor-pointer">
-                      <option>{fr ? 'Demande générale' : 'General Inquiry'}</option>
-                      <option>{fr ? 'Support commande' : 'Order Support'}</option>
-                      <option>{fr ? 'Problème technique' : 'Technical Issue'}</option>
-                      <option>{fr ? 'Partenariat commercial' : 'Business Partnership'}</option>
+                    <select
+                      value={form.subject}
+                      onChange={set('subject')}
+                      className="w-full h-14 px-6 bg-white border border-gray-200 rounded-2xl focus:outline-none focus:ring-4 focus:ring-blue-100 font-medium transition-all appearance-none cursor-pointer"
+                    >
+                      {subjects.map((s) => (
+                        <option key={s} value={s}>{s}</option>
+                      ))}
                     </select>
                   </div>
 
@@ -136,6 +195,8 @@ export default function ContactUs() {
                       required
                       placeholder={fr ? 'Comment pouvons-nous vous aider ?' : 'How can we help you?'}
                       rows={5}
+                      value={form.message}
+                      onChange={set('message')}
                       className="w-full p-6 bg-white border border-gray-200 rounded-3xl focus:outline-none focus:ring-4 focus:ring-blue-100 font-medium transition-all resize-none"
                     ></textarea>
                   </div>
@@ -145,7 +206,7 @@ export default function ContactUs() {
                     className="w-full h-16 bg-[#007bff] hover:bg-blue-600 text-white rounded-2xl font-bold transition-all shadow-lg shadow-blue-500/25 active:scale-95 flex items-center justify-center gap-3"
                   >
                     <Send size={20} />
-                    {fr ? 'Envoyer le message' : 'Send Message'}
+                    {fr ? 'Envoyer via WhatsApp' : 'Send via WhatsApp'}
                   </button>
                 </form>
               )}
