@@ -1,9 +1,10 @@
 import { Facebook, Twitter, Instagram, Youtube, ShoppingCart } from 'lucide-react';
 import { useLanguage } from '@/src/contexts/LanguageContext';
 import { Link } from 'react-router-dom';
+import { COMPANY } from '@/src/lib/company';
 
 export default function Footer() {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
 
   return (
     <footer className="bg-gray-50 border-t border-gray-100 pt-20 pb-10">
@@ -51,10 +52,19 @@ export default function Footer() {
             <h4 className="font-bold text-gray-900 mb-6">{t('footer.contact')}</h4>
             <ul className="space-y-4 text-sm text-gray-500">
               <li><Link to="/contact" className="hover:text-[#007bff] font-bold">{t('footer.contact-us')}</Link></li>
-              <li>123 Electronic Street</li>
-              <li>Tech City, TC 12345</li>
-              <li>+00 123 456 7890</li>
-              <li>contact@gctech.com</li>
+              <li>{COMPANY.address.area}</li>
+              <li>{COMPANY.address.street}</li>
+              <li>{COMPANY.address.city}, {COMPANY.address.country[language]}</li>
+              {COMPANY.phones.map((p) => (
+                <li key={p.tel}>
+                  <a href={`tel:${p.tel}`} className="hover:text-[#007bff]">{p.display}</a>
+                </li>
+              ))}
+              <li>
+                <a href={`mailto:${COMPANY.email}`} className="hover:text-[#007bff] break-all">
+                  {COMPANY.email}
+                </a>
+              </li>
             </ul>
           </div>
         </div>

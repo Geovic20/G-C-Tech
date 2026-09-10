@@ -3,8 +3,9 @@ import Navbar from '@/src/components/Navbar';
 import Seo from '@/src/components/Seo';
 import { useLanguage } from '@/src/contexts/LanguageContext';
 import { motion } from 'motion/react';
-import { Mail, Phone, MapPin, Send, CheckCircle } from 'lucide-react';
+import { Mail, Phone, Send, CheckCircle } from 'lucide-react';
 import { buildWhatsappUrl } from '@/src/lib/whatsapp';
+import { COMPANY } from '@/src/lib/company';
 
 export default function ContactUs() {
   const { t, language } = useLanguage();
@@ -81,8 +82,9 @@ ${form.email}`;
                   </div>
                   <div>
                     <h4 className="font-bold text-gray-900 mb-1">{fr ? 'Écrivez-nous' : 'Email us'}</h4>
-                    <p className="text-gray-500">support@gctech.com</p>
-                    <p className="text-gray-500">sales@gctech.com</p>
+                    <a href={`mailto:${COMPANY.email}`} className="text-gray-500 hover:text-[#007bff] break-all">
+                      {COMPANY.email}
+                    </a>
                   </div>
                 </div>
 
@@ -92,21 +94,15 @@ ${form.email}`;
                   </div>
                   <div>
                     <h4 className="font-bold text-gray-900 mb-1">{fr ? 'Appelez-nous' : 'Call us'}</h4>
-                    <p className="text-gray-500">+221 33 000 00 00</p>
-                    <p className="text-gray-500">{fr ? 'Lun-Ven (8h - 20h)' : 'Mon-Fri (8am - 8pm)'}</p>
+                    {COMPANY.phones.map((p) => (
+                      <a key={p.tel} href={`tel:${p.tel}`} className="block text-gray-500 hover:text-[#007bff]">
+                        {p.display}
+                      </a>
+                    ))}
+                    <p className="text-gray-400 text-sm mt-1">{COMPANY.hoursShort[language]}</p>
                   </div>
                 </div>
 
-                <div className="flex gap-6">
-                  <div className="w-14 h-14 bg-gray-50 rounded-2xl flex items-center justify-center text-[#007bff] flex-shrink-0">
-                    <MapPin size={24} />
-                  </div>
-                  <div>
-                    <h4 className="font-bold text-gray-900 mb-1">{fr ? 'Rendez-nous visite' : 'Visit us'}</h4>
-                    <p className="text-gray-500">Electronic Business Center</p>
-                    <p className="text-gray-500">{fr ? 'Dakar, Sénégal' : 'Dakar, Senegal'}</p>
-                  </div>
-                </div>
               </div>
             </motion.div>
 

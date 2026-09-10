@@ -4,6 +4,7 @@ import { useLanguage } from '@/src/contexts/LanguageContext';
 import { motion } from 'motion/react';
 import { Search, ChevronRight, MessageCircle, Phone, Mail, ShoppingBag, Truck, RotateCcw, ShieldCheck } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { COMPANY } from '@/src/lib/company';
 
 const HELP_CATEGORIES = {
   en: [
@@ -118,14 +119,20 @@ export default function HelpCenter() {
                     <Phone size={20} />
                   </div>
                   <h4 className="text-white font-bold mb-1">{fr ? 'Appelez-nous' : 'Call us'}</h4>
-                  <p className="text-gray-500 text-sm">+221 33 000 00 00</p>
+                  {COMPANY.phones.map((p) => (
+                    <a key={p.tel} href={`tel:${p.tel}`} className="block text-gray-400 text-sm hover:text-white">
+                      {p.display}
+                    </a>
+                  ))}
                 </div>
                 <div className="bg-white/5 backdrop-blur-md border border-white/10 p-6 rounded-3xl">
                   <div className="w-12 h-12 bg-blue-500/20 rounded-xl flex items-center justify-center text-blue-400 mb-4">
                     <Mail size={20} />
                   </div>
                   <h4 className="text-white font-bold mb-1">{fr ? 'Écrivez-nous' : 'Email us'}</h4>
-                  <p className="text-gray-500 text-sm">support@gctech.com</p>
+                  <a href={`mailto:${COMPANY.email}`} className="text-gray-400 text-sm hover:text-white break-all">
+                    {COMPANY.email}
+                  </a>
                 </div>
               </div>
             </div>

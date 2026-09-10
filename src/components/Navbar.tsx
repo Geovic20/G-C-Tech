@@ -8,6 +8,7 @@ import { Search, ShoppingCart, User, Phone, ChevronDown, MapPin, Menu, X, Heart 
 import { Link, useNavigate } from 'react-router-dom';
 import { cn } from '@/src/lib/utils';
 import { useCatalog } from '@/src/contexts/CatalogContext';
+import { COMPANY } from '@/src/lib/company';
 
 export default function Navbar() {
   const [isSearchFocused, setIsSearchFocused] = useState(false);
@@ -84,7 +85,9 @@ export default function Navbar() {
         <div className="bg-[#007bff] text-white py-2 px-4 md:px-12 flex justify-between items-center text-sm">
           <div className="flex items-center gap-2">
             <Phone size={14} />
-            <span className="hidden sm:inline">+2290140543686</span>
+            <a href={`tel:${COMPANY.phones[0].tel}`} className="hidden sm:inline hover:underline">
+              {COMPANY.phones[0].display}
+            </a>
             <span className="sm:hidden">{t('nav.call-us')}</span>
           </div>
           
@@ -380,7 +383,9 @@ export default function Navbar() {
                    <Phone size={18} className="text-[#007bff]" />
                    <div>
                      <p className="text-xs text-gray-500">{t('nav.contact-support')}</p>
-                     <p className="font-bold text-gray-900">+229040543686</p>
+                     <a href={`tel:${COMPANY.phones[0].tel}`} className="font-bold text-gray-900">
+                       {COMPANY.phones[0].display}
+                     </a>
                    </div>
                  </div>
               </div>

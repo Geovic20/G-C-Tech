@@ -1,6 +1,7 @@
 import Navbar from '@/src/components/Navbar';
 import Seo from '@/src/components/Seo';
 import { useLanguage } from '@/src/contexts/LanguageContext';
+import { COMPANY, HOSTING, DATA_RETENTION, DATA_PROTECTION } from '@/src/lib/company';
 import { motion } from 'motion/react';
 
 export default function PrivacyPolicy() {
@@ -23,6 +24,18 @@ export default function PrivacyPolicy() {
       {
         title: "4. Data Security",
         text: "We take reasonable measures to protect your personal information from unauthorized access, use, or disclosure. However, no method of transmission over the internet or electronic storage is 100% secure."
+      },
+      {
+        title: "5. Where your data is stored",
+        text: `Your account, orders and savings plans are stored by ${HOSTING.data.name} on servers located in ${HOSTING.data.region.en}. Your data therefore leaves ${COMPANY.country.en} to be hosted there.`
+      },
+      {
+        title: "6. How long we keep it",
+        text: `Account: ${DATA_RETENTION.account.en}. Orders and invoices: ${DATA_RETENTION.orders.en} — these are accounting records we are required to keep. Savings plans: ${DATA_RETENTION.savings.en}. Cookies: ${DATA_RETENTION.cookies.en}.`
+      },
+      {
+        title: "7. Your rights",
+        text: `The data controller is ${DATA_PROTECTION.controller}. You may ask to access, correct, or delete your data, or object to its processing, by writing to ${COMPANY.email}. Deletion cannot cover records we must keep for accounting purposes. A declaration to the ${DATA_PROTECTION.authority.fullName.en} (${DATA_PROTECTION.authority.name}) is in progress.`
       }
     ],
     fr: [
@@ -41,6 +54,18 @@ export default function PrivacyPolicy() {
       {
         title: "4. Sécurité des données",
         text: "Nous prenons des mesures raisonnables pour protéger vos informations personnelles contre tout accès, utilisation ou divulgation non autorisés. Cependant, aucune méthode de transmission sur Internet ou de stockage électronique n'est sûre à 100 %."
+      },
+      {
+        title: "5. Où vos données sont stockées",
+        text: `Votre compte, vos commandes et vos plans d'épargne sont stockés par ${HOSTING.data.name} sur des serveurs situés en ${HOSTING.data.region.fr}. Vos données quittent donc le ${COMPANY.country.fr} pour y être hébergées.`
+      },
+      {
+        title: "6. Combien de temps nous les conservons",
+        text: `Compte client : ${DATA_RETENTION.account.fr}. Commandes et factures : ${DATA_RETENTION.orders.fr} — ce sont des pièces comptables que nous sommes tenus de conserver. Plans d'épargne : ${DATA_RETENTION.savings.fr}. Cookies : ${DATA_RETENTION.cookies.fr}.`
+      },
+      {
+        title: "7. Vos droits",
+        text: `Le responsable de traitement est ${DATA_PROTECTION.controller}. Vous pouvez demander l'accès, la rectification ou la suppression de vos données, ou vous opposer à leur traitement, en écrivant à ${COMPANY.email}. La suppression ne peut pas porter sur les pièces que nous devons conserver au titre de nos obligations comptables. Une déclaration auprès de l'${DATA_PROTECTION.authority.fullName.fr} (${DATA_PROTECTION.authority.name}) est en cours.`
       }
     ]
   };

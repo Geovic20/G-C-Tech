@@ -1,64 +1,67 @@
 import Navbar from '@/src/components/Navbar';
 import Seo from '@/src/components/Seo';
 import { useLanguage } from '@/src/contexts/LanguageContext';
+import { COMPANY, HOSTING, DATA_PROTECTION, formattedAddress, phoneList } from '@/src/lib/company';
 import { motion } from 'motion/react';
 
 export default function LegalNotice() {
   const { t, language } = useLanguage();
 
+  // Toutes les données d'identité viennent de src/lib/company.ts — ne rien
+  // recopier ici, sinon les pages recommenceront à se contredire.
   const content = {
     en: [
       {
-        title: "1. Publisher Information",
-        text: "G&C Tech is a limited liability company registered under the laws of [Country]. The company is headquartered at 123 Electronic Street, Tech City, TC 12345."
+        title: '1. Publisher',
+        text: `${COMPANY.name} is a ${COMPANY.legalForm.en} registered in ${COMPANY.country.en}, run by ${COMPANY.manager}, who is also responsible for publication. Business address: ${formattedAddress('en')}.`,
       },
       {
-        title: "2. Contact Information",
-        text: "You can contact us by email at contact@gctech.com or by phone at +00 123 456 7890. Our customer service is available Monday to Friday from 9 AM to 6 PM."
+        title: '2. Contact',
+        text: `You can reach us by email at ${COMPANY.email} or by phone at ${phoneList()}. Customer service is open ${COMPANY.hours.en.toLowerCase()}.`,
       },
       {
-        title: "3. Hosting Provider",
-        text: "This website is hosted by [Hosting Provider], located at [Hosting Address]. The hosting provider can be contacted at [Hosting Contact]."
+        title: '3. Hosting',
+        text: `This website is hosted by ${HOSTING.site.name} (${HOSTING.site.country.en}, ${HOSTING.site.url}). Customer accounts and orders are stored by ${HOSTING.data.name} (${HOSTING.data.url}) on servers located in ${HOSTING.data.region.en}.`,
       },
       {
-        title: "4. Intellectual Property",
-        text: "All content on this website (text, images, logos, videos, etc.) is protected by copyright and intellectual property laws. Any reproduction, distribution, or use of this content without prior written authorization is prohibited."
+        title: '4. Intellectual property',
+        text: 'All content on this website (text, images, logos, videos) is protected by copyright and intellectual property law. Any reproduction, distribution or use without prior written authorisation is prohibited. Product images and brand logos remain the property of their respective owners.',
       },
       {
-        title: "5. Personal Data Protection",
-        text: "In accordance with applicable data protection laws, you have the right to access, rectify, and delete your personal data. To exercise these rights, please contact us at privacy@gctech.com."
+        title: '5. Personal data',
+        text: `The data controller is ${DATA_PROTECTION.controller}. You may request access to, correction of, or deletion of your personal data by writing to ${COMPANY.email}. A declaration to the ${DATA_PROTECTION.authority.fullName.en} (${DATA_PROTECTION.authority.name}) of ${DATA_PROTECTION.authority.country.en} is in progress. See our Privacy Policy for retention periods.`,
       },
       {
-        title: "6. Cookies",
-        text: "This website uses cookies to improve your browsing experience and analyze site traffic. You can configure your browser to refuse cookies. For more information, please refer to our Cookie Policy."
-      }
+        title: '6. Cookies',
+        text: `This website uses cookies strictly necessary for it to work — keeping you signed in and remembering your cart. You can configure your browser to refuse them, at the cost of some features. See our Cookie Policy.`,
+      },
     ],
     fr: [
       {
-        title: "1. Informations sur l'éditeur",
-        text: "G&C Tech est une société à responsabilité limitée immatriculée conformément aux lois de [Pays]. Le siège social est situé au 123 Electronic Street, Tech City, TC 12345."
+        title: "1. Éditeur du site",
+        text: `${COMPANY.name} est une ${COMPANY.legalForm.fr} immatriculée au ${COMPANY.country.fr}, exploitée par ${COMPANY.manager}, également directeur de la publication. Adresse : ${formattedAddress('fr')}.`,
       },
       {
-        title: "2. Coordonnées de contact",
-        text: "Vous pouvez nous contacter par e-mail à contact@gctech.com ou par téléphone au +00 123 456 7890. Notre service client est disponible du lundi au vendredi de 9h à 18h."
+        title: '2. Nous contacter',
+        text: `Par e-mail à ${COMPANY.email} ou par téléphone au ${phoneList()}. Le service client est joignable ${COMPANY.hours.fr.toLowerCase()}.`,
       },
       {
-        title: "3. Hébergeur",
-        text: "Ce site web est hébergé par [Hébergeur], situé à [Adresse de l'hébergeur]. L'hébergeur peut être contacté à [Contact de l'hébergeur]."
+        title: '3. Hébergement',
+        text: `Ce site est hébergé par ${HOSTING.site.name} (${HOSTING.site.country.fr}, ${HOSTING.site.url}). Les comptes clients et les commandes sont stockés par ${HOSTING.data.name} (${HOSTING.data.url}) sur des serveurs situés en ${HOSTING.data.region.fr}.`,
       },
       {
-        title: "4. Propriété intellectuelle",
-        text: "Tout le contenu de ce site web (textes, images, logos, vidéos, etc.) est protégé par le droit d'auteur et les lois sur la propriété intellectuelle. Toute reproduction, distribution ou utilisation de ce contenu sans autorisation écrite préalable est interdite."
+        title: '4. Propriété intellectuelle',
+        text: "L'ensemble du contenu de ce site (textes, images, logos, vidéos) est protégé par le droit d'auteur et le droit de la propriété intellectuelle. Toute reproduction, distribution ou utilisation sans autorisation écrite préalable est interdite. Les visuels produits et les logos de marques restent la propriété de leurs détenteurs respectifs.",
       },
       {
-        title: "5. Protection des données personnelles",
-        text: "Conformément aux lois sur la protection des données applicables, vous avez le droit d'accéder, de rectifier et de supprimer vos données personnelles. Pour exercer ces droits, veuillez nous contacter à privacy@gctech.com."
+        title: '5. Données personnelles',
+        text: `Le responsable de traitement est ${DATA_PROTECTION.controller}. Vous pouvez demander l'accès, la rectification ou la suppression de vos données personnelles en écrivant à ${COMPANY.email}. Une déclaration auprès de l'${DATA_PROTECTION.authority.fullName.fr} (${DATA_PROTECTION.authority.name}) du ${DATA_PROTECTION.authority.country.fr} est en cours. Les durées de conservation figurent dans notre Politique de Confidentialité.`,
       },
       {
-        title: "6. Cookies",
-        text: "Ce site web utilise des cookies pour améliorer votre expérience de navigation et analyser le trafic du site. Vous pouvez configurer votre navigateur pour refuser les cookies. Pour plus d'informations, veuillez consulter notre Politique de Cookies."
-      }
-    ]
+        title: '6. Cookies',
+        text: "Ce site utilise uniquement des cookies nécessaires à son fonctionnement : maintien de votre session et mémorisation de votre panier. Vous pouvez configurer votre navigateur pour les refuser, au prix de certaines fonctionnalités. Voir notre Politique de Cookies.",
+      },
+    ],
   };
 
   const currentContent = content[language];
