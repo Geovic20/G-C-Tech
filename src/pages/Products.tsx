@@ -2,6 +2,7 @@ import { useState } from 'react';
 import Navbar from '@/src/components/Navbar';
 import Seo from '@/src/components/Seo';
 import ProductCard from '@/src/components/ProductCard';
+import CatalogState from '@/src/components/CatalogState';
 import { useLanguage, TranslationKey } from '@/src/contexts/LanguageContext';
 import { motion } from 'motion/react';
 import { ChevronRight, LayoutGrid, List } from 'lucide-react';
@@ -112,7 +113,7 @@ export default function Products() {
         </div>
 
         {/* Product Grid */}
-        {products.length > 0 ? (
+        <CatalogState count={products.length}>
           <div
             className={cn(
               'grid gap-8',
@@ -130,9 +131,7 @@ export default function Products() {
               </motion.div>
             ))}
           </div>
-        ) : (
-          <p className="text-center text-gray-500 py-20">{t('catalog.empty')}</p>
-        )}
+        </CatalogState>
       </main>
     </div>
   );

@@ -23,9 +23,8 @@ export default function ProductDetail() {
   const [quantity, setQuantity] = useState(1);
   const [mainImage, setMainImage] = useState<string>('');
 
-  // The catalog starts on the static fallback and swaps to the DB rows once
-  // they load, so `product` can change identity after the first render. A state
-  // initializer only runs once, hence the sync.
+  // `product` is undefined until the catalog finishes loading, then becomes a
+  // real row. A state initializer only runs once, hence the sync.
   useEffect(() => {
     if (product) setMainImage(product.image);
   }, [product?.id, product?.image]);
@@ -71,7 +70,7 @@ export default function ProductDetail() {
   return (
     <div className="min-h-screen bg-white">
       <Navbar />
-      <Seo title={product.name} description={product.description} />
+      <Seo title={product.name} description={product.description} image={product.image} />
 
       <main className="px-4 md:px-12 py-8">
         {/* Breadcrumbs */}

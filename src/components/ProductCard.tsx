@@ -24,8 +24,8 @@ export default function ProductCard({ product }: ProductCardProps) {
   const navigate = useNavigate();
 
   const favorite = isFavorite(product.id);
-  // Absent from the static fallback catalog, where stock isn't known: only an
-  // explicit `false` means out of stock, so the fallback stays purchasable.
+  // Only an explicit `false` means out of stock: the field is optional, and a
+  // missing value must never make a product look unavailable.
   const outOfStock = product.inStock === false;
 
   const handleAddToCart = () => {

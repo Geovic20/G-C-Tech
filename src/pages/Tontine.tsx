@@ -38,7 +38,7 @@ export default function Tontine() {
   const fr = language === 'fr';
   const { formatPrice } = useCurrency();
   const { currentUser, loading: authLoading } = useAuth();
-  const { products, source: catalogSource } = useCatalog();
+  const { products, status: catalogStatus } = useCatalog();
   const navigate = useNavigate();
 
   const [plans, setPlans] = useState<SavingsPlan[]>([]);
@@ -108,10 +108,10 @@ export default function Tontine() {
     }
   }, [formProducts, productId]);
 
-  // The plan's target amount is resolved from the catalog row server-side, so a
-  // product that only exists in the static fallback list can't back a plan.
-  // Catch it here rather than letting the insert fail after the terms dialog.
-  const catalogOffline = catalogSource === 'fallback';
+  // The plan's target amount is resolved from the catalog row server-side, so
+  // a plan cannot be opened while the catalog itself is unreachable. Catch it
+  // here rather than letting the insert fail after the terms dialog.
+  const catalogOffline = catalogStatus !== 'ready' || products.length === 0;
 
   // Submitting the form opens the rules dialog (the plan is only created after acceptance).
   const handleSubmit = (e: React.FormEvent) => {

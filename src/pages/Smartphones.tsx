@@ -2,6 +2,7 @@ import { useState } from 'react';
 import Navbar from '@/src/components/Navbar';
 import Seo from '@/src/components/Seo';
 import ProductCard from '@/src/components/ProductCard';
+import CatalogState from '@/src/components/CatalogState';
 import FilterBar from '@/src/components/FilterBar';
 import { useCatalog } from '@/src/contexts/CatalogContext';
 import { useLanguage } from '@/src/contexts/LanguageContext';
@@ -14,6 +15,7 @@ import { cn } from '@/src/lib/utils';
 export default function Smartphones() {
   const { t } = useLanguage();
   const { byGroup } = useCatalog();
+  const items = byGroup('smartphones');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
 
   return (
@@ -82,11 +84,12 @@ export default function Smartphones() {
         </div>
 
         {/* Product Grid */}
+        <CatalogState count={items.length}>
         <div className={cn(
           "grid gap-8",
           viewMode === 'grid' ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3" : "grid-cols-1"
         )}>
-          {byGroup('smartphones').map((product, index) => (
+          {items.map((product, index) => (
             <motion.div
               key={product.id}
               initial={{ opacity: 0, y: 20 }}
@@ -97,6 +100,7 @@ export default function Smartphones() {
             </motion.div>
           ))}
         </div>
+        </CatalogState>
 
         {/* Empty State / Pagination Simulation */}
         <div className="mt-20 text-center">

@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { CATEGORIES } from '@/src/constants';
+import { CATEGORIES, ProductGroup } from '@/src/constants';
 import { useCatalog } from '@/src/contexts/CatalogContext';
 import Navbar from '@/src/components/Navbar';
 import Seo from '@/src/components/Seo';
@@ -13,6 +13,11 @@ import { Star, ShieldCheck } from 'lucide-react';
 export default function Home() {
   const { t, language } = useLanguage();
   const { products } = useCatalog();
+
+  // Real per-category counts. The static CATEGORIES list claimed 240 items
+  // for every single category, which was never true of any of them.
+  const countByGroup = (group: string) =>
+    products.filter((p) => p.group === (group as ProductGroup)).length;
   const fr = language === 'fr';
 
   const TESTIMONIALS = [
@@ -128,6 +133,11 @@ export default function Home() {
                 <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-colors"></div>
                 <div className="absolute top-4 left-0 right-0 text-center">
                   <h3 className="text-xl font-bold text-white drop-shadow-md">{cat.name}</h3>
+                  {countByGroup(cat.group) > 0 && (
+                    <p className="text-xs font-bold text-white/80 drop-shadow mt-0.5">
+                      {countByGroup(cat.group)} {countByGroup(cat.group) > 1 ? 'produits' : 'produit'}
+                    </p>
+                  )}
                 </div>
               </Link>
             ))}

@@ -107,7 +107,7 @@ export async function createPlan(input: NewPlanInput): Promise<{ error?: string 
     // Unique-index violation = the user already has an active plan.
     if (error.code === '23505') return { error: 'ACTIVE_PLAN_EXISTS' };
     // Raised by trg_validate_plan when the product can't be resolved in the
-    // catalog — in practice, the catalog was served from the static fallback.
+    // catalog — it was removed between page load and submission.
     // The trigger uses the default P0001 SQLSTATE (HTTP 400) and tags the
     // message, so we match on the prefix rather than on a custom code.
     if (error.message?.includes('PRODUCT_UNAVAILABLE')) return { error: 'PRODUCT_UNAVAILABLE' };
