@@ -49,9 +49,6 @@ export default function FeatureSection() {
           >
             {t('feature.explore')}
           </Link>
-          <button className="px-8 py-4 border-2 border-gray-100 text-gray-600 rounded-full font-bold hover:bg-gray-50 transition-all">
-            {t('feature.learn')}
-          </button>
         </div>
       </div>
 

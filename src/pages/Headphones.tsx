@@ -4,7 +4,7 @@ import Seo from '@/src/components/Seo';
 import ProductCard from '@/src/components/ProductCard';
 import CatalogState from '@/src/components/CatalogState';
 import FilterBar from '@/src/components/FilterBar';
-import { useCatalog } from '@/src/contexts/CatalogContext';
+import { useProductFilters } from '@/src/hooks/useProductFilters';
 import { useLanguage } from '@/src/contexts/LanguageContext';
 import { motion } from 'motion/react';
 import { ChevronRight, LayoutGrid, List } from 'lucide-react';
@@ -14,8 +14,7 @@ import { cn } from '@/src/lib/utils';
 
 export default function Headphones() {
   const { t } = useLanguage();
-  const { byGroup } = useCatalog();
-  const items = byGroup('headphones');
+  const { items, brands, brand, setBrand, sort, setSort } = useProductFilters('headphones');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
 
   return (
@@ -41,11 +40,13 @@ export default function Headphones() {
         </header>
 
         <div className="flex flex-col md:flex-row items-center justify-between gap-4 mb-8 md:mb-12">
-          <FilterBar 
-            filters={[]} 
-            brandOptions={['Bose', 'Oraimo', 'SONY']} 
-            showAllFilters={false} 
-            showSort={false} 
+          <FilterBar
+            brands={brands}
+            brand={brand}
+            onBrandChange={setBrand}
+            sort={sort}
+            onSortChange={setSort}
+            count={items.length}
           />
           <div className="flex items-center gap-3 bg-white p-1.5 rounded-2xl shadow-sm border border-gray-100 flex-shrink-0">
             <button onClick={() => setViewMode('grid')} className={cn("p-2.5 rounded-xl transition-all", viewMode === 'grid' ? "bg-[#007bff] text-white shadow-lg shadow-blue-500/20" : "text-gray-400 hover:text-gray-600 hover:bg-gray-50")}><LayoutGrid size={20} /></button>

@@ -89,11 +89,6 @@ export default function ProductCard({ product }: ProductCardProps) {
       
       <p className="text-[10px] md:text-sm text-gray-500 mb-3 line-clamp-2 min-h-[30px] md:min-h-[40px]">{product.description}</p>
       
-      <div className="flex items-center gap-1 text-[10px] text-yellow-500 mb-4">
-        <span className="flex">{'★'.repeat(Math.floor(product.rating))}</span>
-        <span className="text-gray-400 ml-1">({product.reviews})</span>
-      </div>
-
       <button
         onClick={handleAddToCart}
         disabled={outOfStock}

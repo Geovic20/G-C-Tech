@@ -21,7 +21,7 @@ export default function LegalNotice() {
       },
       {
         title: '3. Hosting',
-        text: `This website is hosted by ${HOSTING.site.name} (${HOSTING.site.country.en}, ${HOSTING.site.url}). Customer accounts and orders are stored by ${HOSTING.data.name} (${HOSTING.data.url}) on servers located in ${HOSTING.data.region.en}.`,
+        text: `This website is hosted by ${HOSTING.site.name}, ${HOSTING.site.address}, ${HOSTING.site.country.en} — ${HOSTING.site.phone}, ${HOSTING.site.url}. Customer accounts and orders are stored by ${HOSTING.data.name} (${HOSTING.data.url}) on servers located in ${HOSTING.data.region.en}.`,
       },
       {
         title: '4. Intellectual property',
@@ -47,7 +47,7 @@ export default function LegalNotice() {
       },
       {
         title: '3. Hébergement',
-        text: `Ce site est hébergé par ${HOSTING.site.name} (${HOSTING.site.country.fr}, ${HOSTING.site.url}). Les comptes clients et les commandes sont stockés par ${HOSTING.data.name} (${HOSTING.data.url}) sur des serveurs situés en ${HOSTING.data.region.fr}.`,
+        text: `Ce site est hébergé par ${HOSTING.site.name}, ${HOSTING.site.address}, ${HOSTING.site.country.fr} — ${HOSTING.site.phone}, ${HOSTING.site.url}. Les comptes clients et les commandes sont stockés par ${HOSTING.data.name} (${HOSTING.data.url}) sur des serveurs situés en ${HOSTING.data.region.fr}.`,
       },
       {
         title: '4. Propriété intellectuelle',

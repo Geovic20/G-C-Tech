@@ -424,12 +424,6 @@ export default function AdminProducts() {
                     <Field label={fr ? 'Prix (F)' : 'Price (F)'}>
                       <input required type="number" min={0} value={form.price} onChange={(e) => setForm({ ...form, price: Number(e.target.value) })} className={inputCls} />
                     </Field>
-                    <Field label={fr ? 'Note' : 'Rating'}>
-                      <input type="number" step="0.1" min={0} max={5} value={form.rating} onChange={(e) => setForm({ ...form, rating: Number(e.target.value) })} className={inputCls} />
-                    </Field>
-                    <Field label={fr ? 'Avis' : 'Reviews'}>
-                      <input type="number" min={0} value={form.reviews} onChange={(e) => setForm({ ...form, reviews: Number(e.target.value) })} className={inputCls} />
-                    </Field>
                     <Field label={fr ? 'Sous-type' : 'Sub-type'}>
                       <input value={form.type} onChange={(e) => setForm({ ...form, type: e.target.value })} className={inputCls} placeholder="Phones…" />
                     </Field>

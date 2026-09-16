@@ -1,64 +1,60 @@
 import Navbar from '@/src/components/Navbar';
 import Seo from '@/src/components/Seo';
 import { useLanguage } from '@/src/contexts/LanguageContext';
+import { COMPANY, HOSTING, DATA_RETENTION } from '@/src/lib/company';
 import { motion } from 'motion/react';
 
 export default function CookiesPolicy() {
   const { t, language } = useLanguage();
 
+  // Le site n'embarque aucun outil de mesure d'audience ni pixel publicitaire.
+  // Ce texte doit être revu si l'un venait à être ajouté : un traceur non
+  // nécessaire impose un consentement préalable, donc une bannière.
   const content = {
     en: [
       {
-        title: "1. What Are Cookies",
-        text: "Cookies are small text files that are stored on your device when you visit a website. They help us provide you with a better experience by remembering your preferences and understanding how you use our site."
+        title: '1. What we store on your device',
+        text: `${COMPANY.name} only stores what the site needs to work: the session that keeps you signed in, your shopping cart, and your language and currency preference. Nothing else is written to your device.`,
       },
       {
-        title: "2. How We Use Cookies",
-        text: "We use cookies for various purposes: essential cookies to ensure the website functions properly, analytics cookies to understand user behavior, and marketing cookies to provide personalized content and advertisements."
+        title: '2. No tracking, no advertising',
+        text: 'We use no audience measurement tool, no advertising pixel and no social network tracker. We do not build a browsing profile, and we share nothing with advertisers. Because these cookies are strictly necessary to provide the service you asked for, no consent banner is required.',
       },
       {
-        title: "3. Types of Cookies We Use",
-        text: "Essential cookies are necessary for the website to function. Performance cookies help us analyze site traffic. Functionality cookies remember your preferences. Targeting cookies are used to deliver relevant advertisements."
+        title: '3. Third parties',
+        text: `Two services are involved when you use the site: ${HOSTING.data.name}, which keeps you signed in, and FedaPay, which handles savings payments. Both set only what their own service requires. Their privacy policies apply to what they collect.`,
       },
       {
-        title: "4. Managing Cookies",
-        text: "You can control and manage cookies through your browser settings. Most browsers allow you to delete cookies, block cookies from third parties, or receive a warning before cookies are stored."
+        title: '4. How long',
+        text: `Browser storage is kept for ${DATA_RETENTION.cookies.en}. You can clear it at any time from your browser settings — you will simply be signed out and your cart emptied.`,
       },
       {
-        title: "5. Third-Party Cookies",
-        text: "We may use third-party services that set cookies on your device. These include analytics services like Google Analytics, social media platforms, and payment processors. These third parties have their own privacy policies."
+        title: '5. Refusing them',
+        text: 'Your browser lets you refuse or delete this storage. The site will still display, but signing in, the cart and checkout will no longer work — these functions depend on it.',
       },
-      {
-        title: "6. Updates to This Policy",
-        text: "We may update this Cookie Policy from time to time to reflect changes in our practices or for other operational, legal, or regulatory reasons. We encourage you to review this policy periodically."
-      }
     ],
     fr: [
       {
-        title: "1. Qu'est-ce que les cookies",
-        text: "Les cookies sont de petits fichiers texte qui sont stockés sur votre appareil lorsque vous visitez un site web. Ils nous aident à vous offrir une meilleure expérience en mémorisant vos préférences et en comprenant comment vous utilisez notre site."
+        title: '1. Ce que nous stockons sur votre appareil',
+        text: `${COMPANY.name} ne stocke que ce dont le site a besoin pour fonctionner : la session qui vous garde connecté, votre panier, et votre préférence de langue et de devise. Rien d'autre n'est écrit sur votre appareil.`,
       },
       {
-        title: "2. Comment nous utilisons les cookies",
-        text: "Nous utilisons des cookies à diverses fins : des cookies essentiels pour assurer le bon fonctionnement du site web, des cookies d'analyse pour comprendre le comportement des utilisateurs, et des cookies marketing pour fournir du contenu et des publicités personnalisés."
+        title: '2. Aucun suivi, aucune publicité',
+        text: "Nous n'utilisons aucun outil de mesure d'audience, aucun pixel publicitaire et aucun traceur de réseau social. Nous ne construisons pas de profil de navigation et ne transmettons rien à des annonceurs. Ces cookies étant strictement nécessaires au service que vous demandez, aucune bannière de consentement n'est requise.",
       },
       {
-        title: "3. Types de cookies que nous utilisons",
-        text: "Les cookies essentiels sont nécessaires au bon fonctionnement du site web. Les cookies de performance nous aident à analyser le trafic du site. Les cookies de fonctionnalité mémorisent vos préférences. Les cookies de ciblage sont utilisés pour diffuser des publicités pertinentes."
+        title: '3. Services tiers',
+        text: `Deux services interviennent pendant votre navigation : ${HOSTING.data.name}, qui maintient votre session, et FedaPay, qui traite les versements d'épargne. Chacun ne dépose que ce que son propre service exige. Leurs politiques de confidentialité s'appliquent à ce qu'ils collectent.`,
       },
       {
-        title: "4. Gestion des cookies",
-        text: "Vous pouvez contrôler et gérer les cookies via les paramètres de votre navigateur. La plupart des navigateurs vous permettent de supprimer les cookies, de bloquer les cookies de tiers ou de recevoir un avertissement avant le stockage des cookies."
+        title: '4. Durée de conservation',
+        text: `Le stockage navigateur est conservé ${DATA_RETENTION.cookies.fr}. Vous pouvez l'effacer à tout moment depuis les réglages de votre navigateur : vous serez simplement déconnecté et votre panier vidé.`,
       },
       {
-        title: "5. Cookies tiers",
-        text: "Nous pouvons utiliser des services tiers qui placent des cookies sur votre appareil. Cela inclut des services d'analyse comme Google Analytics, des plateformes de médias sociaux et des processeurs de paiement. Ces tiers ont leurs propres politiques de confidentialité."
+        title: '5. Les refuser',
+        text: "Votre navigateur vous permet de refuser ou de supprimer ce stockage. Le site restera consultable, mais la connexion, le panier et la commande cesseront de fonctionner : ces fonctions en dépendent.",
       },
-      {
-        title: "6. Mises à jour de cette politique",
-        text: "Nous pouvons mettre à jour cette Politique de Cookies de temps à autre pour refléter les changements dans nos pratiques ou pour d'autres raisons opérationnelles, juridiques ou réglementaires. Nous vous encourageons à consulter cette politique périodiquement."
-      }
-    ]
+    ],
   };
 
   const currentContent = content[language];

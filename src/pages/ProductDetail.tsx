@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import NotFound from '@/src/pages/NotFound';
-import { ChevronRight, Star, Minus, Plus, Truck, RotateCcw } from 'lucide-react';
+import { ChevronRight, Minus, Plus, Truck, RotateCcw } from 'lucide-react';
 import { useCatalog } from '@/src/contexts/CatalogContext';
 import Navbar from '@/src/components/Navbar';
 import Seo from '@/src/components/Seo';
@@ -93,7 +93,10 @@ export default function ProductDetail() {
               {images.map((img, i) => (
                 <button
                   key={i}
+                  // Le survol seul excluait le clavier et le tactile.
                   onMouseEnter={() => setMainImage(img)}
+                  onClick={() => setMainImage(img)}
+                  aria-label={`Image ${i + 1}`}
                   className={cn(
                     "aspect-square bg-[#f5f6f6] rounded-2xl overflow-hidden p-4 transition-all border-2",
                     mainImage === img ? "border-[#007bff]" : "border-transparent"
@@ -110,15 +113,6 @@ export default function ProductDetail() {
             <h1 className="text-3xl md:text-5xl font-bold text-gray-900 mb-4">{product.name.split(',')[0]}</h1>
             <p className="text-sm md:text-base text-gray-600 mb-6 max-w-lg">{product.description}</p>
             
-            <div className="flex items-center gap-2 mb-8">
-              <div className="flex items-center gap-1 text-yellow-500">
-                {[...Array(5)].map((_, i) => (
-                  <Star key={i} size={18} fill={i < Math.floor(product.rating) ? "currentColor" : "none"} />
-                ))}
-              </div>
-              <span className="text-sm text-gray-500">({product.reviews})</span>
-            </div>
-
             <hr className="border-gray-100 mb-8" />
 
               <div className="flex items-baseline gap-2 mb-1">
@@ -133,10 +127,6 @@ export default function ProductDetail() {
                 <button onClick={() => setQuantity(Math.max(1, quantity - 1))} className="p-2 hover:text-[#007bff]"><Minus size={18} /></button>
                 <span className="w-12 text-center font-bold">{quantity}</span>
                 <button onClick={() => setQuantity(quantity + 1)} className="p-2 hover:text-[#007bff]"><Plus size={18} /></button>
-              </div>
-              <div className="flex flex-col">
-                <p className="text-sm font-bold text-red-500">{t('detail.left')}</p>
-                <p className="text-xs text-gray-500">{t('detail.dont-miss')}</p>
               </div>
             </div>
 

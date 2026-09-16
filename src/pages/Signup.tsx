@@ -172,45 +172,6 @@ export default function Signup() {
             </div>
           </form>
 
-          <div className="mt-8">
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-gray-100" />
-              </div>
-              <div className="relative flex justify-center text-sm">
-                <span className="px-4 bg-white text-gray-400 font-medium">
-                  {t('auth.or')}
-                </span>
-              </div>
-            </div>
-
-            <div className="mt-6">
-              <button
-                type="button"
-                className="w-full inline-flex justify-center py-4 px-4 border border-gray-100 rounded-2xl shadow-sm bg-white text-sm font-bold text-gray-700 hover:bg-gray-50 transition-all gap-3 items-center"
-              >
-                <svg className="w-5 h-5" viewBox="0 0 24 24">
-                  <path
-                    fill="#EA4335"
-                    d="M5.266 9.765A7.077 7.077 0 0 1 12 4.909c1.69 0 3.218.6 4.418 1.582L19.91 3C17.782 1.145 15.055 0 12 0 7.27 0 3.198 2.698 1.24 6.65l4.026 3.115Z"
-                  />
-                  <path
-                    fill="#34A853"
-                    d="M16.04 18.013c-1.09.693-2.459 1.078-4.04 1.078a7.077 7.077 0 0 1-6.723-4.823l-4.04 3.067C3.186 21.314 7.345 24 12 24c3.11 0 5.927-1.036 8.114-2.827l-4.074-3.16Z"
-                  />
-                  <path
-                    fill="#4285F4"
-                    d="M23.49 12.275c0-.84-.075-1.645-.213-2.422H12v4.588h6.448a5.513 5.513 0 0 1-2.392 3.618l4.074 3.16C22.505 19.123 24 15.932 24 12.275Z"
-                  />
-                  <path
-                    fill="#FBBC05"
-                    d="M5.277 14.268A7.12 7.12 0 0 1 4.909 12c0-.782.125-1.533.357-2.235L1.24 6.65A11.934 11.934 0 0 0 0 12c0 1.92.445 3.73 1.237 5.335l4.04-3.067Z"
-                  />
-                </svg>
-                {t('auth.google')}
-              </button>
-            </div>
-          </div>
 
           <div className="mt-10 text-center">
             <p className="text-sm text-gray-500 font-medium">

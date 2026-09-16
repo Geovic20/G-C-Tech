@@ -1,7 +1,9 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import Navbar from '@/src/components/Navbar';
 import Seo from '@/src/components/Seo';
 import { useLanguage } from '@/src/contexts/LanguageContext';
+import { COMPANY } from '@/src/lib/company';
 import { motion } from 'motion/react';
 import { ChevronDown, ShoppingCart, CreditCard, RotateCcw } from 'lucide-react';
 
@@ -133,10 +135,13 @@ export default function FAQ() {
           <div className="mt-20 p-12 bg-gray-900 rounded-[40px] text-center text-white relative overflow-hidden">
              <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500/10 rounded-full blur-3xl -mr-32 -mt-32"></div>
              <h3 className="text-2xl font-bold mb-4">{fr ? 'Encore des questions ?' : 'Still have questions?'}</h3>
-             <p className="text-gray-400 mb-8">{fr ? 'Notre équipe support est là pour vous aider 24h/24 et 7j/7.' : 'Our support team is here to help you 24/7.'}</p>
-             <button className="px-8 py-4 bg-[#007bff] hover:bg-blue-600 text-white rounded-2xl font-bold transition-all">
+             <p className="text-gray-400 mb-8">{fr ? `Notre équipe vous répond ${COMPANY.hours.fr.toLowerCase()}.` : `Our team replies ${COMPANY.hours.en.toLowerCase()}.`}</p>
+             <Link
+               to="/contact"
+               className="inline-block px-8 py-4 bg-[#007bff] hover:bg-blue-600 text-white rounded-2xl font-bold transition-all"
+             >
                 {fr ? 'Contacter le support' : 'Contact Support'}
-             </button>
+             </Link>
           </div>
         </div>
       </main>

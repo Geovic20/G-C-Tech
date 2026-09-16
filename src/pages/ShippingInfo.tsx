@@ -5,7 +5,7 @@ import { useLanguage } from '@/src/contexts/LanguageContext';
 import { useCurrency } from '@/src/contexts/CurrencyContext';
 import { motion } from 'motion/react';
 import { Truck, Clock, MessageCircle, MapPin } from 'lucide-react';
-import { DELIVERY_ZONES, TIME_SLOTS, MIN_DELIVERY_COST } from '@/src/lib/delivery';
+import { PRICED_ZONES, QUOTE_ZONES, TIME_SLOTS, MIN_DELIVERY_COST } from '@/src/lib/delivery';
 
 /**
  * Everything on this page is derived from `src/lib/delivery.ts`, the same
@@ -18,9 +18,11 @@ export default function ShippingInfo() {
   const { formatPrice } = useCurrency();
 
   // Zones grouped by tariff, cheapest first.
-  const tiers = Array.from(new Set(DELIVERY_ZONES.map((z) => z.cost)))
+  // Seules les zones tarifées forment des paliers : une destination sur devis
+  // n'a pas de prix et apparaîtrait sinon dans un palier « 0 F ».
+  const tiers = Array.from(new Set(PRICED_ZONES.map((z) => z.cost)))
     .sort((a, b) => a - b)
-    .map((cost) => ({ cost, zones: DELIVERY_ZONES.filter((z) => z.cost === cost) }));
+    .map((cost) => ({ cost, zones: PRICED_ZONES.filter((z) => z.cost === cost) }));
 
   const facts = [
     {
@@ -28,16 +30,16 @@ export default function ShippingInfo() {
       title: fr ? 'Un tarif par quartier' : 'One tariff per neighbourhood',
       value: `${fr ? 'À partir de' : 'From'} ${formatPrice(MIN_DELIVERY_COST)}`,
       desc: fr
-        ? 'Les frais dépendent uniquement de votre zone, jamais du montant de la commande. Le tarif exact s’affiche dès que vous choisissez votre quartier dans le panier.'
-        : 'The fee depends only on your zone, never on the order amount. The exact tariff appears as soon as you pick your neighbourhood in the cart.',
+        ? 'Les frais dépendent uniquement de votre zone, jamais du montant de la commande. Le tarif exact s’affiche dès que vous choisissez votre quartier dans le panier. Hors du Bénin, il est établi sur devis.'
+        : 'The fee depends only on your zone, never on the order amount. The exact tariff appears as soon as you pick your neighbourhood in the cart. Outside Benin it is quoted on request.',
     },
     {
       icon: Clock,
       title: fr ? 'Vous choisissez le créneau' : 'You pick the time slot',
       value: `${TIME_SLOTS.length} ${fr ? 'créneaux' : 'slots'} · 08h–20h`,
       desc: fr
-        ? 'Au moment de la commande, vous indiquez la date qui vous arrange et l’un des créneaux de deux heures. Nous nous y tenons.'
-        : 'When ordering, you choose the date that suits you and one of the two-hour slots. We stick to it.',
+        ? 'Pour les livraisons au Bénin, vous indiquez la date qui vous arrange et l’un des créneaux de deux heures. Nous nous y tenons. Pour les envois hors du pays, la date se convient sur WhatsApp.'
+        : 'For deliveries within Benin you choose the date that suits you and one of the two-hour slots. We stick to it. For shipments abroad, the date is agreed on WhatsApp.',
     },
     {
       icon: MessageCircle,
@@ -109,7 +111,7 @@ export default function ShippingInfo() {
                 {fr ? 'Zones et tarifs' : 'Zones and tariffs'}
               </h2>
               <span className="text-sm text-gray-400 font-medium">
-                {DELIVERY_ZONES.length} {fr ? 'zones' : 'zones'}
+                {PRICED_ZONES.length} {fr ? 'zones au Bénin' : 'zones in Benin'}
               </span>
             </div>
             <p className="text-gray-500 text-sm mb-8 max-w-2xl leading-relaxed">
@@ -146,6 +148,33 @@ export default function ShippingInfo() {
               ))}
             </div>
 
+            {QUOTE_ZONES.map((zone) => (
+              <div
+                key={zone.id}
+                className="mt-4 border border-gray-100 rounded-[28px] overflow-hidden bg-white"
+              >
+                <div className="flex items-baseline gap-3 px-6 py-4 bg-gray-50 border-b border-gray-100">
+                  <span className="text-xl font-black text-[#007bff]">
+                    {fr ? 'Sur devis' : 'On request'}
+                  </span>
+                  <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">
+                    {fr ? 'Hors Bénin' : 'Outside Benin'}
+                  </span>
+                </div>
+                <div className="px-6 py-4 flex gap-3">
+                  <MapPin size={16} className="text-gray-300 flex-shrink-0 mt-1" />
+                  <div>
+                    <p className="text-sm text-gray-700 leading-relaxed mb-2">{zone.areas.join(' · ')}</p>
+                    <p className="text-xs text-gray-500 leading-relaxed">
+                      {fr
+                        ? "Le tarif dépend de la destination et du poids. Choisissez « Sur devis » au moment de la commande : nous vous communiquons le montant sur WhatsApp et convenons d'une date avant toute expédition."
+                        : 'The fee depends on the destination and the weight. Pick "On request" when ordering: we send you the amount on WhatsApp and agree on a date before anything ships.'}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            ))}
+
             <div className="mt-8 p-6 md:p-8 bg-blue-50/60 border border-blue-100 rounded-[28px] flex flex-col sm:flex-row sm:items-center gap-5">
               <div className="flex-1">
                 <h3 className="font-bold text-gray-900 mb-1">
@@ -153,8 +182,8 @@ export default function ShippingInfo() {
                 </h3>
                 <p className="text-sm text-gray-600 leading-relaxed">
                   {fr
-                    ? 'Écrivez-nous : nous livrons au-delà de ces zones au cas par cas, et nous vous donnons le tarif avant que vous ne commandiez.'
-                    : 'Get in touch: we deliver beyond these zones case by case, and we quote the fee before you order.'}
+                    ? 'Écrivez-nous : nous couvrons aussi des quartiers hors de cette grille, et nous vous donnons le tarif avant que vous ne commandiez.'
+                    : 'Get in touch: we also cover neighbourhoods beyond this grid, and we quote the fee before you order.'}
                 </p>
               </div>
               <Link

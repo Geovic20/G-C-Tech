@@ -4,7 +4,7 @@ import Seo from '@/src/components/Seo';
 import ProductCard from '@/src/components/ProductCard';
 import CatalogState from '@/src/components/CatalogState';
 import FilterBar from '@/src/components/FilterBar';
-import { useCatalog } from '@/src/contexts/CatalogContext';
+import { useProductFilters } from '@/src/hooks/useProductFilters';
 import { useLanguage } from '@/src/contexts/LanguageContext';
 import { motion } from 'motion/react';
 import { ChevronRight, LayoutGrid, List } from 'lucide-react';
@@ -14,8 +14,7 @@ import { cn } from '@/src/lib/utils';
 
 export default function Smartphones() {
   const { t } = useLanguage();
-  const { byGroup } = useCatalog();
-  const items = byGroup('smartphones');
+  const { items, brands, brand, setBrand, sort, setSort } = useProductFilters('smartphones');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
 
   return (
@@ -54,11 +53,13 @@ export default function Smartphones() {
 
         {/* Filters & View Toggle */}
         <div className="flex flex-col md:flex-row items-center justify-between gap-4 mb-8 md:mb-12">
-          <FilterBar 
-            filters={[]}
-            brandOptions={['Apple', 'Samsung', 'Tecno', 'Huawei', 'iNFINIX', 'Google Pixel']}
-            showAllFilters={false}
-            showSort={false}
+          <FilterBar
+            brands={brands}
+            brand={brand}
+            onBrandChange={setBrand}
+            sort={sort}
+            onSortChange={setSort}
+            count={items.length}
           />
           
           <div className="flex items-center gap-3 bg-white p-1.5 rounded-2xl shadow-sm border border-gray-100 flex-shrink-0">
@@ -102,12 +103,6 @@ export default function Smartphones() {
         </div>
         </CatalogState>
 
-        {/* Empty State / Pagination Simulation */}
-        <div className="mt-20 text-center">
-          <button className="px-10 py-5 bg-white border border-gray-100 rounded-full font-black text-gray-900 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all uppercase tracking-widest text-sm">
-            {t('products.load-more')}
-          </button>
-        </div>
       </main>
 
     </div>

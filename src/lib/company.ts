@@ -34,24 +34,19 @@ export const COMPANY = {
   },
 
   /**
-   * Numéros affichés au public.
-   *
-   * ⚠ TODO CONFIRMER — les numéros fournis comptaient 8 chiffres
-   * (90835005 et 59100290), c'est-à-dire le format d'avant la renumérotation
-   * béninoise de 2022. Ils ont été préfixés de « 01 » pour atteindre les
-   * 10 chiffres composables aujourd'hui. Vérifier en appelant avant l'ouverture.
+   * Numéros affichés au public, tels que fournis par l'exploitant.
+   * Le numéro WhatsApp qui reçoit les commandes est distinct et vient de
+   * VITE_WHATSAPP_NUMBER : c'est volontaire.
    */
   phones: [
-    { display: '+229 01 90 83 50 05', tel: '+2290190835005' },
-    { display: '+229 01 59 10 02 90', tel: '+2290159100290' },
+    { display: '+229 90 83 50 05', tel: '+22990835005' },
+    { display: '+229 59 10 02 90', tel: '+22959100290' },
   ],
 
   /**
    * Adresse de contact unique.
-   *
-   * ⚠ TODO — une adresse Gmail inspire moins confiance sur un site marchand
-   * qu'une adresse au nom du domaine. À remplacer par contact@<domaine> dès que
-   * le nom de domaine sera acheté et la messagerie configurée.
+   * À remplacer par contact@<domaine> une fois le domaine acheté et la
+   * messagerie configurée — une adresse au nom du site inspire plus confiance.
    */
   email: 'kpossilandegeovic68@gmail.com',
 
@@ -77,17 +72,12 @@ export const COMPANY = {
   domain: null as string | null,
 } as const;
 
-/**
- * Hébergement — mention obligatoire dans les mentions légales.
- *
- * ⚠ TODO — l'adresse postale exacte de Vercel Inc. n'est volontairement pas
- * inscrite ici : elle a changé plusieurs fois et une adresse fausse dans des
- * mentions légales est pire que pas d'adresse. La relever sur vercel.com/legal
- * ou sur une facture Vercel, puis la compléter.
- */
+/** Hébergement — mention obligatoire dans les mentions légales. */
 export const HOSTING = {
   site: {
     name: 'Vercel Inc.',
+    address: '340 S Lemon Ave #4133, Walnut, CA 91789',
+    phone: '+1 (559) 288-7060',
     country: { fr: 'États-Unis', en: 'United States' },
     url: 'https://vercel.com',
   },
@@ -104,8 +94,8 @@ export const HOSTING = {
 /**
  * Durées de conservation annoncées dans la politique de confidentialité.
  *
- * ⚠ TODO FAIRE VALIDER — proposition à confirmer par un conseil compétent en
- * droit béninois. Le raisonnement retenu :
+ * Durées retenues par l'exploitant. Une relecture par un conseil compétent en
+ * droit béninois reste recommandée avant l'ouverture. Le raisonnement :
  *   • Les commandes et factures sont des pièces comptables. Le droit comptable
  *     OHADA impose une conservation longue (dix ans) : elles ne peuvent donc
  *     pas être effacées au bout de 12 mois comme envisagé initialement.

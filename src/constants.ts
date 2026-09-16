@@ -17,6 +17,8 @@ export interface Product {
   category: string;
   /** High-level group matching a catalog page / route. */
   group: ProductGroup;
+  /** Marque, telle qu'enregistree en base. */
+  brand?: string;
   /** False when the product is out of stock. */
   inStock?: boolean;
   specs?: Record<string, string>;

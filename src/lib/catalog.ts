@@ -45,6 +45,7 @@ function mapProduct(row: ProductRow): Product {
     group: (row.categories?.slug ?? 'smartphones') as ProductGroup,
     specs: row.specs && Object.keys(row.specs).length ? row.specs : undefined,
     inStock: row.in_stock,
+    brand: row.brands?.name ?? undefined,
   };
 }
 

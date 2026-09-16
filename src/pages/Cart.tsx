@@ -41,7 +41,10 @@ export default function Cart() {
 
   const selectedZone = findZone(deliveryData.zoneId);
   const selectedZoneName = selectedZone ? zoneLabel(selectedZone) : '';
-  const shipping = selectedZone ? selectedZone.cost : 0;
+  // Hors Bénin, le tarif se fixe dans la conversation WhatsApp : on n'ajoute
+  // rien au total plutôt que d'annoncer un montant qu'on ne connaît pas.
+  const quoteOnRequest = selectedZone?.quote === true;
+  const shipping = selectedZone && !quoteOnRequest ? selectedZone.cost : 0;
   const tax = subtotal * 0.1;
   const total = subtotal + shipping + tax;
 
@@ -58,7 +61,7 @@ ${productsText}
 
 💵 *Détails Financiers* :
 - Sous-total : ${formatPrice(subtotal)}
-- Livraison (${zoneName}) : +${formatPrice(shipping)}
+- Livraison (${zoneName}) : ${quoteOnRequest ? 'tarif à confirmer' : '+' + formatPrice(shipping)}
 - Taxes (10%) : ${formatPrice(tax)}
 *TOTAL : ${formatPrice(total)}*
 ---------------------------------------
@@ -79,7 +82,7 @@ ${productsText}
 
 💵 *Financial Summary* :
 - Subtotal : ${formatPrice(subtotal)}
-- Shipping (${zoneName}) : +${formatPrice(shipping)}
+- Shipping (${zoneName}) : ${quoteOnRequest ? 'to be confirmed' : '+' + formatPrice(shipping)}
 - Taxes (10%) : ${formatPrice(tax)}
 *TOTAL : ${formatPrice(total)}*
 ---------------------------------------
@@ -143,7 +146,13 @@ Please let me know how I can settle the payment!`;
     if (step > 1) setStep(step - 1);
   };
 
-  const isStep2Valid = deliveryData.zoneId && deliveryData.phone && deliveryData.date && deliveryData.timeSlot;
+  // Un créneau de deux heures n'a pas de sens pour une expédition vers Lagos :
+  // hors Bénin, la date se convient sur WhatsApp et n'est pas demandée ici.
+  const isStep2Valid = Boolean(
+    deliveryData.zoneId &&
+      deliveryData.phone &&
+      (quoteOnRequest || (deliveryData.date && deliveryData.timeSlot))
+  );
 
   if (step === 4) {
     return (
@@ -321,7 +330,9 @@ Please let me know how I can settle the payment!`;
                         <option value="">{t('delivery.zone.placeholder')}</option>
                         {visibleZones.map(zone => (
                           <option key={zone.id} value={zone.id}>
-                            {formatPrice(zone.cost)} — {zoneLabel(zone)}
+                            {zone.quote
+                              ? `${t('delivery.zone.quote')} — ${zoneLabel(zone)}`
+                              : `${formatPrice(zone.cost)} — ${zoneLabel(zone)}`}
                           </option>
                         ))}
                       </select>
@@ -359,8 +370,19 @@ Please let me know how I can settle the payment!`;
                       />
                     </div>
 
+                    {quoteOnRequest && (
+                      <div className="md:col-span-2 p-4 bg-blue-50/70 border border-blue-100 rounded-2xl">
+                        <p className="text-sm font-bold text-gray-900 mb-1">
+                          {t('delivery.quote.title')}
+                        </p>
+                        <p className="text-xs text-gray-600 leading-relaxed">
+                          {t('delivery.quote.desc')}
+                        </p>
+                      </div>
+                    )}
+
                     {/* Date */}
-                    <div className="space-y-2">
+                    <div className={cn('space-y-2', quoteOnRequest && 'hidden')}>
                       <label className="text-sm font-bold text-gray-500 uppercase tracking-wider">{t('delivery.date')}</label>
                       <div className="relative">
                         <Calendar className="absolute left-6 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
@@ -374,7 +396,7 @@ Please let me know how I can settle the payment!`;
                     </div>
 
                     {/* Time Slot */}
-                    <div className="space-y-2">
+                    <div className={cn('space-y-2', quoteOnRequest && 'hidden')}>
                       <label className="text-sm font-bold text-gray-500 uppercase tracking-wider">{t('delivery.time')}</label>
                       <div className="relative">
                         <Clock className="absolute left-6 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
@@ -482,7 +504,11 @@ Please let me know how I can settle the payment!`;
                   <div className="flex justify-between text-gray-500 font-medium">
                     <span>{t('cart.shipping')}</span>
                     <span className={cn("font-bold", shipping > 0 ? "text-green-500" : "text-gray-400")}>
-                      {shipping > 0 ? `+${formatPrice(shipping)}` : '---'}
+                      {quoteOnRequest
+                        ? t('delivery.zone.quote')
+                        : shipping > 0
+                        ? `+${formatPrice(shipping)}`
+                        : '---'}
                     </span>
                   </div>
                   <div className="flex justify-between text-gray-500 font-medium">

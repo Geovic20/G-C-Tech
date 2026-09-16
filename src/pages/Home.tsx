@@ -5,10 +5,8 @@ import Navbar from '@/src/components/Navbar';
 import Seo from '@/src/components/Seo';
 import ProductCard from '@/src/components/ProductCard';
 import FeatureSection from '@/src/components/FeatureSection';
-import { TestimonialStack } from '@/src/components/TestimonialStack';
 import { motion } from 'motion/react';
 import { useLanguage } from '@/src/contexts/LanguageContext';
-import { Star, ShieldCheck } from 'lucide-react';
 
 export default function Home() {
   const { t, language } = useLanguage();
@@ -20,54 +18,6 @@ export default function Home() {
     products.filter((p) => p.group === (group as ProductGroup)).length;
   const fr = language === 'fr';
 
-  const TESTIMONIALS = [
-    {
-      id: 1,
-      initials: t('testimonials.1.initials'),
-      name: t('testimonials.1.name'),
-      role: t('testimonials.1.role'),
-      quote: t('testimonials.1.quote'),
-      tags: [
-        { text: t('testimonials.tag.featured'), type: 'featured' as const },
-        { text: t('testimonials.tag.tech'), type: 'default' as const }
-      ],
-      stats: [
-        { icon: ShieldCheck, text: t('testimonials.stat.verified') },
-        { icon: Star, text: '5.0' }
-      ],
-      avatarGradient: 'bg-gradient-to-br from-blue-400 to-indigo-600'
-    },
-    {
-      id: 2,
-      initials: t('testimonials.2.initials'),
-      name: t('testimonials.2.name'),
-      role: t('testimonials.2.role'),
-      quote: t('testimonials.2.quote'),
-      tags: [
-        { text: 'Gaming', type: 'default' as const }
-      ],
-      stats: [
-        { icon: ShieldCheck, text: t('testimonials.stat.verified') },
-        { icon: Star, text: '4.9' }
-      ],
-      avatarGradient: 'bg-gradient-to-br from-purple-400 to-pink-600'
-    },
-    {
-      id: 3,
-      initials: t('testimonials.3.initials'),
-      name: t('testimonials.3.name'),
-      role: t('testimonials.3.role'),
-      quote: t('testimonials.3.quote'),
-      tags: [
-        { text: 'Design', type: 'default' as const }
-      ],
-      stats: [
-        { icon: ShieldCheck, text: t('testimonials.stat.verified') },
-        { icon: Star, text: '5.0' }
-      ],
-      avatarGradient: 'bg-gradient-to-br from-green-400 to-teal-600'
-    }
-  ];
 
   return (
     <div className="min-h-screen bg-white">
@@ -102,9 +52,12 @@ export default function Home() {
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.5, delay: 0.4 }}
             >
-              <button className="px-8 py-4 bg-[#007bff] text-white rounded-full font-bold hover:bg-blue-700 transition-colors">
+              <Link
+                to="/products"
+                className="inline-block px-8 py-4 bg-[#007bff] text-white rounded-full font-bold hover:bg-blue-700 transition-colors"
+              >
                 {t('hero.learn')}
-              </button>
+              </Link>
             </motion.div>
           </div>
           <div className="relative mt-12 md:mt-0">
@@ -161,13 +114,6 @@ export default function Home() {
             ))}
           </div>
         </section>
-
-        {/* Testimonials Section */}
-        <TestimonialStack 
-          testimonials={TESTIMONIALS} 
-          title={t('testimonials.title')} 
-          subtitle={t('testimonials.subtitle')} 
-        />
 
         {/* Services Section */}
         <section className="mb-16">

@@ -19,8 +19,14 @@ export interface DeliveryZone {
   id: string;
   /** Quartiers couverts, dans l'ordre fourni par l'exploitation. */
   areas: string[];
-  /** Frais de livraison en CFA. */
+  /** Frais de livraison en CFA. Vaut 0 quand `quote` est vrai. */
   cost: number;
+  /**
+   * Vrai pour une destination dont le tarif se fixe au cas par cas. Le panier
+   * n'ajoute alors aucun frais et annonce « à confirmer » : le montant est
+   * donné dans la conversation WhatsApp, jamais deviné par le site.
+   */
+  quote?: true;
 }
 
 export const DELIVERY_ZONES: DeliveryZone[] = [
@@ -94,6 +100,14 @@ export const DELIVERY_ZONES: DeliveryZone[] = [
     cost: 2500,
     areas: ['Houézoumè', 'Attakê', 'Djassin', 'Houinmè', 'Ouando', 'et autres'],
   },
+  {
+    // Les pays sont listés comme « quartiers » pour que la recherche du panier
+    // les trouve : taper « Togo » ou « Abidjan » ramène cette option.
+    id: 'afrique-ouest',
+    cost: 0,
+    quote: true,
+    areas: ['Togo', 'Niger', 'Nigeria', "Côte d'Ivoire", 'Sénégal'],
+  },
 ];
 
 /**
@@ -136,5 +150,15 @@ function normalize(s: string): string {
     .replace(/\p{Diacritic}/gu, '');
 }
 
-/** Tarif le plus bas parmi toutes les zones — sert à annoncer « à partir de ». */
-export const MIN_DELIVERY_COST = Math.min(...DELIVERY_ZONES.map((z) => z.cost));
+/**
+ * Tarif le plus bas parmi les zones réellement tarifées — sert à annoncer
+ * « à partir de ». Les zones sur devis sont exclues : leur coût nominal de 0
+ * ferait afficher « à partir de 0 F ».
+ */
+export const MIN_DELIVERY_COST = Math.min(
+  ...DELIVERY_ZONES.filter((z) => !z.quote).map((z) => z.cost)
+);
+
+/** Zones facturées d'avance, par opposition aux destinations sur devis. */
+export const PRICED_ZONES = DELIVERY_ZONES.filter((z) => !z.quote);
+export const QUOTE_ZONES = DELIVERY_ZONES.filter((z) => z.quote);
