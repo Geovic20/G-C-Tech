@@ -11,7 +11,7 @@
 
 export const COMPANY = {
   /** Nom commercial et légal. */
-  name: 'G&C Tech',
+  name: '2G HUB',
 
   legalForm: {
     fr: 'entreprise individuelle',
@@ -60,16 +60,17 @@ export const COMPANY = {
   },
 
   /**
-   * Nom de domaine définitif.
+   * Nom de domaine. Le renseigner ici active automatiquement les balises
+   * canoniques, og:url et og:image du composant Seo.
    *
-   * ⚠ TODO BLOQUANT — pas encore acheté. Une fois renseigné ici, il faut aussi :
+   * ⚠ RESTE À FAIRE HORS DU CODE, sinon des fonctions entières cassent :
    *   • Supabase → Authentication → URL Configuration : Site URL + Redirect URLs
+   *     (sans ça, confirmation d'inscription et réinitialisation de mot de passe
+   *     échouent en production)
    *   • Secret APP_URL de l'Edge Function create-payment
-   *   • URL du webhook dans le tableau de bord FedaPay
-   *   • balises canoniques, og:url, robots.txt et sitemap.xml
-   * Tant que c'est `null`, les pages omettent proprement la mention.
+   *   • URL du webhook dans le tableau de bord FedaPay, en mode production
    */
-  domain: null as string | null,
+  domain: '2ghub.tech' as string | null,
 } as const;
 
 /** Hébergement — mention obligatoire dans les mentions légales. */

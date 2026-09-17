@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { COMPANY } from '@/src/lib/company';
 import { Link } from 'react-router-dom';
 import Navbar from '@/src/components/Navbar';
 import Seo from '@/src/components/Seo';
@@ -53,7 +54,7 @@ export default function Cart() {
     
     const productsText = items.map(p => `• ${p.name} (x${p.quantity}) - ${formatPrice(p.price * p.quantity)}`).join('\n');
     
-    const textFr = `Bonjour G&C Tech ! Je souhaite commander et finaliser mon paiement :
+    const textFr = `Bonjour ${COMPANY.name} ! Je souhaite commander et finaliser mon paiement :
 
 📝 *RÉCAPITULATIF DE LA COMMANDE*
 ---------------------------------------
@@ -74,7 +75,7 @@ ${productsText}
 
 Merci de m'indiquer la procédure pour le règlement !`;
 
-    const textEn = `Hello G&C Tech! I would like to place an order and pay on WhatsApp:
+    const textEn = `Hello ${COMPANY.name}! I would like to place an order and pay on WhatsApp:
 
 📝 *ORDER SUMMARY*
 ---------------------------------------

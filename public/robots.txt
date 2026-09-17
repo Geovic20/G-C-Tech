@@ -1,11 +1,8 @@
-# G&C Tech — robots.txt
+# 2G HUB — robots.txt
 #
 # Le catalogue et les pages d'information sont indexables. Les espaces
 # personnels et le tunnel de commande ne le sont pas : ils n'ont aucune valeur
 # en résultat de recherche et exposeraient des URL de session.
-#
-# TODO — ajouter la ligne Sitemap une fois le nom de domaine acheté :
-#   Sitemap: https://<domaine>/sitemap.xml
 
 User-agent: *
 Allow: /
@@ -17,3 +14,5 @@ Disallow: /favoris
 Disallow: /paiement/
 Disallow: /reset-password
 Disallow: /mot-de-passe-oublie
+
+Sitemap: https://2ghub.tech/sitemap.xml

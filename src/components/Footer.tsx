@@ -15,7 +15,7 @@ export default function Footer() {
               <div className="w-10 h-10 bg-[#007bff] rounded-full flex items-center justify-center">
                 <ShoppingCart className="text-white" size={24} />
               </div>
-              <span className="text-2xl font-bold text-[#007bff]">G&C Tech</span>
+              <span className="text-2xl font-bold text-[#007bff]">{COMPANY.name}</span>
             </Link>
             <p className="text-gray-500 text-sm leading-relaxed">
               {t('footer.desc')}
@@ -70,7 +70,7 @@ export default function Footer() {
         </div>
 
         <div className="pt-8 border-t border-gray-200 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-gray-400">
-          <p>© {new Date().getFullYear()} G&C Tech. {t('footer.rights')}</p>
+          <p>© {new Date().getFullYear()} {COMPANY.name}. {t('footer.rights')}</p>
           <div className="flex gap-8 flex-wrap justify-center">
             <Link to="/privacy" className="hover:text-[#007bff]">{t('footer.privacy')}</Link>
             <Link to="/terms" className="hover:text-[#007bff]">{t('footer.terms')}</Link>

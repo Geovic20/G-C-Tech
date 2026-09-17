@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { COMPANY } from '@/src/lib/company';
 import { Link } from 'react-router-dom';
 import { motion } from 'motion/react';
 import { Layout, MailCheck } from 'lucide-react';
@@ -36,7 +37,7 @@ export default function ForgotPassword() {
           <div className="w-12 h-12 bg-[#007bff] rounded-2xl flex items-center justify-center shadow-lg shadow-blue-500/20">
             <Layout className="text-white" size={24} />
           </div>
-          <span className="text-3xl font-black text-gray-900 tracking-tight">G&C Tech</span>
+          <span className="text-3xl font-black text-gray-900 tracking-tight">{COMPANY.name}</span>
         </Link>
       </div>
 

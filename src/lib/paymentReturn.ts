@@ -12,7 +12,7 @@
  * verification", never "failed": the webhook is asynchronous and a slow callback
  * is not a refusal.
  */
-const KEY = 'gctech:pending-payment';
+const KEY = '2ghub:pending-payment';
 
 export interface PendingPayment {
   planId: string;

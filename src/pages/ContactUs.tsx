@@ -28,7 +28,7 @@ export default function ContactUs() {
     e.preventDefault();
     const subject = form.subject || subjects[0];
     const body = fr
-      ? `Bonjour G&C Tech,
+      ? `Bonjour ${COMPANY.name},
 
 *${subject}*
 
@@ -37,7 +37,7 @@ ${form.message}
 —
 ${form.name}
 ${form.email}`
-      : `Hello G&C Tech,
+      : `Hello ${COMPANY.name},
 
 *${subject}*
 

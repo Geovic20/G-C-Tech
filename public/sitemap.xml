@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  2G HUB — sitemap.
+  Seules les pages publiques et stables figurent ici. Les espaces personnels,
+  le tunnel de commande et les pages d'authentification en sont exclus, comme
+  dans robots.txt.
+
+  Les fiches produit (/product/:id) ne peuvent pas être listées ici : elles
+  sont générées depuis la base et changent avec le catalogue. Il faudra les
+  produire dynamiquement — c'est ce qui apporterait le plus en référencement.
+-->
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>https://2ghub.tech/</loc><changefreq>weekly</changefreq><priority>1.0</priority></url>
+  <url><loc>https://2ghub.tech/products</loc><changefreq>weekly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://2ghub.tech/epargne</loc><changefreq>monthly</changefreq><priority>0.9</priority></url>
+
+  <url><loc>https://2ghub.tech/smartphones</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://2ghub.tech/computers</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://2ghub.tech/tablets</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://2ghub.tech/headphones</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://2ghub.tech/earphones</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://2ghub.tech/smartwatches</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+
+  <url><loc>https://2ghub.tech/shipping</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://2ghub.tech/contact</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://2ghub.tech/help</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://2ghub.tech/faq</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://2ghub.tech/payment-details</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
+
+  <url><loc>https://2ghub.tech/terms</loc><changefreq>yearly</changefreq><priority>0.3</priority></url>
+  <url><loc>https://2ghub.tech/privacy</loc><changefreq>yearly</changefreq><priority>0.3</priority></url>
+  <url><loc>https://2ghub.tech/refund</loc><changefreq>yearly</changefreq><priority>0.3</priority></url>
+  <url><loc>https://2ghub.tech/legal-notice</loc><changefreq>yearly</changefreq><priority>0.3</priority></url>
+  <url><loc>https://2ghub.tech/cookies</loc><changefreq>yearly</changefreq><priority>0.3</priority></url>
+</urlset>

@@ -1,5 +1,5 @@
 /**
- * Zones de livraison G&C Tech et leurs tarifs (en CFA).
+ * Zones de livraison 2G HUB et leurs tarifs (en CFA).
  *
  * Une zone regroupe plusieurs quartiers facturés au même prix. Le client
  * choisit sa zone, puis précise son adresse exacte dans le champ libre du

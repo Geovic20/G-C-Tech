@@ -1,4 +1,4 @@
-# G&C Tech - Plateforme d'E-commerce d'Électronique
+# 2G HUB - Plateforme d'E-commerce d'Électronique
 
 Une plateforme d'e-commerce haute gamme et performante pour la vente d'électronique, développée avec les dernières technologies web modernes.
 
