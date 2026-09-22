@@ -1,18 +1,22 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { ChevronDown, Wallet } from 'lucide-react';
+import { ChevronDown, Wallet, Ban, X, AlertTriangle } from 'lucide-react';
 import AdminLayout from '@/src/components/AdminLayout';
 import { useLanguage } from '@/src/contexts/LanguageContext';
 import { useCurrency } from '@/src/contexts/CurrencyContext';
 import {
   adminListSavings,
   adminUpdateSavingsStatus,
+  adminCancelSavings,
   adminListPlanContributions,
   AdminSavingsPlan,
   AdminContribution,
   SavingsStatus,
 } from '@/src/lib/admin';
 
+// Statuts que l'admin peut appliquer via le menu déroulant. 'cancelled' en est
+// volontairement absent : l'annulation passe par un bouton dédié + motif.
 const STATUSES: SavingsStatus[] = ['active', 'suspended', 'completed', 'cancelled'];
+const TRANSITION_STATUSES: SavingsStatus[] = ['active', 'suspended', 'completed'];
 
 const STATUS_STYLE: Record<SavingsStatus, string> = {
   active: 'bg-blue-50 text-blue-600',
@@ -47,6 +51,11 @@ export default function AdminSavings() {
   const [expanded, setExpanded] = useState<string | null>(null);
   const [history, setHistory] = useState<Record<string, AdminContribution[]>>({});
   const [historyLoading, setHistoryLoading] = useState<string | null>(null);
+
+  // Cancellation flow: dedicated confirmation modal with a mandatory reason.
+  const [cancelTarget, setCancelTarget] = useState<AdminSavingsPlan | null>(null);
+  const [cancelReason, setCancelReason] = useState('');
+  const [cancelBusy, setCancelBusy] = useState(false);
 
   const statusLabel = (s: SavingsStatus) => {
     const frMap = { active: 'En cours', suspended: 'Suspendue', completed: 'Terminée', cancelled: 'Annulée' };
@@ -105,6 +114,32 @@ export default function AdminSavings() {
       return;
     }
     setPlans((prev) => prev.map((p) => (p.id === plan.id ? { ...p, status } : p)));
+  };
+
+  const openCancel = (plan: AdminSavingsPlan) => {
+    setCancelReason('');
+    setError('');
+    setCancelTarget(plan);
+  };
+
+  const confirmCancel = async () => {
+    if (!cancelTarget || !cancelReason.trim()) return;
+    setCancelBusy(true);
+    const result = await adminCancelSavings(cancelTarget.id, cancelReason);
+    setCancelBusy(false);
+    if (result.error) {
+      setError(result.error === 'REASON_REQUIRED' ? (fr ? 'Le motif est obligatoire.' : 'A reason is required.') : result.error);
+      return;
+    }
+    const reason = cancelReason.trim();
+    const cancelledAt = new Date().toISOString();
+    setPlans((prev) =>
+      prev.map((p) =>
+        p.id === cancelTarget.id ? { ...p, status: 'cancelled', cancellation_reason: reason, cancelled_at: cancelledAt } : p
+      )
+    );
+    setCancelTarget(null);
+    setCancelReason('');
   };
 
   const toggleHistory = async (planId: string) => {
@@ -241,16 +276,40 @@ export default function AdminSavings() {
                           <span className={`px-2.5 py-0.5 rounded-full text-[11px] font-bold uppercase tracking-wider ${STATUS_STYLE[p.status]}`}>
                             {statusLabel(p.status)}
                           </span>
-                          <select
-                            value={p.status}
-                            disabled={busyId === p.id}
-                            onChange={(e) => changeStatus(p, e.target.value as SavingsStatus)}
-                            className="px-2 py-1.5 bg-white border border-gray-200 rounded-lg text-xs font-bold focus:outline-none focus:ring-2 focus:ring-[#007bff]"
-                          >
-                            {STATUSES.map((s) => (
-                              <option key={s} value={s}>{statusLabel(s)}</option>
-                            ))}
-                          </select>
+                          {p.status === 'cancelled' ? (
+                            <div className="text-right max-w-[220px]">
+                              {p.cancelled_at && (
+                                <p className="text-[11px] text-gray-400">
+                                  {new Date(p.cancelled_at).toLocaleDateString(locale, { day: 'numeric', month: 'short', year: 'numeric' })}
+                                </p>
+                              )}
+                              {p.cancellation_reason && (
+                                <p className="text-xs text-gray-500 italic mt-0.5" title={p.cancellation_reason}>
+                                  « {p.cancellation_reason} »
+                                </p>
+                              )}
+                            </div>
+                          ) : (
+                            <>
+                              <select
+                                value={p.status}
+                                disabled={busyId === p.id}
+                                onChange={(e) => changeStatus(p, e.target.value as SavingsStatus)}
+                                className="px-2 py-1.5 bg-white border border-gray-200 rounded-lg text-xs font-bold focus:outline-none focus:ring-2 focus:ring-[#007bff]"
+                              >
+                                {TRANSITION_STATUSES.map((s) => (
+                                  <option key={s} value={s}>{statusLabel(s)}</option>
+                                ))}
+                              </select>
+                              <button
+                                onClick={() => openCancel(p)}
+                                disabled={busyId === p.id}
+                                className="inline-flex items-center gap-1 px-2 py-1 text-[11px] font-bold text-red-600 hover:bg-red-50 rounded-lg transition-all disabled:opacity-50"
+                              >
+                                <Ban size={12} /> {fr ? 'Annuler' : 'Cancel'}
+                              </button>
+                            </>
+                          )}
                         </div>
                       </td>
                     </tr>
@@ -307,6 +366,79 @@ export default function AdminSavings() {
           </table>
         </div>
       </div>
+
+      {/* Cancellation confirmation modal */}
+      {cancelTarget && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
+          onClick={() => !cancelBusy && setCancelTarget(null)}
+        >
+          <div
+            className="bg-white rounded-3xl shadow-xl w-full max-w-md p-6 relative"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              onClick={() => !cancelBusy && setCancelTarget(null)}
+              className="absolute top-4 right-4 p-1.5 text-gray-400 hover:text-gray-700 hover:bg-gray-100 rounded-lg"
+            >
+              <X size={18} />
+            </button>
+
+            <div className="w-11 h-11 bg-red-50 text-red-600 rounded-2xl flex items-center justify-center mb-4">
+              <AlertTriangle size={20} />
+            </div>
+            <h2 className="text-lg font-black text-gray-900 mb-1">
+              {fr ? "Annuler cette épargne ?" : 'Cancel this savings plan?'}
+            </h2>
+            <p className="text-sm text-gray-500 mb-4">
+              {fr
+                ? 'Le plan passera à « Annulée » et le motif sera visible par le client. Le remboursement éventuel se gère hors-ligne.'
+                : 'The plan will be set to “Cancelled” and the reason shown to the customer. Any refund is handled offline.'}
+            </p>
+
+            <div className="bg-gray-50 rounded-2xl p-4 mb-4 text-sm">
+              <p className="font-bold text-gray-900">{cancelTarget.product_name}</p>
+              <p className="text-gray-500">{cancelTarget.user?.fullname || cancelTarget.user?.email || '—'}</p>
+              <p className="text-gray-500 mt-1">
+                {fr ? 'Déjà épargné' : 'Already saved'}:{' '}
+                <strong className="text-gray-900">{formatPrice(cancelTarget.saved_amount)}</strong>
+                {' / '}
+                {formatPrice(cancelTarget.target_amount)}
+              </p>
+            </div>
+
+            <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">
+              {fr ? 'Motif (obligatoire)' : 'Reason (required)'}
+            </label>
+            <textarea
+              value={cancelReason}
+              onChange={(e) => setCancelReason(e.target.value)}
+              rows={3}
+              autoFocus
+              placeholder={fr ? 'Ex. : demande du client, produit indisponible…' : 'E.g. customer request, product unavailable…'}
+              className="w-full px-3 py-2.5 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-red-500 resize-none"
+            />
+
+            <div className="flex gap-3 mt-5">
+              <button
+                onClick={() => setCancelTarget(null)}
+                disabled={cancelBusy}
+                className="flex-1 px-4 py-2.5 bg-gray-100 text-gray-700 rounded-xl font-bold text-sm hover:bg-gray-200 transition-all disabled:opacity-50"
+              >
+                {fr ? 'Retour' : 'Back'}
+              </button>
+              <button
+                onClick={confirmCancel}
+                disabled={cancelBusy || !cancelReason.trim()}
+                className="flex-1 inline-flex items-center justify-center gap-1.5 px-4 py-2.5 bg-red-600 text-white rounded-xl font-bold text-sm hover:bg-red-700 transition-all disabled:opacity-50"
+              >
+                <Ban size={15} />
+                {cancelBusy ? (fr ? 'Annulation…' : 'Cancelling…') : fr ? "Confirmer l'annulation" : 'Confirm cancellation'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </AdminLayout>
   );
 }

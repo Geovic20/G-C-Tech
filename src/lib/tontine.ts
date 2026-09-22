@@ -1,7 +1,7 @@
 import { supabase } from './supabase';
 
 export type Cadence = 'daily' | 'weekly' | 'monthly';
-export type PlanStatus = 'active' | 'completed' | 'cancelled';
+export type PlanStatus = 'active' | 'completed' | 'cancelled' | 'suspended';
 
 export interface SavingsPlan {
   id: string;
@@ -15,6 +15,9 @@ export interface SavingsPlan {
   status: PlanStatus;
   target_date: string | null;
   created_at: string;
+  /** Set only when status is 'cancelled' — shown to the customer. */
+  cancellation_reason: string | null;
+  cancelled_at: string | null;
 }
 
 export interface Contribution {

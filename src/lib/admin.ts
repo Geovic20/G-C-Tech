@@ -142,6 +142,8 @@ export interface AdminSavingsPlan {
   target_date: string | null;
   created_at: string;
   product_group: string | null;
+  cancellation_reason: string | null;
+  cancelled_at: string | null;
   user: { email: string | null; fullname: string | null } | null;
 }
 
@@ -156,7 +158,7 @@ export interface AdminContribution {
 export async function adminListSavings(): Promise<AdminSavingsPlan[]> {
   const { data: plans, error } = await supabase
     .from('savings_plans')
-    .select('id,user_id,product_name,product_image,target_amount,saved_amount,installment,cadence,status,target_date,created_at,product_group')
+    .select('id,user_id,product_name,product_image,target_amount,saved_amount,installment,cadence,status,target_date,created_at,product_group,cancellation_reason,cancelled_at')
     .order('created_at', { ascending: false });
   if (error) throw error;
 
@@ -190,6 +192,29 @@ export async function adminUpdateSavingsStatus(id: string, status: SavingsStatus
     if ((error as any).code === '23505') return { error: 'ACTIVE_PLAN_EXISTS' };
     return { error: error.message };
   }
+  return {};
+}
+
+/**
+ * Cancels a savings plan with a mandatory reason (shown to the customer).
+ * Distinct from adminUpdateSavingsStatus so cancellation always records who,
+ * when and why — a plan the customer has real money on shouldn't flip to
+ * 'cancelled' from a silent dropdown.
+ */
+export async function adminCancelSavings(id: string, reason: string): Promise<{ error?: string }> {
+  const trimmed = reason.trim();
+  if (!trimmed) return { error: 'REASON_REQUIRED' };
+  const { data: auth } = await supabase.auth.getUser();
+  const { error } = await supabase
+    .from('savings_plans')
+    .update({
+      status: 'cancelled',
+      cancellation_reason: trimmed,
+      cancelled_at: new Date().toISOString(),
+      cancelled_by: auth.user?.id ?? null,
+    })
+    .eq('id', id);
+  if (error) return { error: error.message };
   return {};
 }
 

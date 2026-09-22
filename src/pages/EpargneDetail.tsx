@@ -59,7 +59,7 @@ export default function EpargneDetail() {
   }, [authLoading, currentUser, id]);
 
   const handleContribute = async () => {
-    if (!plan) return;
+    if (!plan || plan.status === 'cancelled') return;
     const remaining = plan.target_amount - plan.saved_amount;
     if (remaining <= 0) return;
     setBusy(true);
@@ -75,6 +75,7 @@ export default function EpargneDetail() {
 
   const pct = plan ? Math.min(100, Math.round((plan.saved_amount / plan.target_amount) * 100)) : 0;
   const remaining = plan ? Math.max(0, plan.target_amount - plan.saved_amount) : 0;
+  const cancelled = plan ? plan.status === 'cancelled' : false;
   const done = plan ? plan.status === 'completed' || remaining === 0 : false;
 
   return (
@@ -100,6 +101,25 @@ export default function EpargneDetail() {
           <div className="space-y-6">
             {error && (
               <div className="p-3 rounded-2xl bg-red-50 border border-red-100 text-red-600 text-sm font-medium">{error}</div>
+            )}
+
+            {cancelled && (
+              <div className="p-4 rounded-2xl bg-red-50 border border-red-100">
+                <p className="text-sm font-bold text-red-700 mb-1">
+                  {fr ? 'Cette épargne a été annulée.' : 'This savings plan was cancelled.'}
+                </p>
+                {plan.cancellation_reason && (
+                  <p className="text-sm text-red-600">
+                    <span className="font-semibold">{fr ? 'Motif' : 'Reason'} : </span>
+                    {plan.cancellation_reason}
+                  </p>
+                )}
+                <p className="text-xs text-red-500/80 mt-2">
+                  {fr
+                    ? 'Pour toute question sur un remboursement, contactez-nous.'
+                    : 'For any question about a refund, please contact us.'}
+                </p>
+              </div>
             )}
 
             {/* Header card */}
@@ -142,7 +162,7 @@ export default function EpargneDetail() {
                   : (<>{fr ? 'Reste à épargner' : 'Left to save'}: <strong className="text-gray-900">{formatPrice(remaining)}</strong></>)}
               </p>
 
-              {!done && (
+              {!done && !cancelled && (
                 <button
                   onClick={handleContribute}
                   disabled={busy}
