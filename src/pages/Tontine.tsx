@@ -1,7 +1,10 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'motion/react';
-import { PiggyBank, Target, Truck, CheckCircle2, Plus, Wallet, X, Ban } from 'lucide-react';
+import {
+  PiggyBank, Target, Truck, CheckCircle2, Plus, Wallet, X, Ban,
+  Smartphone, Laptop, Tablet, Headphones, Watch, Ear, ArrowLeft, type LucideIcon,
+} from 'lucide-react';
 import Navbar from '@/src/components/Navbar';
 import Seo from '@/src/components/Seo';
 import { useLanguage } from '@/src/contexts/LanguageContext';
@@ -23,6 +26,14 @@ const GROUP_LABELS: Record<string, { fr: string; en: string }> = {
   headphones: { fr: 'Casques', en: 'Headphones' },
   earphones: { fr: 'Écouteurs', en: 'Earphones' },
   smartwatches: { fr: 'Montres', en: 'Watches' },
+};
+const GROUP_ICON: Record<string, LucideIcon> = {
+  smartphones: Smartphone,
+  computers: Laptop,
+  tablets: Tablet,
+  headphones: Headphones,
+  earphones: Ear,
+  smartwatches: Watch,
 };
 
 function computeTargetDate(count: number, cadence: Cadence): Date {
@@ -94,19 +105,14 @@ export default function Tontine() {
     getSavingsTerms().then(setTermsData).catch(() => {});
   }, []);
 
-  // Default the category once the catalog has loaded.
+  // No category/product is pre-selected: the customer picks a category box
+  // first, then a product within it. We only guard against a stale product id
+  // (e.g. the catalog changed) without auto-selecting one.
   useEffect(() => {
-    if (groups.length && !groups.includes(groupFilter)) {
-      setGroupFilter(groups[0]);
+    if (productId && !products.some((p) => p.id === productId)) {
+      setProductId('');
     }
-  }, [groups, groupFilter]);
-
-  // Keep the selected product valid within the chosen category.
-  useEffect(() => {
-    if (formProducts.length && !formProducts.some((p) => p.id === productId)) {
-      setProductId(formProducts[0].id);
-    }
-  }, [formProducts, productId]);
+  }, [products, productId]);
 
   // The plan's target amount is resolved from the catalog row server-side, so
   // a plan cannot be opened while the catalog itself is unreachable. Catch it
@@ -282,39 +288,91 @@ export default function Tontine() {
                   {fr ? 'Démarrer une épargne' : 'Start a savings plan'}
                 </h2>
                 <form onSubmit={handleSubmit} className="space-y-5">
-                  {/* Category first, then the product list is limited to that category */}
-                  <div className="space-y-2">
-                    <label className="text-sm font-bold text-gray-500 uppercase tracking-wider">{fr ? 'Catégorie' : 'Category'}</label>
-                    <div className="flex flex-wrap gap-2">
-                      {groups.map((g) => (
-                        <button
-                          key={g}
-                          type="button"
-                          onClick={() => setGroupFilter(g)}
-                          className={`px-4 py-2 rounded-full text-sm font-bold transition-all ${
-                            groupFilter === g
-                              ? 'bg-[#007bff] text-white shadow-lg shadow-blue-500/20'
-                              : 'bg-gray-50 text-gray-600 border border-gray-100 hover:border-gray-200'
-                          }`}
-                        >
-                          {groupLabel(g)}
-                        </button>
-                      ))}
+                  {!groupFilter ? (
+                    /* Step 1 — the customer picks a category box */
+                    <div className="space-y-3">
+                      <label className="text-sm font-bold text-gray-500 uppercase tracking-wider">
+                        {fr ? 'Choisissez une catégorie' : 'Choose a category'}
+                      </label>
+                      <div className="grid grid-cols-2 gap-3">
+                        {groups.map((g) => {
+                          const Icon = GROUP_ICON[g] ?? PiggyBank;
+                          const cnt = products.filter((p) => p.group === g).length;
+                          return (
+                            <button
+                              key={g}
+                              type="button"
+                              onClick={() => { setGroupFilter(g); setProductId(''); setError(''); }}
+                              className="group flex flex-col items-start gap-3 p-4 bg-gray-50 border border-gray-100 rounded-2xl text-left transition-all hover:border-blue-300 hover:bg-blue-50/50 hover:shadow-md"
+                            >
+                              <span className="w-11 h-11 bg-white text-[#007bff] rounded-xl flex items-center justify-center shadow-sm transition-all group-hover:bg-[#007bff] group-hover:text-white">
+                                <Icon size={20} />
+                              </span>
+                              <span className="font-bold text-gray-900 text-sm leading-tight">{groupLabel(g)}</span>
+                              <span className="text-xs text-gray-400">
+                                {cnt} {cnt > 1 ? (fr ? 'produits' : 'products') : (fr ? 'produit' : 'product')}
+                              </span>
+                            </button>
+                          );
+                        })}
+                      </div>
                     </div>
-                  </div>
+                  ) : (
+                  <>
+                    {/* Chosen category + a way back to the category boxes */}
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        {(() => {
+                          const Icon = GROUP_ICON[groupFilter] ?? PiggyBank;
+                          return (
+                            <span className="w-9 h-9 bg-blue-50 text-[#007bff] rounded-xl flex items-center justify-center">
+                              <Icon size={18} />
+                            </span>
+                          );
+                        })()}
+                        <span className="font-bold text-gray-900">{groupLabel(groupFilter)}</span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => { setGroupFilter(''); setProductId(''); }}
+                        className="inline-flex items-center gap-1 text-sm font-bold text-gray-500 hover:text-[#007bff] transition-all"
+                      >
+                        <ArrowLeft size={14} /> {fr ? 'Changer' : 'Change'}
+                      </button>
+                    </div>
 
-                  <div className="space-y-2">
-                    <label className="text-sm font-bold text-gray-500 uppercase tracking-wider">{fr ? 'Produit' : 'Product'}</label>
-                    <select
-                      value={productId}
-                      onChange={(e) => setProductId(e.target.value)}
-                      className="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium"
-                    >
-                      {formProducts.map((p) => (
-                        <option key={p.id} value={p.id}>{p.name} — {formatPrice(p.price)}</option>
-                      ))}
-                    </select>
-                  </div>
+                    {/* Step 2 — pick a product within the chosen category */}
+                    <div className="space-y-2">
+                      <label className="text-sm font-bold text-gray-500 uppercase tracking-wider">{fr ? 'Produit' : 'Product'}</label>
+                      <div className="space-y-2 max-h-72 overflow-y-auto pr-1">
+                        {formProducts.map((p) => (
+                          <button
+                            key={p.id}
+                            type="button"
+                            onClick={() => setProductId(p.id)}
+                            className={`w-full flex items-center gap-3 p-3 rounded-2xl border text-left transition-all ${
+                              productId === p.id
+                                ? 'border-[#007bff] bg-blue-50/60 ring-1 ring-[#007bff]'
+                                : 'border-gray-100 bg-gray-50 hover:border-gray-200'
+                            }`}
+                          >
+                            <span className="w-12 h-12 bg-white rounded-xl p-1.5 flex-shrink-0 flex items-center justify-center overflow-hidden">
+                              {p.image && <img src={p.image} alt={p.name} className="max-w-full max-h-full object-contain" />}
+                            </span>
+                            <span className="flex-1 min-w-0">
+                              <span className="block font-bold text-gray-900 text-sm truncate">{p.name}</span>
+                              <span className="block text-sm text-[#007bff] font-bold">{formatPrice(p.price)}</span>
+                            </span>
+                            {productId === p.id && <CheckCircle2 size={18} className="text-[#007bff] flex-shrink-0" />}
+                          </button>
+                        ))}
+                        {formProducts.length === 0 && (
+                          <p className="text-sm text-gray-400 py-4 text-center">
+                            {fr ? 'Aucun produit dans cette catégorie.' : 'No product in this category.'}
+                          </p>
+                        )}
+                      </div>
+                    </div>
 
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
@@ -343,7 +401,8 @@ export default function Tontine() {
                     </div>
                   </div>
 
-                  {/* Summary */}
+                  {/* Summary — only once a product is chosen */}
+                  {selectedProduct && (
                   <div className="bg-blue-50/60 rounded-2xl p-4 text-sm space-y-1.5">
                     <div className="flex justify-between">
                       <span className="text-gray-500">{fr ? 'Montant cible' : 'Target amount'}</span>
@@ -358,6 +417,7 @@ export default function Tontine() {
                       <span className="font-bold text-gray-900">{targetDate.toLocaleDateString(locale, { day: 'numeric', month: 'long', year: 'numeric' })}</span>
                     </div>
                   </div>
+                  )}
 
                   <button
                     type="submit"
@@ -374,6 +434,8 @@ export default function Tontine() {
                         : 'Catalog still loading. Opening a plan will be available in a moment.'}
                     </p>
                   )}
+                </>
+                )}
                 </form>
                 </>
                 )}
