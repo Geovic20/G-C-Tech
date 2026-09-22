@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'motion/react';
-import { PiggyBank, Target, Truck, CheckCircle2, Plus, Wallet, X } from 'lucide-react';
+import { PiggyBank, Target, Truck, CheckCircle2, Plus, Wallet, X, Ban } from 'lucide-react';
 import Navbar from '@/src/components/Navbar';
 import Seo from '@/src/components/Seo';
 import { useLanguage } from '@/src/contexts/LanguageContext';
@@ -164,6 +164,7 @@ export default function Tontine() {
   };
 
   const handleContribute = async (plan: SavingsPlan) => {
+    if (plan.status === 'cancelled') return;
     const remaining = plan.target_amount - plan.saved_amount;
     if (remaining <= 0) return;
     setBusyId(plan.id);
@@ -400,6 +401,7 @@ export default function Tontine() {
                   {plans.map((plan) => {
                     const pct = Math.min(100, Math.round((plan.saved_amount / plan.target_amount) * 100));
                     const remaining = Math.max(0, plan.target_amount - plan.saved_amount);
+                    const cancelled = plan.status === 'cancelled';
                     const done = plan.status === 'completed' || remaining === 0;
                     return (
                       <motion.div
@@ -421,7 +423,11 @@ export default function Tontine() {
                               {formatPrice(plan.saved_amount)} / {formatPrice(plan.target_amount)}
                             </p>
                           </div>
-                          {done ? (
+                          {cancelled ? (
+                            <span className="inline-flex items-center gap-1 px-3 py-1 bg-red-50 text-red-600 rounded-full text-xs font-bold uppercase tracking-wider">
+                              <Ban size={12} /> {fr ? 'Annulée' : 'Cancelled'}
+                            </span>
+                          ) : done ? (
                             <span className="inline-flex items-center gap-1 px-3 py-1 bg-emerald-50 text-emerald-600 rounded-full text-xs font-bold uppercase tracking-wider">
                               <CheckCircle2 size={12} /> {fr ? 'Atteint' : 'Reached'}
                             </span>
@@ -433,14 +439,23 @@ export default function Tontine() {
                         {/* Progress bar */}
                         <div className="h-2.5 bg-gray-100 rounded-full overflow-hidden mb-4">
                           <div
-                            className={`h-full rounded-full transition-all duration-500 ${done ? 'bg-emerald-500' : 'bg-[#007bff]'}`}
+                            className={`h-full rounded-full transition-all duration-500 ${cancelled ? 'bg-red-300' : done ? 'bg-emerald-500' : 'bg-[#007bff]'}`}
                             style={{ width: `${pct}%` }}
                           />
                         </div>
 
                         <div className="flex flex-wrap items-center justify-between gap-3 text-sm">
                           <div className="text-gray-500">
-                            {done ? (
+                            {cancelled ? (
+                              <span className="text-red-600 font-bold">
+                                {fr ? 'Épargne annulée' : 'Savings cancelled'}
+                                {plan.cancellation_reason && (
+                                  <span className="block text-xs font-normal text-red-500/90 mt-0.5 italic">
+                                    « {plan.cancellation_reason} »
+                                  </span>
+                                )}
+                              </span>
+                            ) : done ? (
                               <span className="text-emerald-600 font-bold">
                                 {fr ? 'Objectif atteint — livraison à venir' : 'Goal reached — delivery coming'}
                               </span>
@@ -453,7 +468,7 @@ export default function Tontine() {
                               </>
                             )}
                           </div>
-                          {!done && (
+                          {!done && !cancelled && (
                             <button
                               onClick={(e) => { e.stopPropagation(); handleContribute(plan); }}
                               disabled={busyId === plan.id}
