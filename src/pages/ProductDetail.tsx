@@ -10,6 +10,7 @@ import { useLanguage } from '@/src/contexts/LanguageContext';
 import { useCurrency } from '@/src/contexts/CurrencyContext';
 import { useCart } from '@/src/contexts/CartContext';
 import { MIN_DELIVERY_COST } from '@/src/lib/delivery';
+import { orderedSpecs } from '@/src/lib/specs';
 
 export default function ProductDetail() {
   const { id } = useParams();
@@ -167,56 +168,20 @@ export default function ProductDetail() {
           </div>
         </div>
 
-        {/* Specifications */}
-        <div className="mb-20">
-          <h2 className="text-2xl font-bold mb-8">{product.name.split(',')[0]} {t('detail.specs')}</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-16 gap-y-12">
-            <div className="space-y-6">
-              <h3 className="font-bold text-xl pb-4 border-b border-gray-100">{fr ? 'Général' : 'General'}</h3>
-              {Object.entries(product.specs || {}).map(([key, value]) => (
-                <div key={key} className="flex justify-between py-2 border-b border-gray-50 last:border-0">
+        {/* Specifications — rendered in the canonical per-category order. */}
+        {orderedSpecs(product.group, product.specs).length > 0 && (
+          <div className="mb-20">
+            <h2 className="text-2xl font-bold mb-8">{product.name.split(',')[0]} {t('detail.specs')}</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-16 gap-y-1 max-w-4xl">
+              {orderedSpecs(product.group, product.specs).map(([key, value]) => (
+                <div key={key} className="flex justify-between gap-4 py-3 border-b border-gray-50">
                   <span className="text-gray-500">{key}</span>
-                  <span className="font-medium text-gray-900">{value}</span>
+                  <span className="font-medium text-gray-900 text-right">{value}</span>
                 </div>
               ))}
             </div>
-            {product.category === 'Headphones' && (
-              <div className="space-y-6">
-                <h3 className="font-bold text-xl pb-4 border-b border-gray-100">{fr ? 'Détails du produit' : 'Product details'}</h3>
-                {[
-                  { key: 'Microphone', val: 'Yes' },
-                  { key: 'Driver Type', val: 'Dynamic' },
-                  { key: 'Driver Size (mm)', val: '40' },
-                  { key: 'Number of Drivers', val: '1' },
-                  { key: 'Water Resistant', val: 'No' },
-                  { key: 'Weight (g)', val: '385.00' },
-                  { key: 'Battery Life (hr)', val: '20' }
-                ].map((item) => (
-                  <div key={item.key} className="flex justify-between py-2 border-b border-gray-50 last:border-0">
-                    <span className="text-gray-500">{item.key}</span>
-                    <span className="font-medium text-gray-900">{item.val}</span>
-                  </div>
-                ))}
-              </div>
-            )}
-            {product.category === 'Phones' && (
-              <div className="space-y-6">
-                <h3 className="font-bold text-xl pb-4 border-b border-gray-100">{fr ? 'Réseau & Connectivité' : 'Network & Connectivity'}</h3>
-                {[
-                  { key: '5G', val: 'Yes' },
-                  { key: 'Bluetooth', val: '5.3' },
-                  { key: 'Sim Type', val: 'Nano-SIM and eSIM' },
-                  { key: 'Charging Port', val: 'USB-C' }
-                ].map((item) => (
-                  <div key={item.key} className="flex justify-between py-2 border-b border-gray-50 last:border-0">
-                    <span className="text-gray-500">{item.key}</span>
-                    <span className="font-medium text-gray-900">{item.val}</span>
-                  </div>
-                ))}
-              </div>
-            )}
           </div>
-        </div>
+        )}
       </main>
     </div>
   );
