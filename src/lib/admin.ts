@@ -44,14 +44,22 @@ export async function adminListProducts(): Promise<AdminProduct[]> {
   return (data ?? []) as unknown as AdminProduct[];
 }
 
+// A product's slug is unique. On collision Postgres raises 23505 with a message
+// no admin should have to read; we surface a stable code the UI can translate.
+function mapProductError(error: { code?: string; message: string } | null): { error?: string } {
+  if (!error) return {};
+  if (error.code === '23505') return { error: 'DUPLICATE_SLUG' };
+  return { error: error.message };
+}
+
 export async function adminCreateProduct(input: ProductInput): Promise<{ error?: string }> {
   const { error } = await supabase.from('products').insert(input);
-  return error ? { error: error.message } : {};
+  return mapProductError(error as any);
 }
 
 export async function adminUpdateProduct(id: string, input: ProductInput): Promise<{ error?: string }> {
   const { error } = await supabase.from('products').update(input).eq('id', id);
-  return error ? { error: error.message } : {};
+  return mapProductError(error as any);
 }
 
 export async function adminDeleteProduct(id: string): Promise<{ error?: string }> {

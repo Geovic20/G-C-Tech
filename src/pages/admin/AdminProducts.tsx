@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { Plus, Pencil, Trash2, X, ChevronLeft, ChevronDown, Smartphone, Laptop, Tablet, Headphones, Watch, Package } from 'lucide-react';
+import { Plus, Pencil, Trash2, X, ChevronLeft, ChevronDown, Smartphone, Laptop, Tablet, Headphones, Watch, Package, Upload, Image as ImageIcon } from 'lucide-react';
 import AdminLayout from '@/src/components/AdminLayout';
 import { useLanguage } from '@/src/contexts/LanguageContext';
 import { useCurrency } from '@/src/contexts/CurrencyContext';
@@ -13,6 +13,7 @@ import {
   AdminProduct,
   ProductInput,
 } from '@/src/lib/admin';
+import { uploadProductImage } from '@/src/lib/storage';
 
 // Category-specific technical spec fields (keys are stored as-is in `specs`).
 const SPEC_FIELDS: Record<string, string[]> = {
@@ -74,6 +75,26 @@ export default function AdminProducts() {
   const [editing, setEditing] = useState<AdminProduct | null>(null);
   const [form, setForm] = useState<ProductInput>(EMPTY);
   const [saving, setSaving] = useState(false);
+  const [uploading, setUploading] = useState(false);
+
+  const handleImageFile = async (file?: File | null) => {
+    if (!file) return;
+    setError('');
+    setUploading(true);
+    const { url, error } = await uploadProductImage(file);
+    setUploading(false);
+    if (error) {
+      setError(
+        error === 'NOT_IMAGE'
+          ? (fr ? 'Le fichier doit être une image.' : 'The file must be an image.')
+          : error === 'TOO_LARGE'
+          ? (fr ? 'Image trop lourde (5 Mo maximum).' : 'Image too large (5MB maximum).')
+          : error
+      );
+      return;
+    }
+    if (url) setForm((f) => ({ ...f, image: url }));
+  };
 
   const load = async () => {
     setError('');
@@ -95,6 +116,7 @@ export default function AdminProducts() {
 
   // Create: start on the category-picker step.
   const openCreate = () => {
+    setError('');
     setEditing(null);
     setFormCategory(null);
     setForm(EMPTY);
@@ -110,6 +132,7 @@ export default function AdminProducts() {
 
   // Edit: category already known → go straight to the form.
   const openEdit = (p: AdminProduct) => {
+    setError('');
     setEditing(p);
     setFormCategory(categories.find((c) => c.id === p.category_id) ?? null);
     setForm({
@@ -156,7 +179,13 @@ export default function AdminProducts() {
       : await adminCreateProduct(payload);
     setSaving(false);
     if (result.error) {
-      setError(result.error);
+      setError(
+        result.error === 'DUPLICATE_SLUG'
+          ? (fr
+              ? 'Ce slug est déjà utilisé par un autre produit. Modifiez-le (il doit être unique).'
+              : 'This slug is already used by another product. Change it (it must be unique).')
+          : result.error
+      );
       return;
     }
     setShowForm(false);
@@ -403,21 +432,46 @@ export default function AdminProducts() {
                 </div>
 
                 <form onSubmit={handleSave} className="space-y-4">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <Field label={fr ? 'Nom' : 'Name'}>
-                      <input required value={form.name} onChange={(e) => setName(e.target.value)} className={inputCls} />
-                    </Field>
-                    <Field label="Slug">
-                      <input required value={form.slug} onChange={(e) => setForm({ ...form, slug: e.target.value })} className={inputCls} />
-                    </Field>
-                  </div>
-
-                  <Field label="Description">
-                    <textarea rows={2} value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} className={inputCls} />
+                  {error && (
+                    <div className="p-3 rounded-2xl bg-red-50 border border-red-100 text-red-600 text-sm font-medium">{error}</div>
+                  )}
+                  {/* Slug is auto-generated from the name (see setName / handleSave) and
+                      kept out of the form — admins never need to see it. */}
+                  <Field label={fr ? 'Nom' : 'Name'}>
+                    <input required value={form.name} onChange={(e) => setName(e.target.value)} className={inputCls} />
                   </Field>
 
-                  <Field label={fr ? "URL de l'image" : 'Image URL'}>
-                    <input value={form.image} onChange={(e) => setForm({ ...form, image: e.target.value })} className={inputCls} placeholder="https://..." />
+                  <Field label={fr ? 'Image du produit' : 'Product image'}>
+                    <div className="flex items-start gap-4">
+                      <div className="w-24 h-24 bg-gray-50 border border-gray-100 rounded-2xl flex items-center justify-center overflow-hidden flex-shrink-0">
+                        {form.image ? (
+                          <img src={form.image} alt="" className="w-full h-full object-contain" />
+                        ) : (
+                          <ImageIcon size={24} className="text-gray-300" />
+                        )}
+                      </div>
+                      <div className="flex-1 space-y-2">
+                        <div className="flex items-center gap-3">
+                          <label className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold text-sm cursor-pointer transition-all ${uploading ? 'bg-gray-100 text-gray-400 cursor-wait' : 'bg-gray-900 text-white hover:bg-gray-800'}`}>
+                            <Upload size={16} />
+                            {uploading ? (fr ? 'Envoi…' : 'Uploading…') : (fr ? 'Choisir une image' : 'Choose image')}
+                            <input
+                              type="file"
+                              accept="image/*"
+                              disabled={uploading}
+                              onChange={(e) => { handleImageFile(e.target.files?.[0]); e.target.value = ''; }}
+                              className="hidden"
+                            />
+                          </label>
+                          {form.image && !uploading && (
+                            <button type="button" onClick={() => setForm({ ...form, image: '' })} className="text-xs font-bold text-red-500 hover:underline">
+                              {fr ? 'Retirer' : 'Remove'}
+                            </button>
+                          )}
+                        </div>
+                        <p className="text-[11px] text-gray-400">{fr ? 'JPG, PNG, WebP — 5 Mo max.' : 'JPG, PNG, WebP — 5MB max.'}</p>
+                      </div>
+                    </div>
                   </Field>
 
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -465,7 +519,7 @@ export default function AdminProducts() {
                   </label>
 
                   <div className="flex gap-3 pt-4">
-                    <button type="submit" disabled={saving} className="flex-1 py-3.5 bg-[#007bff] text-white rounded-full font-bold hover:bg-blue-700 transition-all disabled:opacity-60">
+                    <button type="submit" disabled={saving || uploading} className="flex-1 py-3.5 bg-[#007bff] text-white rounded-full font-bold hover:bg-blue-700 transition-all disabled:opacity-60">
                       {saving ? '…' : editing ? (fr ? 'Enregistrer' : 'Save') : (fr ? 'Créer' : 'Create')}
                     </button>
                     <button type="button" onClick={() => setShowForm(false)} className="px-6 py-3.5 border border-gray-200 text-gray-700 rounded-full font-bold hover:bg-gray-50 transition-all">
