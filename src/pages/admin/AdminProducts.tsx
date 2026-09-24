@@ -15,14 +15,61 @@ import {
 } from '@/src/lib/admin';
 import { uploadProductImage } from '@/src/lib/storage';
 
-// Category-specific technical spec fields (keys are stored as-is in `specs`).
-const SPEC_FIELDS: Record<string, string[]> = {
-  smartphones: ['Chip', 'Display', 'Camera', 'Battery', 'RAM', 'Storage'],
-  computers: ['Chip', 'RAM', 'Storage', 'Display', 'GPU'],
-  tablets: ['Chip', 'Display', 'Storage', 'Battery'],
-  headphones: ['Connectivity', 'Battery Life', 'Noise Canceling', 'Driver Size'],
-  earphones: ['Connectivity', 'Battery Life', 'Noise Canceling'],
-  smartwatches: ['Display', 'Battery', 'Water Resistant', 'GPS', 'Connectivity'],
+// Category-specific technical spec fields. The `key` is the label shown to the
+// admin AND the key stored in `specs` (the storefront renders specs generically,
+// so French keys display as-is). `type: 'select'` renders a dropdown limited to
+// `options`; everything else is a free-text field with an optional placeholder.
+type SpecField = { key: string; type?: 'select'; options?: string[]; placeholder?: string };
+
+const SPEC_FIELDS: Record<string, SpecField[]> = {
+  smartphones: [
+    { key: 'Processeur', placeholder: 'Snapdragon 8 Gen 3' },
+    { key: "Système d'exploitation", placeholder: 'Android 15' },
+    { key: "Taille de l'écran (pouces)", placeholder: '6.7' },
+    { key: 'Taux de rafraîchissement', placeholder: '120 Hz' },
+    { key: 'Capteur principal', placeholder: '50 Mpx' },
+    { key: 'Caméra frontale', placeholder: '8 Mpx' },
+    { key: 'Batterie', placeholder: '5000 mAh' },
+    { key: 'RAM', placeholder: '8 Go' },
+    { key: 'Stockage', placeholder: '128 Go' },
+    { key: 'Poids', placeholder: '195 g' },
+    { key: 'Connectivité réseaux', placeholder: '2G / 3G / 4G LTE / 5G' },
+    { key: 'Carte SIM', type: 'select', options: ['Double nano SIM', 'Nano SIM unique', 'e-SIM uniquement', 'Nano SIM + e-SIM'] },
+    { key: 'Port de charge', type: 'select', options: ['USB Type-C', 'Lightning', 'Micro-USB'] },
+  ],
+  computers: [
+    { key: 'Processeur', placeholder: 'Intel Core i7 / Apple M3' },
+    { key: 'RAM', placeholder: '16 Go' },
+    { key: 'Stockage', placeholder: '512 Go SSD' },
+    { key: 'Écran', placeholder: '15,6 pouces' },
+    { key: 'Carte graphique', placeholder: 'RTX 4060' },
+    { key: "Système d'exploitation", placeholder: 'Windows 11' },
+  ],
+  tablets: [
+    { key: 'Processeur' },
+    { key: "Taille de l'écran (pouces)", placeholder: '11' },
+    { key: 'Stockage', placeholder: '128 Go' },
+    { key: 'Batterie', placeholder: '8000 mAh' },
+    { key: "Système d'exploitation", placeholder: 'Android 14' },
+  ],
+  headphones: [
+    { key: 'Connectivité', type: 'select', options: ['Bluetooth', 'Filaire', 'Bluetooth + Filaire'] },
+    { key: 'Autonomie', placeholder: '30 h' },
+    { key: 'Réduction de bruit', type: 'select', options: ['Oui', 'Non'] },
+    { key: 'Taille du haut-parleur', placeholder: '40 mm' },
+  ],
+  earphones: [
+    { key: 'Connectivité', type: 'select', options: ['Bluetooth', 'Filaire'] },
+    { key: 'Autonomie', placeholder: '6 h (30 h avec le boîtier)' },
+    { key: 'Réduction de bruit', type: 'select', options: ['Oui', 'Non'] },
+  ],
+  smartwatches: [
+    { key: "Taille de l'écran (pouces)", placeholder: '1.9' },
+    { key: 'Batterie', placeholder: '400 mAh' },
+    { key: "Résistance à l'eau", type: 'select', options: ['Oui', 'Non'] },
+    { key: 'GPS', type: 'select', options: ['Oui', 'Non'] },
+    { key: 'Connectivité', placeholder: 'Bluetooth / Wi-Fi' },
+  ],
 };
 
 const CATEGORY_LABELS: Record<string, { fr: string; en: string }> = {
@@ -479,7 +526,7 @@ export default function AdminProducts() {
                       <input required type="number" min={0} value={form.price} onChange={(e) => setForm({ ...form, price: Number(e.target.value) })} className={inputCls} />
                     </Field>
                     <Field label={fr ? 'Sous-type' : 'Sub-type'}>
-                      <input value={form.type} onChange={(e) => setForm({ ...form, type: e.target.value })} className={inputCls} placeholder="Phones…" />
+                      <input value={form.type} onChange={(e) => setForm({ ...form, type: e.target.value })} className={inputCls} placeholder={fr ? 'Facultatif' : 'Optional'} />
                     </Field>
                   </div>
 
@@ -499,14 +546,28 @@ export default function AdminProducts() {
                         {fr ? 'Caractéristiques' : 'Specifications'} — {formCategory?.name}
                       </p>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        {specKeys.map((key) => (
-                          <div key={key} className="space-y-1.5">
-                            <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">{key}</label>
-                            <input
-                              value={form.specs[key] ?? ''}
-                              onChange={(e) => setSpec(key, e.target.value)}
-                              className={inputCls}
-                            />
+                        {specKeys.map((f) => (
+                          <div key={f.key} className="space-y-1.5">
+                            <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">{f.key}</label>
+                            {f.type === 'select' ? (
+                              <select
+                                value={form.specs[f.key] ?? ''}
+                                onChange={(e) => setSpec(f.key, e.target.value)}
+                                className={inputCls}
+                              >
+                                <option value="">{fr ? '— Choisir —' : '— Choose —'}</option>
+                                {f.options?.map((o) => (
+                                  <option key={o} value={o}>{o}</option>
+                                ))}
+                              </select>
+                            ) : (
+                              <input
+                                value={form.specs[f.key] ?? ''}
+                                onChange={(e) => setSpec(f.key, e.target.value)}
+                                className={inputCls}
+                                placeholder={f.placeholder}
+                              />
+                            )}
                           </div>
                         ))}
                       </div>

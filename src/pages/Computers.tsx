@@ -31,12 +31,9 @@ export default function Computers() {
         </nav>
 
         <header className="mb-6 md:mb-12">
-          <motion.h1 initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} className="text-4xl md:text-5xl font-black text-gray-900 mb-4 tracking-tight">
+          <motion.h1 initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} className="text-4xl md:text-5xl font-black text-gray-900 tracking-tight">
             {t('computers.title')}
           </motion.h1>
-          <motion.p initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.1 }} className="text-gray-500 max-w-2xl text-lg font-medium leading-relaxed">
-            {t('computers.subtitle')}
-          </motion.p>
         </header>
 
         <div className="flex flex-col md:flex-row items-center justify-between gap-4 mb-8 md:mb-12">
