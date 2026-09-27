@@ -487,30 +487,36 @@ export default function AdminProducts() {
                         {fr ? 'Caractéristiques' : 'Specifications'} — {formCategory?.name}
                       </p>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        {specKeys.map((f) => (
-                          <div key={f.key} className="space-y-1.5">
-                            <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">{f.key}</label>
-                            {f.type === 'select' ? (
-                              <select
-                                value={form.specs[f.key] ?? ''}
-                                onChange={(e) => setSpec(f.key, e.target.value)}
-                                className={inputCls}
-                              >
-                                <option value="">{fr ? '— Choisir —' : '— Choose —'}</option>
-                                {f.options?.map((o) => (
-                                  <option key={o} value={o}>{o}</option>
-                                ))}
-                              </select>
-                            ) : (
-                              <input
-                                value={form.specs[f.key] ?? ''}
-                                onChange={(e) => setSpec(f.key, e.target.value)}
-                                className={inputCls}
-                                placeholder={f.placeholder}
-                              />
-                            )}
-                          </div>
-                        ))}
+                        {specKeys.map((f) =>
+                          f.type === 'section' ? (
+                            <div key={f.key} className="md:col-span-2 pt-2">
+                              <p className="text-sm font-black text-gray-900 border-b border-gray-100 pb-2">{f.key}</p>
+                            </div>
+                          ) : (
+                            <div key={f.key} className="space-y-1.5">
+                              <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">{f.key}</label>
+                              {f.type === 'select' ? (
+                                <select
+                                  value={form.specs[f.key] ?? ''}
+                                  onChange={(e) => setSpec(f.key, e.target.value)}
+                                  className={inputCls}
+                                >
+                                  <option value="">{fr ? '— Choisir —' : '— Choose —'}</option>
+                                  {f.options?.map((o) => (
+                                    <option key={o} value={o}>{o}</option>
+                                  ))}
+                                </select>
+                              ) : (
+                                <input
+                                  value={form.specs[f.key] ?? ''}
+                                  onChange={(e) => setSpec(f.key, e.target.value)}
+                                  className={inputCls}
+                                  placeholder={f.placeholder}
+                                />
+                              )}
+                            </div>
+                          )
+                        )}
                       </div>
                     </div>
                   )}

@@ -10,7 +10,7 @@ import { useLanguage } from '@/src/contexts/LanguageContext';
 import { useCurrency } from '@/src/contexts/CurrencyContext';
 import { useCart } from '@/src/contexts/CartContext';
 import { MIN_DELIVERY_COST } from '@/src/lib/delivery';
-import { orderedSpecs } from '@/src/lib/specs';
+import { groupedSpecs } from '@/src/lib/specs';
 
 export default function ProductDetail() {
   const { id } = useParams();
@@ -168,20 +168,30 @@ export default function ProductDetail() {
           </div>
         </div>
 
-        {/* Specifications — rendered in the canonical per-category order. */}
-        {orderedSpecs(product.group, product.specs).length > 0 && (
-          <div className="mb-20">
-            <h2 className="text-2xl font-bold mb-8">{product.name.split(',')[0]} {t('detail.specs')}</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-16 gap-y-1 max-w-4xl">
-              {orderedSpecs(product.group, product.specs).map(([key, value]) => (
-                <div key={key} className="flex justify-between gap-4 py-3 border-b border-gray-50">
-                  <span className="text-gray-500">{key}</span>
-                  <span className="font-medium text-gray-900 text-right">{value}</span>
-                </div>
-              ))}
+        {/* Specifications — canonical per-category order, with section headings. */}
+        {(() => {
+          const items = groupedSpecs(product.group, product.specs);
+          if (!items.some((i) => i.kind === 'row')) return null;
+          return (
+            <div className="mb-20">
+              <h2 className="text-2xl font-bold mb-8">{product.name.split(',')[0]} {t('detail.specs')}</h2>
+              <div className="max-w-2xl">
+                {items.map((item, i) =>
+                  item.kind === 'section' ? (
+                    <h3 key={`s-${i}`} className="font-bold text-lg text-gray-900 mt-8 first:mt-0 mb-1 pb-2 border-b-2 border-gray-100">
+                      {item.label}
+                    </h3>
+                  ) : (
+                    <div key={item.key} className="flex justify-between gap-6 py-3 border-b border-gray-50">
+                      <span className="text-gray-500">{item.key}</span>
+                      <span className="font-medium text-gray-900 text-right">{item.value}</span>
+                    </div>
+                  )
+                )}
+              </div>
             </div>
-          </div>
-        )}
+          );
+        })()}
       </main>
     </div>
   );

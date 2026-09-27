@@ -9,7 +9,9 @@
 // The `key` is both the admin label and the key stored in `specs` (French), so
 // it appears as-is on the storefront.
 
-export type SpecField = { key: string; type?: 'select'; options?: string[]; placeholder?: string };
+// `type: 'section'` is a visual group heading (e.g. "Écran & Affichage"), not a
+// stored value: it has no input and is never written to `specs`.
+export type SpecField = { key: string; type?: 'select' | 'section'; options?: string[]; placeholder?: string };
 
 export const SPEC_FIELDS: Record<string, SpecField[]> = {
   smartphones: [
@@ -28,12 +30,26 @@ export const SPEC_FIELDS: Record<string, SpecField[]> = {
     { key: 'Port de charge', type: 'select', options: ['USB Type-C', 'Lightning', 'Micro-USB'] },
   ],
   computers: [
-    { key: 'Processeur', placeholder: 'Intel Core i7 / Apple M3' },
-    { key: 'RAM', placeholder: '16 Go' },
-    { key: 'Stockage', placeholder: '512 Go SSD' },
-    { key: 'Écran', placeholder: '15,6 pouces' },
-    { key: 'Carte graphique', placeholder: 'RTX 4060' },
+    { key: 'État', type: 'select', options: ['Neuf', 'Reconditionné', 'Occasion'] },
+    { key: 'Processeur (CPU)', placeholder: 'Intel Core i5-1335U' },
+    { key: 'Carte graphique', placeholder: 'Radeon Graphics' },
+    { key: 'Fréquence de base', placeholder: '1.70 GHz' },
+    { key: 'Fréquence Turbo', placeholder: '3.60 GHz' },
+    { key: 'Mémoire RAM', placeholder: '8 Go DDR4 / DDR5' },
+    { key: 'Stockage', placeholder: '512 Go SSD NVMe' },
+    { key: 'Écran & Affichage', type: 'section' },
+    { key: 'Définition', type: 'select', options: ['HD', 'Full HD', '2.5K (QHD)', '4K UHD'] },
+    { key: 'Technologie de dalle', type: 'select', options: ['IPS', 'OLED', 'TN', 'VA'] },
+    { key: 'Tactile', type: 'select', options: ['Oui', 'Non'] },
+    { key: 'Clavier', placeholder: 'AZERTY, rétroéclairé' },
     { key: 'OS', placeholder: 'Windows 11' },
+    { key: 'Autonomie', placeholder: '+4 heures' },
+    { key: 'Connectivité & Réseau', type: 'section' },
+    { key: 'Ports USB', placeholder: 'USB-A ×2, USB-C (Thunderbolt 4)' },
+    { key: 'Sorties vidéo', placeholder: 'HDMI, DisplayPort' },
+    { key: 'Réseau', placeholder: 'Wi-Fi 6E, Bluetooth 5.3, RJ45' },
+    { key: 'Audio', placeholder: 'Prise combo casque/micro 3,5 mm' },
+    { key: 'Autres infos', placeholder: 'Livré avec sac…' },
   ],
   tablets: [
     { key: 'Processeur' },
@@ -79,4 +95,48 @@ export function orderedSpecs(
     const rb = rank.has(b) ? (rank.get(b) as number) : Number.MAX_SAFE_INTEGER;
     return ra - rb;
   });
+}
+
+export type SpecItem =
+  | { kind: 'section'; label: string }
+  | { kind: 'row'; key: string; value: string };
+
+/**
+ * Like orderedSpecs, but interleaves section headings from SPEC_FIELDS. A section
+ * is emitted only when at least one filled field follows it (empty sections are
+ * dropped). Filled keys not present in the reference list are appended at the end.
+ */
+export function groupedSpecs(
+  group: string | undefined,
+  specs: Record<string, string> | undefined | null
+): SpecItem[] {
+  if (!specs) return [];
+  const fields = (group && SPEC_FIELDS[group]) || [];
+  const known = new Set(fields.filter((f) => f.type !== 'section').map((f) => f.key));
+
+  const items: SpecItem[] = [];
+  let pendingSection: string | null = null;
+
+  for (const f of fields) {
+    if (f.type === 'section') {
+      pendingSection = f.key; // held back until a filled row appears under it
+      continue;
+    }
+    const value = specs[f.key];
+    if (value == null || String(value).trim() === '') continue;
+    if (pendingSection) {
+      items.push({ kind: 'section', label: pendingSection });
+      pendingSection = null;
+    }
+    items.push({ kind: 'row', key: f.key, value });
+  }
+
+  // Values stored under keys the reference list doesn't know about (e.g. older
+  // demo products) still deserve to show — appended, in their own order.
+  for (const [key, value] of Object.entries(specs)) {
+    if (!known.has(key) && value != null && String(value).trim() !== '') {
+      items.push({ kind: 'row', key, value });
+    }
+  }
+  return items;
 }
