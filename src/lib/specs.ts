@@ -32,9 +32,12 @@ export const SPEC_FIELDS: Record<string, SpecField[]> = {
   computers: [
     { key: 'État', type: 'select', options: ['Neuf', 'Reconditionné', 'Occasion'] },
     { key: 'Processeur (CPU)', placeholder: 'Intel Core i5-1335U' },
-    { key: 'Carte graphique', placeholder: 'Radeon Graphics' },
+    { key: 'Génération', placeholder: '11ᵉ génération' },
+    { key: 'Nombre de cœurs', placeholder: '10' },
+    { key: 'Processeurs logiques', placeholder: '12' },
     { key: 'Fréquence de base', placeholder: '1.70 GHz' },
     { key: 'Fréquence Turbo', placeholder: '3.60 GHz' },
+    { key: 'Carte graphique', placeholder: 'Radeon Graphics' },
     { key: 'Mémoire RAM', placeholder: '8 Go DDR4 / DDR5' },
     { key: 'Stockage', placeholder: '512 Go SSD NVMe' },
     { key: 'Écran & Affichage', type: 'section' },
