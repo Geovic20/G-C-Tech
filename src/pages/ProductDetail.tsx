@@ -66,7 +66,10 @@ export default function ProductDetail() {
   // Only the product's own image. The three Unsplash stock photos that used to
   // pad this gallery showed the same unrelated headphones/laptop on every
   // product page. A real gallery needs an `images text[]` column on `products`.
-  const images = [product.image];
+  // Main image first, then the gallery angles; drop blanks and duplicates.
+  const images = [product.image, ...(product.images ?? [])].filter(
+    (src, i, arr) => src && arr.indexOf(src) === i
+  );
 
   return (
     <div className="min-h-screen bg-white">

@@ -14,6 +14,8 @@ export interface Product {
   rating: number;
   reviews: number;
   image: string;
+  /** Additional gallery images (other angles), shown as thumbnails. */
+  images?: string[];
   category: string;
   /** High-level group matching a catalog page / route. */
   group: ProductGroup;

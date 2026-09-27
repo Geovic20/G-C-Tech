@@ -42,6 +42,7 @@ const EMPTY: ProductInput = {
   rating: 0,
   reviews: 0,
   image: '',
+  images: [],
   brand_id: null,
   category_id: '',
   type: '',
@@ -86,6 +87,28 @@ export default function AdminProducts() {
     }
     if (url) setForm((f) => ({ ...f, image: url }));
   };
+
+  const GALLERY_MAX = 5;
+  const handleGalleryFile = async (file?: File | null) => {
+    if (!file) return;
+    setError('');
+    setUploading(true);
+    const { url, error } = await uploadProductImage(file);
+    setUploading(false);
+    if (error) {
+      setError(
+        error === 'NOT_IMAGE'
+          ? (fr ? 'Le fichier doit être une image.' : 'The file must be an image.')
+          : error === 'TOO_LARGE'
+          ? (fr ? 'Image trop lourde (5 Mo maximum).' : 'Image too large (5MB maximum).')
+          : error
+      );
+      return;
+    }
+    if (url) setForm((f) => ({ ...f, images: [...f.images, url].slice(0, GALLERY_MAX) }));
+  };
+  const removeGalleryImage = (index: number) =>
+    setForm((f) => ({ ...f, images: f.images.filter((_, i) => i !== index) }));
 
   const load = async () => {
     setError('');
@@ -136,6 +159,7 @@ export default function AdminProducts() {
       rating: p.rating,
       reviews: p.reviews,
       image: p.image ?? '',
+      images: p.images ?? [],
       brand_id: p.brand_id,
       category_id: p.category_id,
       type: p.type ?? '',
@@ -465,6 +489,42 @@ export default function AdminProducts() {
                         <p className="text-[11px] text-gray-400">{fr ? 'JPG, PNG, WebP — 5 Mo max.' : 'JPG, PNG, WebP — 5MB max.'}</p>
                       </div>
                     </div>
+                  </Field>
+
+                  <Field label={fr ? 'Galerie (autres angles)' : 'Gallery (other angles)'}>
+                    <div className="flex flex-wrap gap-3">
+                      {form.images.map((url, i) => (
+                        <div key={i} className="relative w-20 h-20 bg-gray-50 border border-gray-100 rounded-xl overflow-hidden flex items-center justify-center">
+                          <img src={url} alt="" className="w-full h-full object-contain" />
+                          <button
+                            type="button"
+                            onClick={() => removeGalleryImage(i)}
+                            aria-label={fr ? 'Retirer' : 'Remove'}
+                            className="absolute top-1 right-1 w-5 h-5 bg-red-500 text-white rounded-full flex items-center justify-center shadow hover:bg-red-600"
+                          >
+                            <X size={12} />
+                          </button>
+                        </div>
+                      ))}
+                      {form.images.length < GALLERY_MAX && (
+                        <label className={`w-20 h-20 border-2 border-dashed rounded-xl flex flex-col items-center justify-center gap-1 transition-all ${uploading ? 'border-gray-100 text-gray-300 cursor-wait' : 'border-gray-200 text-gray-400 hover:border-[#007bff] hover:text-[#007bff] cursor-pointer'}`}>
+                          <Plus size={18} />
+                          <span className="text-[10px] font-bold">{uploading ? '…' : (fr ? 'Ajouter' : 'Add')}</span>
+                          <input
+                            type="file"
+                            accept="image/*"
+                            disabled={uploading}
+                            onChange={(e) => { handleGalleryFile(e.target.files?.[0]); e.target.value = ''; }}
+                            className="hidden"
+                          />
+                        </label>
+                      )}
+                    </div>
+                    <p className="text-[11px] text-gray-400 mt-2">
+                      {fr
+                        ? `Jusqu'à ${GALLERY_MAX} images en plus de l'image principale (le client les voit en miniatures).`
+                        : `Up to ${GALLERY_MAX} images in addition to the main image (shown as thumbnails).`}
+                    </p>
                   </Field>
 
                   <Field label={fr ? 'Prix (F)' : 'Price (F)'}>
