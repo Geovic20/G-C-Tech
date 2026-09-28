@@ -41,6 +41,7 @@ export const SPEC_FIELDS: Record<string, SpecField[]> = {
     { key: 'Mémoire RAM', placeholder: '8 Go DDR4 / DDR5' },
     { key: 'Stockage', placeholder: '512 Go SSD NVMe' },
     { key: 'Écran & Affichage', type: 'section' },
+    { key: "Taille de l'écran (pouces)", placeholder: '15.6' },
     { key: 'Définition', type: 'select', options: ['HD', 'Full HD', '2.5K (QHD)', '4K UHD'] },
     { key: 'Technologie de dalle', type: 'select', options: ['IPS', 'OLED', 'TN', 'VA'] },
     { key: 'Tactile', type: 'select', options: ['Oui', 'Non'] },
