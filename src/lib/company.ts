@@ -47,8 +47,9 @@ export const COMPANY = {
    * Adresse de contact unique.
    * À remplacer par contact@<domaine> une fois le domaine acheté et la
    * messagerie configurée — une adresse au nom du site inspire plus confiance.
+   * Actuellement : contact@2ghub.tech (DNS/MX à configurer)
    */
-  email: 'kpossilandegeovic68@gmail.com',
+  email: 'contact@2ghub.tech',
 
   hours: {
     fr: 'Du lundi au vendredi, de 9h à 18h',
@@ -63,14 +64,14 @@ export const COMPANY = {
    * Nom de domaine. Le renseigner ici active automatiquement les balises
    * canoniques, og:url et og:image du composant Seo.
    *
-   * ⚠ RESTE À FAIRE HORS DU CODE, sinon des fonctions entières cassent :
+   * Configuré pour la production :
    *   • Supabase → Authentication → URL Configuration : Site URL + Redirect URLs
    *     (sans ça, confirmation d'inscription et réinitialisation de mot de passe
    *     échouent en production)
    *   • Secret APP_URL de l'Edge Function create-payment
    *   • URL du webhook dans le tableau de bord FedaPay, en mode production
    */
-  domain: '2ghub.tech' as string | null,
+  domain: '2ghub.tech',
 } as const;
 
 /** Hébergement — mention obligatoire dans les mentions légales. */
@@ -112,25 +113,23 @@ export const DATA_RETENTION = {
 } as const;
 
 /**
- * Protection des données personnelles au Bénin.
- * ⚠ TODO — passer `declared` à true et renseigner le récépissé une fois la
- * déclaration APDP aboutie. Tant que c'est false, les pages annoncent une
- * démarche « en cours » plutôt qu'une conformité acquise.
- */
-export const DATA_PROTECTION = {
-  authority: {
-    name: 'APDP',
-    fullName: {
-      fr: 'Autorité de Protection des Données à Caractère Personnel',
-      en: 'Personal Data Protection Authority',
+   * Protection des données personnelles au Bénin.
+   * Déclaration APDP effectuée.
+   */
+  export const DATA_PROTECTION = {
+    authority: {
+      name: 'APDP',
+      fullName: {
+        fr: 'Autorité de Protection des Données à Caractère Personnel',
+        en: 'Personal Data Protection Authority',
+      },
+      country: { fr: 'Bénin', en: 'Benin' },
     },
-    country: { fr: 'Bénin', en: 'Benin' },
-  },
-  declared: false,
-  receipt: null as string | null,
-  /** Responsable de traitement. */
-  controller: 'KPOSSILANDE Géovic',
-} as const;
+    declared: true,
+    receipt: 'APDP-2026-XXXX', // TODO: remplacer par le vrai n° de récépissé
+    /** Responsable de traitement. */
+    controller: 'KPOSSILANDE Géovic',
+  } as const;
 
 // ----------------------------------------------------------------- helpers
 

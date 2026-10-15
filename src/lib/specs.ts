@@ -46,6 +46,8 @@ export const SPEC_FIELDS: Record<string, SpecField[]> = {
     { key: 'Technologie de dalle', type: 'select', options: ['IPS', 'OLED', 'TN', 'VA'] },
     { key: 'Tactile', type: 'select', options: ['Oui', 'Non'] },
     { key: 'Clavier', placeholder: 'AZERTY, rétroéclairé' },
+    { key: "Lecteur d'empreintes digitales", type: 'select', options: ['Oui', 'Non'] },
+    { key: 'Reconnaissance faciale', type: 'select', options: ['Oui', 'Non'] },
     { key: 'OS', placeholder: 'Windows 11' },
     { key: 'Autonomie', placeholder: '+4 heures' },
     { key: 'Connectivité & Réseau', type: 'section' },
